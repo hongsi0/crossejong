@@ -14,7 +14,8 @@ const gameRooms = {
     // criticalSection: true,
     // lastTurn:  "",
     // currentTurn: 0,
-    // deck = [0,1,2 ... 47]
+    // deck: [0,1,2 ... 47],
+    // difficulty:
   // }
 };
 
@@ -59,6 +60,7 @@ module.exports = (io) => {
         name: room,
         num: gameRooms[room].numPlayers,
         playing: gameRooms[room].playing,
+        difficulty: gameRooms[room].difficulty,
       }));
       roomlist.forEach((gameRoom) => {
         console.log(gameRooms[gameRoom]);
@@ -157,7 +159,7 @@ module.exports = (io) => {
         while(true) {
           roomInfo.turnCount++;
           let next = playerlist[(roomInfo.turnCount % playerlist.length)]
-          if(roomInfo.players[next].played) {
+          if(roomInfo.lastTurn != next) {
             roomInfo.currentTurn = next;
             io.to(roomKey).emit('nextTurn', roomInfo.currentTurn);
             io.to(roomKey).emit('currentPlayers', roomInfo.players);
@@ -283,21 +285,21 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("makeroom", (roomKey) => {
-      socket.join(roomKey);
-      const roomInfo = gameRooms[roomKey];
-      console.log("makeroom");
-      console.log("roomInfo", roomInfo);
+    socket.on("makeroom", (roomvalue) => {
+      socket.join(roomvalue.roomKey);
+      const roomInfo = gameRooms[roomvalue.roomKey];
       roomInfo.players[socket.id] = {
         playerId: socket.id,
         playerNickname: socket.nickname
       };
-
+      roomInfo.difficulty = roomvalue.difficulty;
       // update number of players
       roomInfo.numPlayers = Object.keys(roomInfo.players).length;
       roomInfo.playing = false;
 
       io.to(socket.id).emit("makeroom");
+      console.log("makeroom");
+      console.log("roomInfo", roomInfo);
     });
 
     socket.on("joinRoom", (roomKey) => {

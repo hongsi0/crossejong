@@ -35,6 +35,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("verificationFalseBox", "assets/image/verificationFalseBox.png");
         this.load.image("rightArrange", "assets/image/rightArrange.png");
         this.load.image("leftArrange", "assets/image/leftArrange.png");
+        this.load.image("myturnImage", "assets/image/myturn.png");
         this.load.image("가", "assets/cards/가.png");
         this.load.image("거", "assets/cards/거.png");
         this.load.image("고", "assets/cards/고.png");
@@ -114,6 +115,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("gameEnd");
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
+        scene.curruntTurn = "";
         scene.whetherObjection = false; // objection의 가능 여부를 나타낸다
         scene.word = ""; // 제출하는 단어
         scene.direction = "row"; // 자신의 card drop이 row인지 column인지를 나타낸다
@@ -459,6 +461,7 @@ export default class GameScene extends Phaser.Scene {
       
         // 게임 시작 후 1번째 turn을 부여받는다
         sharedData.socket.on("firstTurn", (id) => {
+            scene.curruntTurn = id;
             console.log("firstTurn");
             if (id === sharedData.socket.id) {
                 scene.myTurn = true;
@@ -467,11 +470,25 @@ export default class GameScene extends Phaser.Scene {
                 // timer를 재설정한다
                 scene.timeInSeconds = 30;
                 scene.timer.paused = false;
+                // Phaser 오브젝트 생성
+                let myturnImage = this.add.sprite(1050, 500, 'myturnImage');
+                myturnImage.setDepth(555);
+                // Tween 애니메이션 적용
+                scene.tweens.add({
+                targets: myturnImage,
+                alpha: 0, // 투명도를 0으로 조절하여 오브젝트가 서서히 사라지도록 함
+                duration: 3000, // 1초 동안 애니메이션을 실행함
+                onComplete: function (tween, targets, myturnImage) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                    myturnImage.destroy();
+                },
+                onCompleteParams: [myturnImage]
+                });
             }
         });
       
         // 2번째 turn부터 자신의 turn인지 확인한다
         sharedData.socket.on("nextTurn", (id) => {
+            scene.curruntTurn = id;
             if (id === sharedData.socket.id) {
                 scene.myTurn = true;
                 scene.dropped = false;
@@ -480,6 +497,19 @@ export default class GameScene extends Phaser.Scene {
                 // timer를 재설정한다
                 scene.timeInSeconds = 30;
                 scene.timer.paused = false;
+                // Phaser 오브젝트 생성
+                let myturnImage = this.add.sprite(1050, 500, 'myturnImage');
+                myturnImage.setDepth(555);
+                // Tween 애니메이션 적용
+                scene.tweens.add({
+                targets: myturnImage,
+                alpha: 0, // 투명도를 0으로 조절하여 오브젝트가 서서히 사라지도록 함
+                duration: 3000, // 1초 동안 애니메이션을 실행함
+                onComplete: function (tween, targets, myturnImage) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                    myturnImage.destroy();
+                },
+                onCompleteParams: [myturnImage]
+                });
             }
 
         });
@@ -718,30 +748,37 @@ export default class GameScene extends Phaser.Scene {
             scene.players = players;
           
             Object.keys(scene.players).forEach((playerkey) => {
-              const playerbox = document.createElement("div");
-              playerbox.setAttribute("class", "playerbox");
-              const textinbox = document.createElement("p");
-              textinbox.setAttribute("class", "game_nickname");
-              const playerNick = document.createTextNode(scene.players[playerkey].playerNickname);
-              if(scene.myTurn && sharedData.socket.id === playerkey) {
-                playerNick.textContent = `${scene.players[playerkey].playerNickname}✔︎`;
-              }
-              const announce_card_text = document.createTextNode("남아있는 카드수");
-              const num_card = document.createTextNode(scene.players[playerkey].card);
-              const lineBreak1 = document.createElement("br");
-              const lineBreak2 = document.createElement("br");
-              textinbox.appendChild(playerNick);
-              textinbox.appendChild(lineBreak1); // 새로운 줄에 추가
-              textinbox.appendChild(announce_card_text)
-              textinbox.appendChild(lineBreak2); // 새로운 줄에 추가
-              textinbox.appendChild(num_card)
-              playerbox.appendChild(textinbox);
-              player_list.appendChild(playerbox);
+                const playerbox = document.createElement("div");
+                if(scene.curruntTurn === playerkey) {
+                    playerbox.setAttribute("class", "playerbox_myturn");
+                } else {
+                    playerbox.setAttribute("class", "playerbox");
+                }
+                const textinbox = document.createElement("p");
+                textinbox.setAttribute("class", "game_nickname");
+                const playerNick = document.createTextNode(scene.players[playerkey].playerNickname);
+                playerNick.textContent = scene.players[playerkey].playerNickname;
+                const announce_card_text = document.createTextNode("남아있는 카드수");
+                const num_card = document.createTextNode(scene.players[playerkey].card);
+                const lineBreak1 = document.createElement("br");
+                const lineBreak2 = document.createElement("br");
+                textinbox.appendChild(playerNick);
+                textinbox.appendChild(lineBreak1); // 새로운 줄에 추가
+                textinbox.appendChild(announce_card_text);
+                textinbox.appendChild(lineBreak2); // 새로운 줄에 추가
+                textinbox.appendChild(num_card);
+                playerbox.appendChild(textinbox);
+                player_list.appendChild(playerbox);
             });
         }
           
         sharedData.socket.on("currentPlayers", updatePlayerList);
-        sharedData.socket.on("disconnected", updatePlayerList);
+        sharedData.socket.on("disconnected", (players) => {
+            if (Object.keys(players).length == 1){
+                sharedData.socket.emit("nextTurn", sharedData.roomKey);
+            }
+            updatePlayerList(players)
+        });
         sharedData.socket.on("currentCardUpdate",updatePlayerList);
       
         sharedData.socket.on("tok", (time) => {

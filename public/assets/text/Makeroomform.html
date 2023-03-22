@@ -5,15 +5,8 @@
         font-weight: normal;
     }
 
-    .image-container {
-        position: relative;
-        display: inline-block;
-    }
-
     .text-overlay {
         position: absolute;
-        padding: 10px;
-        left: 50px;
     }
 
     .input-overlay {
@@ -25,7 +18,7 @@
         background-color: transparent;
         color: #3a2a24;
         font-family: "BR-R";
-        font-size: 35px;
+        font-size: 50px;
         padding: 0;
     }
 
@@ -34,25 +27,25 @@
     }
 
     #roomname {
-        top: 125px;
-        width: 140px;
+        top: 90px;
+        width: 170px;
+    }
+
+    #roomname_input {
+        top: 85px;
     }
 
     #password {
-        top: 225px;
-        width: 140px;
+        top: 215px;
+        width: 170px;
+    }
+
+    #password_input {
+        top: 210px;
     }
 
     #level {
         top: 325px;
-    }
-
-    #roomname_input {
-        top: 125px;
-    }
-
-    #password_input {
-        top: 225px;
     }
 
     input {
@@ -60,9 +53,53 @@
         padding: 10px;
         border: 0px;
     }
+
+    #difficultychoice {
+        position: inherit;
+
+    }
+    
+    #basicButton {
+        position: absolute;
+        top: 430px;
+        left: 20px;
+    }
+
+    #normalButton {
+        position: absolute;
+        top: 430px;
+        left: 280px;
+    }
+
+    #hardButton {
+        position: absolute;
+        top: 430px;
+        left: 540px;
+    }
+    
+    #makeButton {
+        position: absolute;
+        top: 570px;
+    }
+
+    #exitButton {
+        position: absolute;
+        top: 570px;
+        left: 450px;
+    }
+    
+    img {
+        scale:1.1;
+    }
+
+    #background {
+        scale: 1.3;
+    }
+
 </style>
 
-<div class="image-container">
+<div id="image-container">
+    <img id="background" src="assets/image/createRoom.png">
     <div class="text-overlay" id="roomname">
         <a>방이름</a>
     </div>
@@ -78,10 +115,10 @@
     <div class="text-overlay" id="level">
         <a>난이도 설정</a>
     </div>
-    <div id="basicButton"></div>
-    <div id="normalButton"></div>
-    <div id="hardButton"></div>
-    <div id="makeButton"></div>
-    <div id="exitButton"></div>
+    <div id="basicButton"><img src="assets/image/초급(N).png"></div>
+    <div id="normalButton"><img src="assets/image/중급(N).png"></div>
+    <div id="hardButton"><img src="assets/image/고급(N).png"></div>
+    <div id="makeButton"><img src="assets/image/방만들기(N).png"></div>
+    <div id="exitButton"><img src="assets/image/취소(N).png"></div>
 </div>
   

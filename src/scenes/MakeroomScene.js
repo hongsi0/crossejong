@@ -7,119 +7,228 @@ export default class MakeroomScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("createRoom", "assets/image/createRoom.png");
-    this.load.image("makeroomN", "assets/image/방만들기(N).png");
-    this.load.image("makeroomY", "assets/image/방만들기(Y).png");
-    this.load.image("hardN", "assets/image/고급(N).png");
-    this.load.image("hardY", "assets/image/고급(Y).png");
-    this.load.image("normalN", "assets/image/중급(N).png");
-    this.load.image("normalY", "assets/image/중급(Y).png");
-    this.load.image("basicN", "assets/image/초급(N).png");
-    this.load.image("basicY", "assets/image/초급(Y).png");
-    this.load.image("cancelN", "assets/image/취소(N).png");
-    this.load.image("cancelY", "assets/image/취소(Y).png");
     this.load.html("Makeroomform", "assets/text/Makeroomform.html");
   }
   create() {
     const scene = this;
-
-    //BACKGROUND
-    scene.add.image(520, 250, "createRoom").setOrigin(0);
 
     //socket event 초기화
     sharedData.socket.removeAllListeners("RoomkeyNotValid");
     sharedData.socket.removeAllListeners("RoomkeyIsValid");
     sharedData.socket.removeAllListeners("createRoomed");
     
-    scene.makeroomform = scene.add.dom(530,210).setOrigin(0,0).createFromCache("Makeroomform");
+    let difficulty = "";
+    let isMouseOver = false;
 
-    scene.basiccheck = 0
-    scene.normalcheck = 0
-    scene.hardcheck = 0
+    scene.makeroomform = scene.add.dom(530, 210).setOrigin(0, 0).createFromCache("Makeroomform");
+    const input = scene.makeroomform.getChildByID("input_roomname");
+    const basicButton = scene.makeroomform.getChildByID("basicButton");
+    const normalButton = scene.makeroomform.getChildByID("normalButton");
+    const hardButton = scene.makeroomform.getChildByID("hardButton");
+    const makeButton = scene.makeroomform.getChildByID("makeButton");
+    const exitButton = scene.makeroomform.getChildByID("exitButton");
 
-    //basic
-    const basicImage = scene.add.image(570, 650, 'basicN')
-    .setOrigin(0)
-    .setDepth(100)
-    .setInteractive()
-    .on("pointerdown", () => {
-      scene.basiccheck=1;
-      basicImage.setTexture("basicY");
-      if(scene.normalcheck) {
-        scene.normalcheck = 0;
-        normalImage.setTexture("normalN");
-      } else if(scene.hardcheck) {
-        scene.hardcheck = 0;
-        hardImage.setTexture("hardN");
+    basicButton.addEventListener("click", (event) => {
+      difficulty = "초급";
+      while (basicButton.firstChild) {
+        basicButton.removeChild(basicButton.firstChild);
       }
-    });
+      const newButton = document.createElement("img");
+      newButton.src = "assets/image/초급(Y).png";
+      basicButton.appendChild(newButton);
 
-    //normal
-    const normalImage = scene.add.image(810, 650, 'normalN')
-    .setOrigin(0)
-    .setDepth(100)
-    .setInteractive()
-    .on("pointerdown", () => {
-      scene.normalcheck=1;
-      normalImage.setTexture("normalY");
-      if(scene.basiccheck) {
-        scene.basiccheck = 0;
-        basicImage.setTexture("basicN");
-      } else if(scene.hardcheck) {
-        scene.hardcheck = 0;
-        hardImage.setTexture("hardN");
+      while (normalButton.firstChild) {
+        normalButton.removeChild(normalButton.firstChild);
       }
-    });
-
-    //hard
-    const hardImage = scene.add.image(1050, 650, 'hardN')
-    .setOrigin(0)
-    .setDepth(100)
-    .setInteractive()
-    .on("pointerdown", () => {
-      scene.hardcheck=1;
-      hardImage.setTexture("hardY");
-      if(scene.normalcheck) {
-        scene.normalcheck = 0;
-        normalImage.setTexture("normalN");
-      } else if(scene.basiccheck) {
-        scene.basiccheck = 0;
-        basicImage.setTexture("basicN");
+      const normalimg = document.createElement("img");
+      normalimg.src = "assets/image/중급(N).png";
+      normalButton.appendChild(normalimg);
+      while (hardButton.firstChild) {
+        hardButton.removeChild(hardButton.firstChild);
       }
+      const hardimg = document.createElement("img");
+      hardimg.src = "assets/image/고급(N).png";
+      hardButton.appendChild(hardimg);
     });
 
-    //makeroom
-    const makeroomImage = scene.add.image(560, 750, 'makeroomN')
-    .setOrigin(0)
-    .setDepth(100)
-    .setInteractive()
-    .on('pointerover', () => {
-      makeroomImage.setTexture("makeroomY");
-    })
-    .on("pointerout", ()=> {
-      makeroomImage.setTexture("makeroomN");
-    })
-    .on("pointerdown", () => {
-      const input = scene.makeroomform.getChildByID("input_roomname");
-      console.log(input.value);
-      sharedData.socket.emit("RoomKeyValid", input.value);
-    });
-
-    //makeroom
-    const cancelImage = scene.add.image(920, 750, 'cancelN')
-    .setOrigin(0)
-    .setDepth(100)
-    .setInteractive()
-    .on('pointerover', () => {
-      cancelImage.setTexture("cancelY");
-    })
-    .on("pointerout", ()=> {
-      cancelImage.setTexture("cancelN");
-    })
-    .on("pointerdown", () => {
-      scene.scene.stop("MakeroomScene");
+    basicButton.addEventListener("mouseover", (event) => {
+      if(!isMouseOver && difficulty != "초급"){
+        while (basicButton.firstChild) {
+          basicButton.removeChild(basicButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/초급(Y).png";
+        basicButton.appendChild(newButton);
+        isMouseOver = true;
+      }
     });
     
+    basicButton.addEventListener("mouseleave", (event) => {
+      if (isMouseOver && difficulty != "초급") {
+        while (basicButton.firstChild) {
+          basicButton.removeChild(basicButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/초급(N).png";
+        basicButton.appendChild(newButton);
+        isMouseOver = false
+      }
+    });
+
+    normalButton.addEventListener("click", (event) => {
+      difficulty = "중급";
+      while (normalButton.firstChild) {
+        normalButton.removeChild(normalButton.firstChild);
+      }
+      const newButton = document.createElement("img");
+      newButton.src = "assets/image/중급(Y).png";
+      normalButton.appendChild(newButton);
+
+      while (basicButton.firstChild) {
+        basicButton.removeChild(basicButton.firstChild);
+      }
+      const basicimg = document.createElement("img");
+      basicimg.src = "assets/image/초급(N).png";
+      basicButton.appendChild(basicimg);
+
+      while (hardButton.firstChild) {
+        hardButton.removeChild(hardButton.firstChild);
+      }
+      const hardimg = document.createElement("img");
+      hardimg.src = "assets/image/고급(N).png"; 
+      hardButton.appendChild(hardimg);
+    });
+    
+    normalButton.addEventListener("mouseover", (event) => {
+      if(!isMouseOver && difficulty != "중급"){
+        while (normalButton.firstChild) {
+          normalButton.removeChild(normalButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/중급(Y).png";
+        normalButton.appendChild(newButton);
+        isMouseOver = true;
+      }
+    });
+    
+    normalButton.addEventListener("mouseleave", (event) => {
+      if (isMouseOver && difficulty != "중급") {
+        while (normalButton.firstChild) {
+          normalButton.removeChild(normalButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/중급(N).png";
+        normalButton.appendChild(newButton);
+        isMouseOver = false
+      }
+    });
+
+    hardButton.addEventListener("click", (event) => {
+      difficulty = "고급";
+      while (hardButton.firstChild) {
+        hardButton.removeChild(hardButton.firstChild);
+      }
+      const newButton = document.createElement("img");
+      newButton.src = "assets/image/고급(Y).png";
+      hardButton.appendChild(newButton);
+
+      while (basicButton.firstChild) {
+        basicButton.removeChild(basicButton.firstChild);
+      }
+      const basicimg = document.createElement("img");
+      basicimg.src = "assets/image/초급(N).png";
+      basicButton.appendChild(basicimg);
+      while (normalButton.firstChild) {
+        normalButton.removeChild(normalButton.firstChild);
+      }
+      const normalimg = document.createElement("img");
+      normalimg.src = "assets/image/중급(N).png";
+      normalButton.appendChild(normalimg);
+    });
+
+    hardButton.addEventListener("mouseover", (event) => {
+      if(!isMouseOver && difficulty != "고급"){
+        while (hardButton.firstChild) {
+          hardButton.removeChild(hardButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/고급(Y).png";
+        hardButton.appendChild(newButton);
+        isMouseOver = true;
+      }
+    });
+    
+    hardButton.addEventListener("mouseleave", (event) => {
+      if (isMouseOver && difficulty != "고급") {
+        while (hardButton.firstChild) {
+          hardButton.removeChild(hardButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/고급(N).png";
+        hardButton.appendChild(newButton);
+        isMouseOver = false
+      }
+    });
+
+    makeButton.addEventListener("mouseover", (event) => {
+      if(!isMouseOver){
+        while (makeButton.firstChild) {
+          makeButton.removeChild(makeButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/방만들기(Y).png";
+        makeButton.appendChild(newButton);
+        isMouseOver = true;
+      }
+    });
+    
+    makeButton.addEventListener("mouseleave", (event) => {
+      if (isMouseOver) {
+        while (makeButton.firstChild) {
+          makeButton.removeChild(makeButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/방만들기(N).png";
+        makeButton.appendChild(newButton);
+        isMouseOver = false
+      }
+    });
+
+    makeButton.addEventListener("click", (event) => {
+      if(difficulty != "" && input.value != ""){
+        sharedData.socket.emit("RoomKeyValid", (input.value));
+      }
+    });
+
+    exitButton.addEventListener("mouseover", (event) => {
+      if(!isMouseOver){
+        while (exitButton.firstChild) {
+          exitButton.removeChild(exitButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/취소(Y).png";
+        exitButton.appendChild(newButton);
+        isMouseOver = true;
+      }
+    });
+    
+    exitButton.addEventListener("mouseleave", (event) => {
+      if (isMouseOver) {
+        while (exitButton.firstChild) {
+          exitButton.removeChild(exitButton.firstChild);
+        }
+        const newButton = document.createElement("img");
+        newButton.src = "assets/image/취소(N).png";
+        exitButton.appendChild(newButton);
+        isMouseOver = false
+      }
+    });
+    
+    exitButton.addEventListener("click", (event) => {
+      scene.scene.resume("RoomScene");
+      scene.scene.sleep("MakeroomScene");
+    });
+
     sharedData.socket.on("RoomkeyNotValid", function (input) {
       sharedData.socket.emit("createRoom", input);
     });
@@ -127,10 +236,10 @@ export default class MakeroomScene extends Phaser.Scene {
       console.log("이미 존재하는 방이름입니다.");
     });
     sharedData.socket.on("createRoomed", (roomKey) =>{
-      sharedData.socket.emit("makeroom", roomKey);
+      sharedData.socket.emit("makeroom", {roomKey:roomKey, difficulty:difficulty});
       sharedData.roomKey = roomKey;
-      scene.scene.stop("MakeroomScene");
       scene.scene.resume("RoomScene");
+      scene.scene.sleep("MakeroomScene");
     })
   }
 }

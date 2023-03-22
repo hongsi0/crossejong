@@ -33,7 +33,7 @@ export default class RoomScene extends Phaser.Scene {
 
     //BACKGROUND
     scene.add.image(0, 0, "background").setOrigin(0);
-  
+    
     //LOGO
     const logo_image = scene.add.image(200,100, "logo").setOrigin(0).setDepth(100);
     logo_image.scale = 1.2; //resize the logo
@@ -51,7 +51,7 @@ export default class RoomScene extends Phaser.Scene {
       makeroomImage.setTexture("makeroomN");
     })
     .on("pointerdown", () => {
-      if(scene.nickname != undefined){
+      if(scene.nickname != undefined || sharedData.userNick != ""){
         console.log("makeroomclick");
         scene.scene.pause("RoomScene");
         scene.scene.launch("MakeroomScene");
@@ -90,22 +90,28 @@ export default class RoomScene extends Phaser.Scene {
 
     //nickname
     scene.nameform = scene.add.dom(1600, 150).createFromCache("nameform");
-    scene.nameform.addListener("click");
-    scene.nameform.addListener("submit");
-    scene.nameform.on("click", function (event) {
-      event.preventDefault();
-      if (event.target.name === "username") {
+    if (sharedData.userNick == "") {
+      scene.nameform.addListener("click");
+      scene.nameform.addListener("submit");
+      scene.nameform.on("click", function (event) {
+        event.preventDefault();
+        if (event.target.name === "username") {
+          const input = scene.nameform.getChildByName("name-form");
+          sharedData.socket.emit("nickname", input.value);
+          sharedData.userNick = input.value
+          input.value = "";
+        }
+      });
+      scene.nameform.on("submit", function (event) {
+        event.preventDefault();
         const input = scene.nameform.getChildByName("name-form");
         sharedData.socket.emit("nickname", input.value);
         input.value = "";
-      }
-    });
-    scene.nameform.on("submit", function (event) {
-      event.preventDefault();
-      const input = scene.nameform.getChildByName("name-form");
-      sharedData.socket.emit("nickname", input.value);
-      input.value = "";
-    });
+      });
+    } else{
+      scene.nameform.setText(`이름: ${sharedData.userNick}`);
+    }
+    
 
     sharedData.socket.on("nickname", (nickname) => {
       //player name
@@ -136,6 +142,9 @@ export default class RoomScene extends Phaser.Scene {
         playerNumDiv.setAttribute("class", "playerNumDiv");
         const enterDiv = document.createElement("div");
         enterDiv.setAttribute("class", "enterDiv");
+
+        const roomdifficulty = document.createTextNode(room.difficulty);
+        levelDiv.appendChild(roomdifficulty);
         
         const roomName = document.createTextNode(room.name);
         roomTitleDiv.appendChild(roomName);
@@ -150,7 +159,7 @@ export default class RoomScene extends Phaser.Scene {
   
         button.addEventListener("click", (event) => {
           event.preventDefault();
-          if(scene.nickname != undefined) {
+          if(scene.nickname != undefined || sharedData.userNick != "") {
             if(room.playing === false) {//방에서 게임을 안하고 있을때
               if(room.num < 4) {
                 sharedData.socket.emit("isKeyValid", room.name);

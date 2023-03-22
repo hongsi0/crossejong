@@ -42,17 +42,6 @@ export class Game extends Phaser.Game {
     // << START GAME WITH MAIN SCENE HERE >>
     this.scene.start("RoomScene");
   }
-
-  switchScene(newScene) {
-    // Stop the current scene
-    this.scene.stop(this.currentScene);
-
-    // Start the new scene
-    this.scene.start(newScene);
-
-    // Update the current scene
-    this.currentScene = newScene;
-  }
 }
 // Create new instance of game
 window.onload = function () {

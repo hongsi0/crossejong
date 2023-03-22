@@ -10,13 +10,29 @@ export default class GameRoomScene extends Phaser.Scene {
   preload() {
     this.load.image("background", "assets/image/background.png");
     this.load.image("logo", "assets/image/logo.png");
-    this.load.image("startbutton", "assets/image/okButton.png");
-    this.load.image("outbutton", "assets/image/okButton.png");
+    this.load.image("startbutton", "assets/image/startButton.png");
+    this.load.image("outbutton(N)", "assets/image/out(N).png");
+    this.load.image("outbutton(Y)", "assets/image/out(Y).png");
+    this.load.image("roomnameBar", "assets/image/lastWordBar.png");
     this.load.html("playerlistform", "assets/text/playerlistform.html");
     this.load.html("chatform", "assets/text/chatform.html");
   }
   create() {
     const scene = this;
+
+    function loadFont(name,url) {
+      var newFont = new FontFace(name, `url(${url})`);
+      newFont.load().then(function (loaded) {
+          document.fonts.add(loaded);
+      }).catch(function (error) {
+          return error;
+      });
+    }
+
+    loadFont("BR-R","assets/fonts/BR-R.otf");
+
+
+    let isMouseOver = false;
 
     //socket event 초기화
     sharedData.socket.removeAllListeners("Playerupdate");
@@ -24,19 +40,30 @@ export default class GameRoomScene extends Phaser.Scene {
     sharedData.socket.removeAllListeners("chat");
     
     scene.players = [];
+    let WordStyle = {font: "60px BR-R", fill: "black"};
   
     //BACKGROUND
     scene.add.image(0, 0, "background").setOrigin(0);
   
     //LOGO
     scene.logo = scene.add.sprite(200, 120, "logo");
+    scene.roomnameBar = scene.add.sprite(990, 100, "roomnameBar");
+    scene.roomnameBar.setScale(0.85);
+    scene.roomname = scene.add.text(550, 100, `방 ${sharedData.roomKey}`, WordStyle);
+    scene.roomname.setOrigin(0.5, 0.5);
   
-    const outbuttonImage = scene.add.image(1550, 800, 'outbutton')
+    const outbuttonImage = scene.add.image(1600, 800, 'outbutton(N)')
     .setOrigin(0)
     .setDepth(100)
-    .setScale(1.2)
+    .setScale(0.6)
     .setInteractive()
-    .on('pointerdown', function () {
+    .on('pointerover', () => {
+      outbuttonImage.setTexture("outbutton(Y)");
+    })
+    .on('pointerout', () =>{
+      outbuttonImage.setTexture("outbutton(N)");
+    })
+    .on('pointerdown', () => {
       console.log("click");
       sharedData.socket.emit("outRoom", sharedData.roomKey);
       scene.scene.start('RoomScene');
@@ -66,10 +93,10 @@ export default class GameRoomScene extends Phaser.Scene {
         player_list.appendChild(playerbox);
       });
       if(Object.keys(scene.players).length >= 2) {
-        const startbuttonImage = scene.add.image(1550, 600, 'startbutton')
+        const startbuttonImage = scene.add.image(1600, 400, 'startbutton')
         .setOrigin(0)
         .setDepth(100)
-        .setScale(1.2)
+        .setScale(0.7)
         .setInteractive()
         .on('pointerdown', function () {
           console.log("startclick");
@@ -83,7 +110,7 @@ export default class GameRoomScene extends Phaser.Scene {
     });
   
     //chat
-    scene.inputElement = scene.add.dom(940, 620).createFromCache("chatform");
+    scene.inputElement = scene.add.dom(940, 580).createFromCache("chatform");
     const chatlist = scene.inputElement.getChildByID("chat-messages");
   
     scene.inputElement.addListener("click");
