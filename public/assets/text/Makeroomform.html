@@ -1,0 +1,87 @@
+<style>
+    @font-face {
+        font-family: "BR-R";
+        src: url("assets/fonts/BR-R.otf") format("opentype");
+        font-weight: normal;
+    }
+
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .text-overlay {
+        position: absolute;
+        padding: 10px;
+        left: 50px;
+    }
+
+    .input-overlay {
+        position: absolute;
+        left: 200px;
+    }
+
+    a, input {
+        background-color: transparent;
+        color: #3a2a24;
+        font-family: "BR-R";
+        font-size: 35px;
+        padding: 0;
+    }
+
+    input::placeholder {
+        color: #9b8573;
+    }
+
+    #roomname {
+        top: 125px;
+        width: 140px;
+    }
+
+    #password {
+        top: 225px;
+        width: 140px;
+    }
+
+    #level {
+        top: 325px;
+    }
+
+    #roomname_input {
+        top: 125px;
+    }
+
+    #password_input {
+        top: 225px;
+    }
+
+    input {
+        width: 500px;
+        padding: 10px;
+        border: 0px;
+    }
+</style>
+
+<div class="image-container">
+    <div class="text-overlay" id="roomname">
+        <a>방이름</a>
+    </div>
+    <div class="input-overlay" id="roomname_input">
+        <input type="text" placeholder="이름을 입력하세요" id="input_roomname">
+    </div>
+    <div class="text-overlay" id="password">
+        <a>비밀번호</a>
+    </div>
+    <div class="input-overlay" id="password_input">
+        <input type="text" placeholder="(선택) 비밀번호를 설정하세요">
+    </div>
+    <div class="text-overlay" id="level">
+        <a>난이도 설정</a>
+    </div>
+    <div id="basicButton"></div>
+    <div id="normalButton"></div>
+    <div id="hardButton"></div>
+    <div id="makeButton"></div>
+    <div id="exitButton"></div>
+</div>
+  

@@ -1,0 +1,47 @@
+<style>
+    @font-face {
+        font-family: "BR-R";
+        src: url("assets/fonts/BR-R.otf") format("opentype");
+        font-weight: normal;
+    }
+
+    .playerbox {
+        position: relative;
+        background-color: #f3e3d5;
+        border: solid 5px;
+        border-color: #7e5a44;
+        border-radius: 20px;
+
+        width: 320px;
+        height: 180px;
+        margin: 10px;
+        margin-bottom: 20px;
+    }
+
+    .game_nickname {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%,-50%);
+        color: #523b33;
+        font-size: 40px;
+        white-space: nowrap; /* 자동줄바꿈 해제 */
+        text-align: center;
+        font-family: "BR-R";
+        line-height: 130%; /* <br> 간격 조정 */
+    }
+
+    .room_nickname {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%,-50%);
+        color: #523b33;
+        font-size: 50px;
+        white-space: nowrap; /* 자동줄바꿈 해제 */
+        text-align: center;
+        font-family: "BR-R";
+        line-height: 130%; /* <br> 간격 조정 */
+    }
+</style>
+
+<div id="player_list">
+</div>

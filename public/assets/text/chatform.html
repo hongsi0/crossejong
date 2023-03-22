@@ -1,0 +1,50 @@
+<style>
+    #chat-container {
+    /*position: absolute;
+    bottom: 0;*/
+    width: 1000px;
+    height: 700px;
+    background-color: #fff;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    }
+
+    #chat-messages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    overflow-y: scroll;
+    font-size: 25px;
+    }
+
+    #chat-form {
+    display: flex;
+    height: 40px;
+    margin: 10px;
+    }
+
+    #chat-input {
+    flex: 1;
+    margin-right: 10px;
+    font-size: 25px;
+    }
+
+    #chat-form button {
+    width: 80px;
+    }
+    
+    #sendchat {
+        font-size: 25px;
+    }
+
+</style>
+
+<div id="chat-container">
+    <ul id="chat-messages"></ul>
+    <form id="chat-form">
+        <input type="text" id="chat-input" placeholder="메시지를 입력하세요" autocomplete="off" />
+        <button type="submit" id="sendchat" name="sendchat">전송</button>
+    </form>
+</div>
