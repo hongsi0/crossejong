@@ -151,11 +151,39 @@ export default class RoomScene extends Phaser.Scene {
   
         const roomNum = document.createTextNode(`${room.num}/4`);
         playerNumDiv.appendChild(roomNum);
-  
-        const button = document.createElement('button');
-        const buttonText = document.createTextNode('입장');
+
+        const button = document.createElement("button");
+        button.setAttribute("class", "enterButton");
+        const buttonText = document.createTextNode("입장");
         button.appendChild(buttonText);
         enterDiv.appendChild(button);
+
+        const color = {
+          red: "#d73637",
+          yellow: "#f39f3b",
+          blue: "#09398e"
+        };
+
+        switch(room.difficulty) {
+          case "초급":
+            levelDiv.style.backgroundColor = color.red;
+            roomTitleDiv.style.color = color.red;
+            playerNumDiv.style.color = color.red;
+            button.style.backgroundColor = color.red;
+            break
+          case "중급":
+            levelDiv.style.backgroundColor = color.yellow;
+            roomTitleDiv.style.color = color.yellow;
+            playerNumDiv.style.color = color.yellow;
+            button.style.backgroundColor = color.yellow;
+            break
+          case "고급":
+            levelDiv.style.backgroundColor = color.blue;
+            roomTitleDiv.style.color = color.blue;
+            playerNumDiv.style.color = color.blue;
+            button.style.backgroundColor = color.blue;
+            break
+        };
   
         button.addEventListener("click", (event) => {
           event.preventDefault();

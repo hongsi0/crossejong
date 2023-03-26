@@ -4,6 +4,12 @@
         src: url("assets/fonts/BR-R.otf") format("opentype");
         font-weight: normal;
   }
+  @font-face {
+        font-family: "BR-B";
+        src: url("assets/fonts/BR-B.otf") format("opentype");
+        font-weight: normal;
+  }
+  
 
   div{
     font-family: "BR-R";
@@ -18,9 +24,10 @@
     list-style-type: none;
     overflow-y: scroll;
     top: -50px;
-    left: -70px;
-    z-index: 1;
+    left: -80px;
+    z-index: 0;
   }
+
   #listview::before{
     content: "";
     width: 100%;
@@ -29,73 +36,98 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: -1;
     opacity: 0.5;
+    z-index: -1;
   }
 
   #listview li {
     margin-left: 30px;
     margin-top: 30px;
-    width: 550px;
+    display: inline;
     float: left;
     left: 50%;
   } 
 
   .box {
-    background-color: #eee;
-    width: 500px;
+    position: absolute;
+    background-color: white;
+    width: 550px;
     height: 180px;
 
-    border: solid black;
+    border: solid 0px transparent;
     border-radius: 20px;
     overflow: hidden;
   }
 
-  p {
-    position: absolute;
-    left: 50%;top: 50%;
-    transform: translate(-50%,-50%);
-  }
-
   .levelDiv {
     position: relative;
-    background-color: aqua;
-    height: inherit;
-    width: 25%;
+    height: 160px;
+    width: 100px;
     float: left;
-    border-right: solid black;
+    border: solid 0px transparent;
+    border-radius: 20px 0px 0px 20px;
+    display : flex;
+    justify-content : center;
+    /* align-items: flex-start; */
+    padding-top: 20px;
+    color: white;
+    /* font-family: "BR-B"; */
   }
 
   .roomTitleDiv {
     position: relative;
-    background-color: orange;
-    height: 50%;
-    width: 74%;
+    border: solid 0px transparent;
+    border-top-right-radius: 20px;
+    height: 90px;
+    width: 380px;
     float: left;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
   }
 
   .playerNumDiv {
     position: relative;
-    background-color: skyblue;
-    height: 50%;
-    width: 34%;
+    border: solid 0px white;
+    height: 70px;
+    width: 200px;
     float: left;
+    display: flex;
+    justify-content : flex-start;
+    align-items: flex-end;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    font-size: 40px;
   }
 
   .enterDiv {
     position: relative;
-    height: 50%;
-    width: 40%;
-    float: left;
+    float: right;
+    height: 90px;
+    width: 200px;
+    border: solid 0px transparent;
+    border-bottom-right-radius: 20px;
+    z-index: 1;
+
+    display: flex;
+    justify-content : flex-end;
+    align-items: center;
+    margin-right: 20px;
   }
 
   .enterButton {
-    background-color: pink;
-    height: 100%;
-    width: 100%;
-    border-radius: 20px;
     font-family: "BR-R";
+    font-size: 50px;
+    border: solid 0px transparent;
+    border-radius: 20px;
+    color: white;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 5px;
   }
+
 </style>
 
 
@@ -103,13 +135,10 @@
   <!-- <li>
     <div class="box">
       <div class="levelDiv">
-        <p></p>
       </div>
       <div class="roomTitleDiv">
-        <p>1</p>
       </div>
       <div class="playerNumDiv">
-        <p></p>
       </div>
       <div class="enterDiv">
         <button type="button" class="enterButton">입장</button>
