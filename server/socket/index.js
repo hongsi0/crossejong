@@ -209,6 +209,7 @@ module.exports = (io) => {
 
     socket.on('objection', (roomKey, id) => {
       const roomInfo = gameRooms[roomKey];
+      io.to(roomKey).emit("objection");
       if (roomInfo.criticalSection)
           roomInfo.criticalSection = false;
       else

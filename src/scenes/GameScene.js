@@ -90,6 +90,13 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("여", "assets/cards/여.png");
         this.load.image("믕", "assets/cards/믕.png");
         this.load.image("으", "assets/cards/으.png");
+        this.load.audio("카드클릭", "assets/sound/딸깍.mp3");
+        this.load.audio("카드내려놓기", "assets/sound/놓기.mp3");
+        this.load.audio("버튼클릭", "assets/sound/클릭.mp3");
+        this.load.audio("이의제기", "assets/sound/이의제기.mp3");
+        this.load.audio("이의제기맞음", "assets/sound/맞음.mp3");
+        this.load.audio("이의제기틀림", "assets/sound/틀림.mp3");
+        this.load.audio("내턴", "assets/sound/내턴.mp3");
     }
     create() {
         const scene = this;
@@ -113,6 +120,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("currentCardUpdate");
         sharedData.socket.removeAllListeners("tok");
         sharedData.socket.removeAllListeners("gameEnd");
+        sharedData.socket.removeAllListeners("objection");
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
         scene.curruntTurn = "";
@@ -128,7 +136,15 @@ export default class GameScene extends Phaser.Scene {
         scene.recentlyTimeOut = true;
         scene.recentlyTurnPlayerDisconnection = true;
         let lastWordStyle = {font: "60px Arial", fill: "black"};
-      
+        
+        scene.cardClicksound = scene.sound.add("카드클릭",{loop:false});
+        scene.cardDropsound = scene.sound.add("카드내려놓기",{loop:false});
+        scene.buttonClicksound = scene.sound.add("버튼클릭",{loop:false});
+        scene.verificationsound = scene.sound.add("이의제기",{loop:false});
+        scene.verificationTruesound = scene.sound.add("이의제기맞음",{loop:false});
+        scene.verificationFalsesound = scene.sound.add("이의제기틀림",{loop:false});
+        scene.myturnsound = scene.sound.add("내턴",{loop:false});
+
         scene.players = {
         //   [playerid]: {playerId:, playerNickname:, played:, card:}
         }
@@ -172,6 +188,7 @@ export default class GameScene extends Phaser.Scene {
         // 자신의 turn을 끝내는 button
         const finishButton = scene.add.sprite(1815, 750, "finishButton").setInteractive().on("pointerup",() => {
             if (scene.myTurn & scene.dropped & scene.clicked & scene.sortWord()) {
+                scene.buttonClicksound.play();
                 sharedData.socket.emit("turnEnd", sharedData.roomKey, sharedData.socket.id, scene.word, "drop");
                 sharedData.socket.emit("nextTurn", sharedData.roomKey);
                 scene.myTurn = false;
@@ -249,6 +266,7 @@ export default class GameScene extends Phaser.Scene {
         // handGroup에 있는 카드 목록을 왼쪽, 오른쪽으로 이동시키는 버튼
         scene.rightArrange = scene.add.sprite(1800, 980, "rightArrange").setInteractive().on("pointerup",() => {
             if (scene.handGroup.countActive() - gameOptions.handCardMax > scene.countArrange) {
+                scene.cardClicksound.play();
                 scene.handGroup.children.iterate(function(card) {
                     card.x -= gameOptions.betweenCrad;
                     if (card.x >= gameOptions.firstCardX + gameOptions.betweenCrad * 9 || card.x < gameOptions.firstCardX) {
@@ -263,6 +281,7 @@ export default class GameScene extends Phaser.Scene {
         });
         scene.leftArrange = scene.add.sprite(450, 980, "leftArrange").setInteractive().on("pointerup",() => {
             if (scene.countArrange > 0) {
+                scene.cardClicksound.play();
                 scene.handGroup.children.iterate(function(card) {
                     card.x += gameOptions.betweenCrad;
                     if (card.x >= gameOptions.firstCardX + gameOptions.betweenCrad * 9 || card.x < gameOptions.firstCardX) {
@@ -304,6 +323,7 @@ export default class GameScene extends Phaser.Scene {
         let deck = scene.add.sprite(1810, 490, "deck").setInteractive().on("pointerup",() => {
             // 자신의 turn이며 아직 card를 drop하지 않았을 때 작동한다
             if(scene.myTurn & !(scene.dropped)) {
+                scene.cardClicksound.play();
                 // deck을 click하면 card를 1장 생성한다
                 console.log("pickcard");
                 sharedData.socket.emit("pickcard", (sharedData.roomKey));
@@ -331,6 +351,7 @@ export default class GameScene extends Phaser.Scene {
         scene.input.on("dragstart", (pointer, card) => {
             // card가 hand에 있는지 검사한다
             if(scene.handGroup.contains(card)) {
+                scene.cardClicksound.play();
                 // card의 기준점을 angle을 반영하여 pointer에 위치하게 변경한다
                 scene.setCardOrigin(card);
                 // hand에서 card를 제거한다
@@ -380,6 +401,7 @@ export default class GameScene extends Phaser.Scene {
             const validDrop = scene.myTurn && scene.validLocation(card.i, card.j, "drop");
       
             if (validDrop) {
+                scene.cardDropsound.play();
                 // If scene is the first card drop, initialize some letiables and emit an event to other players
                 if (!scene.dropped) {
                     scene.dropped = true;
@@ -435,6 +457,10 @@ export default class GameScene extends Phaser.Scene {
         });
       
         sharedData.socket.emit("ready", sharedData.roomKey);
+
+        sharedData.socket.on("objection", () => {
+            scene.verificationsound.play();
+        });
       
         sharedData.socket.on("pickcard", (card) => {
             scene.createCard(scene.deckArray[card]),
@@ -464,6 +490,7 @@ export default class GameScene extends Phaser.Scene {
             scene.curruntTurn = id;
             console.log("firstTurn");
             if (id === sharedData.socket.id) {
+                scene.myturnsound.play();
                 scene.myTurn = true;
                 console.log("My Turn! " + scene.myTurn);
                 scene.whetherObjection = true;
@@ -490,6 +517,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("nextTurn", (id) => {
             scene.curruntTurn = id;
             if (id === sharedData.socket.id) {
+                scene.myturnsound.play();
                 scene.myTurn = true;
                 scene.dropped = false;
                 scene.clicked = false;
@@ -539,6 +567,7 @@ export default class GameScene extends Phaser.Scene {
       
         // turn이 부여된 후 1번째 card를 drop하면 objection을 비활성화하고 배열을 초기화한다
         sharedData.socket.on("firstDrop", () => {
+            scene.cardDropsound.play();
             scene.whetherObjection = false;
             console.log("whetherObjection: " + scene.whetherObjection);
             scene.waitBlankGroup = scene.add.group();
@@ -554,6 +583,7 @@ export default class GameScene extends Phaser.Scene {
         // 다른 유저가 card를 drop하면 자신의 board에 반영한다
         sharedData.socket.on("cardDrop", (cardData) => {
             if (scene.lastCardData != cardData) {
+                scene.cardDropsound.play();
                 scene.lastCardData = cardData
                 console.log("Other player: card Drop!");
                 let card = scene.add.sprite(gameOptions.firstBlankX + gameOptions.betweenBlank * cardData.x, gameOptions.firstBlankY + gameOptions.betweenBlank * cardData.y, cardData.value).setDepth(3).setInteractive().on("pointerdown",() => {
@@ -625,6 +655,7 @@ export default class GameScene extends Phaser.Scene {
         // 마지막 유저가 제출한 단어에 대해 objection을 신청한 결과로 존재하지 않는 단어일 때
         sharedData.socket.on("verificationFalse", (id) => {
             if (scene.recentlyVerification) {
+                scene.verificationFalsesound.play();
                 scene.recentlyVerification = false;
                 console.log("objection!");
                 // 마지막 유저가 drop한 card를 모두 제거한다
@@ -656,6 +687,7 @@ export default class GameScene extends Phaser.Scene {
         // 마지막 유저가 제출한 단어에 대해 objection을 신청한 결과로 존재하는 단어일 때
         sharedData.socket.on("verificationTrue", (id, meaning) => {
             if (scene.recentlyVerification) {
+                scene.verificationTruesound.play();
                 scene.recentlyVerification = false;
                 let meaningStyle = {font: "30px Arial", fill: "black"};
                 // 자신이 이의신청한 유저라면 카드를 1장 생성한다
