@@ -97,6 +97,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.audio("이의제기맞음", "assets/sound/맞음.mp3");
         this.load.audio("이의제기틀림", "assets/sound/틀림.mp3");
         this.load.audio("내턴", "assets/sound/내턴.mp3");
+        this.load.audio("게임bgm", "assets/sound/게임bgm.mp3");
     }
     create() {
         const scene = this;
@@ -144,6 +145,7 @@ export default class GameScene extends Phaser.Scene {
         scene.verificationTruesound = scene.sound.add("이의제기맞음",{loop:false});
         scene.verificationFalsesound = scene.sound.add("이의제기틀림",{loop:false});
         scene.myturnsound = scene.sound.add("내턴",{loop:false});
+        scene.gamebgm = scene.sound.add("게임bgm",{loop:true});
 
         scene.players = {
         //   [playerid]: {playerId:, playerNickname:, played:, card:}
@@ -483,6 +485,7 @@ export default class GameScene extends Phaser.Scene {
                 scene.createCard(scene.deckArray[cards[i]]);
                 scene.arrangeCardsInHand()
             }
+            scene.gamebgm.play();
         });
       
         // 게임 시작 후 1번째 turn을 부여받는다
@@ -823,6 +826,7 @@ export default class GameScene extends Phaser.Scene {
       
         sharedData.socket.on("gameEnd", () => {
             console.log("gameEnd");
+            scene.gamebgm.stop();
             scene.scene.start("GameRoomScene");
         });
       }
