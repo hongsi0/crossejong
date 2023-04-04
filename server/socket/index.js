@@ -199,8 +199,8 @@ module.exports = (io) => {
       io.to(roomKey).emit('currentCardUpdate', roomInfo.players);
     });
 
-    socket.on('timeOut', (roomKey) => {
-      io.to(roomKey).emit('timeOut');
+    socket.on('timeOut', (roomKey, dropped) => {
+      io.to(roomKey).emit('timeOut', dropped);
     });
 
     socket.on('tick', (roomKey, time) => {
@@ -352,6 +352,23 @@ module.exports = (io) => {
 
         if (roomInfo.currentTurn === socket.id) {
           console.log("disconnected", roomInfo.players);
+          type = "disconnection"
+          var word = ""
+          roomInfo.criticalSection = true;
+          socket.broadcast.to(roomKey).emit('turnEnd', type, word);
+          let playerlist = Object.keys(roomInfo.players);
+
+          while(true) {
+            roomInfo.turnCount++;
+            let next = playerlist[(roomInfo.turnCount % playerlist.length)]
+            if(roomInfo.lastTurn != next) {
+              roomInfo.currentTurn = next;
+              io.to(roomKey).emit('nextTurn', roomInfo.currentTurn);
+              io.to(roomKey).emit('currentPlayers', roomInfo.players);
+              break;
+            }
+          }
+
           io.to(roomKey).emit("turnPlayerDisconnection");
         }
       }

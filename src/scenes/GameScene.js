@@ -717,7 +717,7 @@ export default class GameScene extends Phaser.Scene {
         })
       
         // 플레이어가 제한시간동안 단어를 완성하지 못한 경우
-        sharedData.socket.on("timeOut", () => {
+        sharedData.socket.on("timeOut", (dropped) => {
             if (scene.recentlyTimeOut) {
                 scene.recentlyTimeOut = false;
                 console.log("time out!");
@@ -732,18 +732,20 @@ export default class GameScene extends Phaser.Scene {
                 }    
       
                 // drop한 card를 모두 제거한다
-                scene.waitBlankGroup.clear(true);
-                scene.waitCardGroup.clear(true);
-                for(let i = 0; i < 10; i++) {
-                    if(scene.dropCard[0][i] != -1) {
-                        scene.createBlank(scene.dropCard[0][i], scene.dropCard[1][i]);
-                        // board를 update한다
-                        scene.board[scene.dropCard[0][i]][scene.dropCard[1][i]] = -1;
-                    }
-                    // 만약 자신의 turn이라면 제거한 card를 모두 hand로 가져온다
-                    if (scene.myTurn) {
+                if (dropped) {
+                    scene.waitBlankGroup.clear(true);
+                    scene.waitCardGroup.clear(true);
+                    for(let i = 0; i < 10; i++) {
                         if(scene.dropCard[0][i] != -1) {
-                            scene.createCard(scene.dropCard[2][i]);
+                            scene.createBlank(scene.dropCard[0][i], scene.dropCard[1][i]);
+                            // board를 update한다
+                            scene.board[scene.dropCard[0][i]][scene.dropCard[1][i]] = -1;
+                        }
+                        // 만약 자신의 turn이라면 제거한 card를 모두 hand로 가져온다
+                        if (scene.myTurn) {
+                            if(scene.dropCard[0][i] != -1) {
+                                scene.createCard(scene.dropCard[2][i]);
+                            }
                         }
                     }
                 }
@@ -754,11 +756,12 @@ export default class GameScene extends Phaser.Scene {
                     // card를 1장 생성한다
                     sharedData.socket.emit("pickcard", (sharedData.roomKey));
                 }
+                scene.recentlyTimeOut = true;
             }
         })
       
         sharedData.socket.on("turnPlayerDisconnection", () => {
-            if (scene.recentlyTurnPlayerDisconnection && !scene.myTurn) {
+            if (scene.recentlyTurnPlayerDisconnection) {
                 scene.recentlyTurnPlayerDisconnection = false;
                 // drop한 card를 모두 제거한다
                 scene.waitBlankGroup.clear(true);
@@ -1167,7 +1170,7 @@ export default class GameScene extends Phaser.Scene {
         //check if the time is up
         if (this.timeInSeconds === 0 && this.myTurn) {
             this.timer.paused = true;
-            sharedData.socket.emit("timeOut", sharedData.roomKey, null);
+            sharedData.socket.emit("timeOut", sharedData.roomKey, this.dropped);
         }
     }
 
