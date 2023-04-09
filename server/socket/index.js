@@ -7,15 +7,18 @@ const gameRooms = {
     // players: {
     //   [playerid]: {playerId: , playerNickname:, played:, card:}
     // },
+    // startingPlayers: [],
     // numPlayers: 0,
     // playing: false,
     // turnCount: 0,
     // lastWord: "",
     // criticalSection: true,
     // lastTurn:  "",
-    // currentTurn: 0,
+    // readycheck: false,
+    // currentTurn: "",
     // deck: [0,1,2 ... 47],
-    // difficulty:
+    // difficulty:,
+    // time:,
   // }
 };
 
@@ -33,8 +36,8 @@ module.exports = (io) => {
     console.log(
       `A socket connection to the server has been made: ${socket.id}`
     );
-    socket.on("nickname", (roomInfo) => {
-      socket['nickname'] = roomInfo;
+    socket.on("nickname", (nickname) => {
+      socket['nickname'] = nickname;
       console.log(socket.nickname);
       io.to(socket.id).emit("nickname", socket.nickname);
     });
@@ -46,7 +49,8 @@ module.exports = (io) => {
       playerlist[socket.id] = {
         playerId: socket.id,
         playerNickname: socket.nickname,
-        played: false
+        played: false,
+        readycheck: false,
       }
       gamestate.numPlayers = 1;
       gamestate['players'] = playerlist;
@@ -89,10 +93,11 @@ module.exports = (io) => {
       roomInfo.lastWord = "";
       roomInfo.criticalSection = true;
       roomInfo.lastTurn = "";
-      roomInfo.currentTurn = 0;
+      roomInfo.currentTurn = "";
       roomInfo.deck = shuffledeck();
       console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
+      roomInfo.startingPlayers = playerlist;
       console.log("first turn: " + playerlist[0]);
       io.to(roomKey).emit("gamestart");
     });
@@ -114,25 +119,27 @@ module.exports = (io) => {
             roomInfo.players[player].card = 6
             io.to(player).emit("firstcard", playercard);
           });
-          io.to(roomKey).emit("firstTurn", playerlist[0]);
+          io.to(roomKey).emit("nextTurn", playerlist[0]);
           io.to(roomKey).emit('centerCard', roomInfo.deck.pop());
           io.to(roomKey).emit('currentPlayers', roomInfo.players);
+          roomInfo.time = 30;
+          roomInfo.readycheck = true;
           console.log("ready");
           console.log(roomInfo.players);
         }
     });
 
-    socket.on("pickcard", (roomKey) => {
-      console.log("pickcard");
-      const roomInfo = gameRooms[roomKey];
-      io.to(socket.id).emit("pickcard", roomInfo.deck.pop());
-    });
-
-    socket.on("verificationpickcard", (roomKey) => {
-      console.log("verificationpickcard");
-      const roomInfo = gameRooms[roomKey];
-      io.to(socket.id).emit("verificationpickcard", roomInfo.deck.pop());
+    socket.on("returnCard", (data) => {
+      const roomInfo = gameRooms[data.roomKey];
+      io.to(data.roomKey).emit("returnCard", data.id)
     })
+
+    socket.on("pickcard", (data) => {
+      console.log("pickcard");
+      const roomInfo = gameRooms[data.roomKey];
+      if (roomInfo.deck.length === 0) roomInfo.deck = shuffledeck();
+      io.to(socket.id).emit("pickcard", {cardval:roomInfo.deck.pop(), type:data.type});
+    });
 
     socket.on('nextTurn', (roomKey) => {
       let roomInfo = gameRooms[roomKey];
@@ -143,7 +150,7 @@ module.exports = (io) => {
           playedplayers.push(player);
         }
       });
-      if(playedplayers.length === 1){ //끝나지 않은 플레이어가 1명일때
+      if(playedplayers.length === 1){ //끝나지 않은 플레이어가 1명일 때
         console.log("gameEnd");
         playerlist.forEach((player) => {
           roomInfo.players[player].played = false;
@@ -151,16 +158,21 @@ module.exports = (io) => {
         temp_roomInfo = {
           players: roomInfo.players,
           numPlayers: playerlist.length,
-          playing: false
+          playing: false,
+          readycheck: false,
+          startingPlayers:roomInfo.startingPlayers,
         }
         gameRooms[roomKey] = temp_roomInfo;
         io.to(roomKey).emit("gameEnd");
-      } else{
+      } else{ //끝나지 않은 플레이어가 2명 이상일 때
         while(true) {
           roomInfo.turnCount++;
-          let next = playerlist[(roomInfo.turnCount % playerlist.length)]
-          if(roomInfo.lastTurn != next) {
-            roomInfo.currentTurn = next;
+          let nextIndex = roomInfo.turnCount % roomInfo.startingPlayers.length
+          if(playedplayers.includes(roomInfo.startingPlayers[nextIndex])) {
+            roomInfo.currentTurn = roomInfo.startingPlayers[nextIndex];
+            console.log(1);
+            console.log(roomInfo.currentTurn);
+            console.log(roomInfo.players);
             io.to(roomKey).emit('nextTurn', roomInfo.currentTurn);
             io.to(roomKey).emit('currentPlayers', roomInfo.players);
             break;
@@ -169,12 +181,12 @@ module.exports = (io) => {
       }
     });
 
-    socket.on('cardDrop', (roomKey, cardData) => {
-      socket.broadcast.to(roomKey).emit('cardDrop', cardData);
+    socket.on('cardDrop', (data) => {
+      io.to(data.roomKey).emit('cardDrop', {cardval:data.cardval, x:data.x, y:data.y});
     });
 
-    socket.on('turnEnd', (roomKey, id, word, type) => {
-      const roomInfo = gameRooms[roomKey];
+    socket.on('turnEnd', (data) => {
+      const roomInfo = gameRooms[data.roomKey];
       const playerlist = Object.keys(roomInfo.players);
       playerlist.forEach((player) => {
         if (player === roomInfo.lastTurn) {
@@ -183,10 +195,11 @@ module.exports = (io) => {
           }
         }
       })
-      roomInfo.lastTurn = id;
-      roomInfo.lastWord = word;
+      roomInfo.time = 30;
+      roomInfo.lastTurn = data.id;
+      roomInfo.lastWord = data.word;
       roomInfo.criticalSection = true;
-      socket.broadcast.to(roomKey).emit('turnEnd', type, word);
+      io.to(data.roomKey).emit('turnEnd', {id:data.id, word:data.word, type:data.type});
     });
 
     socket.on('firstDrop', (roomKey) => {
@@ -198,14 +211,6 @@ module.exports = (io) => {
       roomInfo.players[id].card = number
       io.to(roomKey).emit('currentCardUpdate', roomInfo.players);
     });
-
-    socket.on('timeOut', (roomKey) => {
-      io.to(roomKey).emit('timeOut');
-    });
-
-    socket.on('tick', (roomKey, time) => {
-      socket.broadcast.to(roomKey).emit('tok', time);
-    })
 
     socket.on('objection', (roomKey, id) => {
       const roomInfo = gameRooms[roomKey];
@@ -261,7 +266,8 @@ module.exports = (io) => {
           // 존재하는 단어일 때
           else {
               console.log(word, pos, def);
-              io.to(roomKey).emit('verificationTrue', id, {word, pos, def});
+
+              io.to(roomKey).emit('verificationTrue', {id:id, word:word, pos:pos, def:def});
           }
       });
     });
@@ -315,7 +321,6 @@ module.exports = (io) => {
 
       // update number of players
       roomInfo.numPlayers = Object.keys(roomInfo.players).length;
-
       roomInfo.playing = false;
     });
 
@@ -341,6 +346,7 @@ module.exports = (io) => {
         delete roomInfo.players[socket.id];
         // update numPlayers
         roomInfo.numPlayers = Object.keys(roomInfo.players).length;
+        let playerlist = Object.keys(roomInfo.players);
         
         if(roomInfo.numPlayers === 0) {//no people in room
           delete gameRooms[roomKey];
@@ -352,7 +358,7 @@ module.exports = (io) => {
 
         if (roomInfo.currentTurn === socket.id) {
           console.log("disconnected", roomInfo.players);
-          io.to(roomKey).emit("turnPlayerDisconnection");
+          io.to(roomKey).emit("turnEnd", {id: playerlist[0], word:"", type:"disconnection"});
         }
       }
     });
@@ -370,4 +376,26 @@ module.exports = (io) => {
     });
 
   });
+  // 시간을 1초에 -1씩 감소시키는 함수
+  function decreaseTime(roomKey) {
+    const roomInfo = gameRooms[roomKey];
+    if (roomInfo.playing) {
+      if (roomInfo.turnCount === 0 && !roomInfo.readycheck) roomInfo.time = 30;
+      if (roomInfo.time > 0) {
+        io.to(roomKey).emit("timeDecrease", roomInfo.time);
+        roomInfo.time -= 1;
+      } else {
+          roomInfo.time = 30;
+          console.log("time over",roomInfo.currentTurn);
+          io.to(roomKey).emit("turnEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
+      }
+    }
+  }
+
+  // 1초 간격으로 decreaseTime 함수를 호출하는 setInterval 함수
+  setInterval(function() {
+    for (const roomKey in gameRooms) {
+      decreaseTime(roomKey);
+    }
+  }, 1000);
 };

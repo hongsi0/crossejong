@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import sharedData from "../shared";
+import '../fontLoader';
 
 
 export default class GameRoomScene extends Phaser.Scene {
@@ -16,21 +17,16 @@ export default class GameRoomScene extends Phaser.Scene {
     this.load.image("roomnameBar", "assets/image/lastWordBar.png");
     this.load.html("playerlistform", "assets/text/playerlistform.html");
     this.load.html("chatform", "assets/text/chatform.html");
+    this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
+    this.load.audio("click", "assets/sound/놓기.mp3");
   }
   create() {
     const scene = this;
 
-    function loadFont(name,url) {
-      var newFont = new FontFace(name, `url(${url})`);
-      newFont.load().then(function (loaded) {
-          document.fonts.add(loaded);
-      }).catch(function (error) {
-          return error;
-      });
-    }
+    scene.waitbgm = scene.sound.add("대기방bgm",{loop:true});
+    scene.clicksound = scene.sound.add("click",{loop:false});
 
-    loadFont("BR-R","assets/fonts/BR-R.otf");
-
+    scene.waitbgm.play();
 
     let isMouseOver = false;
 
@@ -64,6 +60,8 @@ export default class GameRoomScene extends Phaser.Scene {
       outbuttonImage.setTexture("outbutton(N)");
     })
     .on('pointerdown', () => {
+      scene.clicksound.play();
+      scene.waitbgm.stop();
       console.log("click");
       sharedData.socket.emit("outRoom", sharedData.roomKey);
       scene.scene.start('RoomScene');
@@ -99,6 +97,7 @@ export default class GameRoomScene extends Phaser.Scene {
         .setScale(0.7)
         .setInteractive()
         .on('pointerdown', function () {
+          scene.clicksound.play();
           console.log("startclick");
           sharedData.socket.emit("gamestart", sharedData.roomKey);
         });
@@ -106,6 +105,7 @@ export default class GameRoomScene extends Phaser.Scene {
     });
   
     sharedData.socket.on("gamestart", () => {
+      scene.waitbgm.stop();
       scene.scene.start("GameScene");
     });
   
@@ -118,6 +118,7 @@ export default class GameRoomScene extends Phaser.Scene {
     scene.inputElement.on("click", function (event) {
       console.log("click");
       event.preventDefault();
+      scene.clicksound.play();
       if (event.target.id === "sendchat") {
         const input = scene.inputElement.getChildByID("chat-input");
         sharedData.socket.emit("chat", input.value, sharedData.roomKey);

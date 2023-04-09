@@ -20,6 +20,7 @@ import MakeroomScene from "./scenes/MakeroomScene";
 import GameRoomScene from "./scenes/GameRoomScene";
 import GameScene from "./scenes/GameScene";
 import sharedData from "./shared";
+import LoginScene from "./scenes/LoginScene";
 
 export class Game extends Phaser.Game {
   constructor() {
@@ -27,6 +28,7 @@ export class Game extends Phaser.Game {
     super(config);
     // Add all the scenes
     // << ADD ALL SCENES HERE >>
+    this.scene.add("LoginScene", LoginScene);
     this.scene.add("RoomScene", RoomScene);
     this.scene.add("MakeroomScene", MakeroomScene);
     this.scene.add("GameRoomScene", GameRoomScene);
@@ -40,7 +42,8 @@ export class Game extends Phaser.Game {
 
     // Start the game with the mainscene
     // << START GAME WITH MAIN SCENE HERE >>
-    this.scene.start("RoomScene");
+    //this.scene.start("RoomScene");
+    this.scene.start("LoginScene");
   }
 }
 // Create new instance of game

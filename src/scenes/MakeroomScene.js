@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import sharedData from "../shared";
+import '../fontLoader';
 
 export default class MakeroomScene extends Phaser.Scene {
   constructor() {
@@ -8,6 +9,7 @@ export default class MakeroomScene extends Phaser.Scene {
 
   preload() {
     this.load.html("Makeroomform", "assets/text/Makeroomform.html");
+    this.load.audio("click", "assets/sound/놓기.mp3");
   }
   create() {
     const scene = this;
@@ -17,6 +19,8 @@ export default class MakeroomScene extends Phaser.Scene {
     sharedData.socket.removeAllListeners("RoomkeyIsValid");
     sharedData.socket.removeAllListeners("createRoomed");
     
+    scene.clicksound = scene.sound.add("click",{loop:false});
+
     let difficulty = "";
     let isMouseOver = false;
 
@@ -29,6 +33,7 @@ export default class MakeroomScene extends Phaser.Scene {
     const exitButton = scene.makeroomform.getChildByID("exitButton");
 
     basicButton.addEventListener("click", (event) => {
+      scene.clicksound.play();
       difficulty = "초급";
       while (basicButton.firstChild) {
         basicButton.removeChild(basicButton.firstChild);
@@ -76,6 +81,7 @@ export default class MakeroomScene extends Phaser.Scene {
     });
 
     normalButton.addEventListener("click", (event) => {
+      scene.clicksound.play();
       difficulty = "중급";
       while (normalButton.firstChild) {
         normalButton.removeChild(normalButton.firstChild);
@@ -124,6 +130,7 @@ export default class MakeroomScene extends Phaser.Scene {
     });
 
     hardButton.addEventListener("click", (event) => {
+      scene.clicksound.play();
       difficulty = "고급";
       while (hardButton.firstChild) {
         hardButton.removeChild(hardButton.firstChild);
@@ -196,6 +203,7 @@ export default class MakeroomScene extends Phaser.Scene {
 
     makeButton.addEventListener("click", (event) => {
       if(difficulty != "" && input.value != ""){
+        scene.clicksound.play();
         sharedData.socket.emit("RoomKeyValid", (input.value));
       }
     });
@@ -225,6 +233,7 @@ export default class MakeroomScene extends Phaser.Scene {
     });
     
     exitButton.addEventListener("click", (event) => {
+      scene.clicksound.play();
       scene.scene.resume("RoomScene");
       scene.scene.sleep("MakeroomScene");
     });
