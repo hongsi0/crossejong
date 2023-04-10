@@ -8,7 +8,7 @@ export default class LoginScene extends Phaser.Scene {
 
     preload() {
         this.load.html("loginform", "assets/text/loginform.html");
-        this.load.image("background", "assets/image/login_background.png");
+        this.load.image("login_background", "assets/image/login_background.png");
         this.load.image("LoginButton(N)", "assets/image/LoginButton.png");
         this.load.image("LoginButton(Y)", "assets/image/LoginButton_clicked.png");
     }
@@ -16,7 +16,7 @@ export default class LoginScene extends Phaser.Scene {
     create() {
         const scene = this;
 
-        scene.add.image(0,0, "background").setOrigin(0);
+        scene.add.image(0,0, "login_background").setOrigin(0);
 
         scene.inputElement = scene.add.dom(400,800).createFromCache("loginform");
         //socket event 초기화
@@ -37,7 +37,6 @@ export default class LoginScene extends Phaser.Scene {
             sharedData.socket.userNick = input.value;
             sharedData.socket.emit("nickname", input.value);
             scene.scene.start("RoomScene");
-            scene.scene.remove("LoginScene");
           }
         })
         .on('pointerover', () => {
@@ -46,8 +45,6 @@ export default class LoginScene extends Phaser.Scene {
         .on("pointerout", ()=> {
             LoginButton.setTexture("LoginButton(N)");
         })
-
-        console.log(this.scene.manager.getScenes().map(scene => scene.scene.key));
     }
     update() {
     }

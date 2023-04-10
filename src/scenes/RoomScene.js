@@ -32,7 +32,7 @@ export default class RoomScene extends Phaser.Scene {
     
     scene.waitbgm.play();
 
-    let WordStyle = {font: "30px Arial", fill: "black"};
+    let WordStyle = {font: "50px BR-R", fill: "black"};
 
     //BACKGROUND
     scene.add.image(0, 0, "background").setOrigin(0);
@@ -54,11 +54,9 @@ export default class RoomScene extends Phaser.Scene {
       makeroomImage.setTexture("makeroomN");
     })
     .on("pointerdown", () => {
-      if(scene.nickname != undefined || sharedData.userNick != ""){
-        scene.clicksound.play();
-        scene.scene.pause("RoomScene");
-        scene.scene.launch("MakeroomScene");
-      }
+      scene.clicksound.play();
+      scene.scene.pause("RoomScene");
+      scene.scene.launch("MakeroomScene");
     });
     
     //reload
@@ -93,7 +91,7 @@ export default class RoomScene extends Phaser.Scene {
     scene.boxes.fillRect(150, 380, 1200, 600);
 
     //nickname
-    scene.add.text(1600, 150, sharedData.socket.userNick);
+    scene.add.text(1480, 150, `별명: ${sharedData.socket.userNick}`,WordStyle);
 
     //roomlist
     scene.roomform = scene.add.dom(230,430).setOrigin(0,0).createFromCache("roomform");
@@ -163,18 +161,16 @@ export default class RoomScene extends Phaser.Scene {
   
         button.addEventListener("click", (event) => {
           event.preventDefault();
-          if(scene.nickname != undefined || sharedData.userNick != "") {
-            if(room.playing === false) {//방에서 게임을 안하고 있을때
-              if(room.num < 4) {
-                sharedData.socket.emit("isKeyValid", room.name);
-              } else{
-                console.log("방이 가득찼습니다.");
-              }
+          if(room.playing === false) {//방에서 게임을 안하고 있을때
+            if(room.num < 4) {
+              sharedData.socket.emit("isKeyValid", room.name);
+            } else{
+              console.log("방이 가득찼습니다.");
             }
-            else {
-              console.log("게임 플레이중입니다.");
-            } 
           }
+          else {
+            console.log("게임 플레이중입니다.");
+          } 
         })
   
         box.appendChild(levelDiv);
@@ -203,8 +199,6 @@ export default class RoomScene extends Phaser.Scene {
       scene.waitbgm.stop();
       scene.scene.start("GameRoomScene");
     });
-
-    console.log(this.scene.manager.getScenes().map(scene => scene.scene.key));
   }
   update() {}
 }
