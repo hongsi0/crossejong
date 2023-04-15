@@ -15,6 +15,7 @@ export default class LoginScene extends Phaser.Scene {
 
     create() {
         const scene = this;
+        
 
         scene.add.image(0,0, "login_background").setOrigin(0);
 
