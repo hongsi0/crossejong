@@ -152,7 +152,8 @@ export default class GameScene extends Phaser.Scene {
         scene.verificationTruesound = scene.sound.add("이의제기맞음",{loop:false});
         scene.verificationFalsesound = scene.sound.add("이의제기틀림",{loop:false});
         scene.myturnsound = scene.sound.add("내턴",{loop:false});
-
+        scene.gamebgm = scene.sound.add("게임bgm",{loop:true});
+      
         scene.players = {
         //   [playerid]: {playerId:, playerNickname:, played:, card:}
         }
@@ -494,6 +495,8 @@ export default class GameScene extends Phaser.Scene {
             for(let i = 0; i < cardvals.length; i ++) {
                 scene.createCard(cardvals[i]);
             }
+            scene.arrangeCardsInHand();
+            scene.gamebgm.play();
         });
       
         // turn이 시작될때 자신의 turn인지 확인한다
@@ -784,7 +787,6 @@ export default class GameScene extends Phaser.Scene {
       
         sharedData.socket.on("gameEnd", () => {
             console.log("gameEnd");
-            scene.gamebgm.stop();
             scene.scene.start("GameRoomScene");
         });
     }

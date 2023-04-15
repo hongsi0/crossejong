@@ -26,8 +26,7 @@ export default class GameRoomScene extends Phaser.Scene {
     scene.waitbgm = scene.sound.add("대기방bgm",{loop:true});
     scene.clicksound = scene.sound.add("click",{loop:false});
 
-    loadFont("BR-R","assets/fonts/BR-R.otf");
-
+    scene.waitbgm.play();
 
     let isMouseOver = false;
 
