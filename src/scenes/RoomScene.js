@@ -14,8 +14,7 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("makeroomN", "assets/image/방만들기(N).png");
     this.load.image("makeroomY", "assets/image/방만들기(Y).png");
     this.load.html("roomform", "assets/text/roomform.html");
-    this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
-    this.load.audio("click", "assets/sound/놓기.mp3");
+    this.load.html("nameform", "assets/text/nameform.html");
   }
 
   create() {
@@ -27,12 +26,8 @@ export default class RoomScene extends Phaser.Scene {
     sharedData.socket.removeAllListeners("keyIsValid");
     sharedData.socket.removeAllListeners("makeroom");
     
-    scene.waitbgm = scene.sound.add("대기방bgm",{loop:true});
-    scene.clicksound = scene.sound.add("click",{loop:false});
-    
-    scene.waitbgm.play();
 
-    let WordStyle = {font: "50px BR-R", fill: "black"};
+    let WordStyle = {font: "30px Arial", fill: "black"};
 
     //BACKGROUND
     scene.add.image(0, 0, "background").setOrigin(0);
@@ -54,9 +49,11 @@ export default class RoomScene extends Phaser.Scene {
       makeroomImage.setTexture("makeroomN");
     })
     .on("pointerdown", () => {
-      scene.clicksound.play();
-      scene.scene.pause("RoomScene");
-      scene.scene.launch("MakeroomScene");
+      if(scene.nickname != undefined || sharedData.userNick != ""){
+        console.log("makeroomclick");
+        scene.scene.pause("RoomScene");
+        scene.scene.launch("MakeroomScene");
+      }
     });
     
     //reload
