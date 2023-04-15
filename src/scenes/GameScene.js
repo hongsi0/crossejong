@@ -439,7 +439,30 @@ export default class GameScene extends Phaser.Scene {
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
                 // 만약 자신이 마지막 유저라면 제거한 card를 모두 hand로 가져온 후 추가로 card를 1장 생성한다
                 dropcardvals.push(scene.dropCards[i].value);
-                scene.dropCards[i].destroy();
+                if(id === sharedData.socket.id) {
+                    let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+                    scene.tweens.add({
+                        targets: scene.dropCards[i],
+                        x: coordinates.x,
+                        y: coordinates.y,
+                        duration: 500,
+                        onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                            dropcard.destroy();
+                        },
+                        onCompleteParams: [scene.dropCards[i]]
+                    });
+                } else {
+                    scene.tweens.add({
+                        targets: scene.dropCards[i],
+                        x: 300,
+                        y: 300,
+                        duration: 500,
+                        onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                            dropcard.destroy();
+                        },
+                        onCompleteParams: [scene.dropCards[i]]
+                    });
+                }
             }
             if (id === sharedData.socket.id) {
                 for (let i=0; i<scene.dropCards.length;i++){
@@ -685,7 +708,17 @@ export default class GameScene extends Phaser.Scene {
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
                 // 만약 자신이 마지막 유저라면 제거한 card를 모두 hand로 가져온 후 추가로 card를 1장 생성한다
                 dropcardvals.push(scene.dropCards[i].value);
-                scene.dropCards[i].destroy();
+                let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+                scene.tweens.add({
+                    targets: scene.dropCards[i],
+                    x: coordinates.x,
+                    y: coordinates.y,
+                    duration: 1500,
+                    onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                        dropcard.destroy();
+                    },
+                    onCompleteParams: [scene.dropCards[i]]
+                });
             }
             if (id === sharedData.socket.id) {
                 for (let i=0; i<scene.dropCards.length;i++){
@@ -811,7 +844,7 @@ export default class GameScene extends Phaser.Scene {
                 y: coordinates.y,
                 displayWidth: gameOptions.cardWidth,
                 displayHeight: gameOptions.cardHeight,
-                duration: 150,
+                duration: 250,
                 onComplete: function(){
                     if (card.x >= gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax || card.x < gameOptions.firstCardX) {
                         card.visible = false;
