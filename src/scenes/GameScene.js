@@ -454,9 +454,9 @@ export default class GameScene extends Phaser.Scene {
                 } else {
                     scene.tweens.add({
                         targets: scene.dropCards[i],
-                        x: 300,
-                        y: 300,
-                        duration: 500,
+                        displayHeight:0,
+                        displayWidth: 0,
+                        duration: 300,
                         onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
                             dropcard.destroy();
                         },
@@ -480,8 +480,27 @@ export default class GameScene extends Phaser.Scene {
       
         sharedData.socket.on("pickcard", (data) => {
             console.log("pickcard data",data);
-            scene.createCard(data.cardval),
-            scene.arrangeCardsInHand()
+            scene.cardPreview.x = 1810;
+            scene.cardPreview.y = 490;
+            scene.cardPreview.visible = true;
+            scene.cardPreview.alpha = 1
+            let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+            if (coordinates.x > gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax){
+                coordinates.x = gameOptions.firstCardX + gameOptions.betweenCrad *  (gameOptions.handCardMax-1);
+            }
+            scene.tweens.add({
+                targets: scene.cardPreview,
+                x: coordinates.x,
+                y: coordinates.y,
+                duration: 500, // 1초 동안 애니메이션을 실행함
+                onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                    card.visible = false;
+                    card.alpha = 0.75;
+                    scene.createCard(data.cardval);
+                    scene.arrangeCardsInHand();
+                },
+                onCompleteParams: [scene.cardPreview]
+            });
             if(data.type === "end") {
                 // turn을 종료한다
                 sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:"", type:"deck"});
@@ -491,9 +510,27 @@ export default class GameScene extends Phaser.Scene {
       
         //게임 시작 후 첫 카드를 받는다
         sharedData.socket.on("firstcard", (cardvals) => {
-            console.log(cardvals);
             for(let i = 0; i < cardvals.length; i ++) {
-                scene.createCard(cardvals[i]);
+                scene.cardPreview.x = 1810;
+                scene.cardPreview.y = 490;
+                scene.cardPreview.visible = true;
+                scene.cardPreview.alpha = 1
+                let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+                if (coordinates.x > gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax){
+                    coordinates.x = gameOptions.firstCardX + gameOptions.betweenCrad * (gameOptions.handCardMax-1);
+                }
+                scene.tweens.add({
+                    targets: scene.cardPreview,
+                    x: coordinates.x,
+                    y: coordinates.y,
+                    duration: 300, // 1초 동안 애니메이션을 실행함
+                    onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                        card.visible = false;
+                        card.alpha = 0.75;
+                        scene.createCard(cardvals[i]);
+                    },
+                    onCompleteParams: [scene.cardPreview]
+                });
             }
             scene.arrangeCardsInHand();
             scene.gamebgm.play();
@@ -808,6 +845,22 @@ export default class GameScene extends Phaser.Scene {
                     this.cardRotation(card);
                 }
             }
+        })
+        .on("pointerover", () => {
+            this.tweens.add({
+                targets: card,
+                displayWidth: gameOptions.cardWidth * 1.5,
+                displayHeight: gameOptions.cardHeight * 1.5,
+                duration: 150,
+            })
+        })
+        .on("pointerout", () => {
+            this.tweens.add({
+                targets: card,
+                displayWidth: gameOptions.cardWidth,
+                displayHeight: gameOptions.cardHeight,
+                duration: 150,
+            })
         });
         card.setOrigin(0.5, 0.5);
         card.handPosition = this.handGroup.countActive();
