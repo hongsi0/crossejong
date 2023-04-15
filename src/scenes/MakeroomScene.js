@@ -14,6 +14,7 @@ export default class MakeroomScene extends Phaser.Scene {
   create() {
     const scene = this;
 
+    
     //socket event 초기화
     sharedData.socket.removeAllListeners("RoomkeyNotValid");
     sharedData.socket.removeAllListeners("RoomkeyIsValid");
