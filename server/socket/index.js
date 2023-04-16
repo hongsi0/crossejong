@@ -182,8 +182,12 @@ module.exports = (io) => {
     });
 
     socket.on('cardDrop', (data) => {
-      io.to(data.roomKey).emit('cardDrop', {cardval:data.cardval, x:data.x, y:data.y});
+      io.to(data.roomKey).emit('cardDrop', {cardval:data.cardval, i:data.i, j:data.j});
     });
+
+    socket.on("addalphacards", (data) => {
+      io.to(data.roomKey).emit("addalphacards", {cardval:data.cardval, i:data.i, j:data.j})
+    })
 
     socket.on('turnEnd', (data) => {
       const roomInfo = gameRooms[data.roomKey];

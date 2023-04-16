@@ -136,6 +136,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("returnCard");
         sharedData.socket.removeAllListeners("timeDecrease");
         sharedData.socket.removeAllListeners("objection");
+        sharedData.socket.removeAllListeners("addalphacards");
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
         scene.whetherObjection = false; // objection의 가능 여부를 나타낸다
@@ -180,17 +181,19 @@ export default class GameScene extends Phaser.Scene {
         "전", "정", "제", "주", "지", "진", "하", "한", "해"];
       
         // board에 drop된 card들을 저장하는 group
-        scene.boardGroup = scene.add.group();
+        scene.boardGroup = new Phaser.GameObjects.Group(scene);
         // hand에 있는 card들을 저장하는 group
-        scene.handGroup = scene.add.group();
+        scene.handGroup = new Phaser.GameObjects.Group(scene);
         // 게임 시작 시 board에 blank를 생성한다
-        scene.zoneGroup = scene.add.group();
+        scene.zoneGroup = new Phaser.GameObjects.Group(scene);
         for(let i = 0; i < gameOptions.boardxrange; i++) {
             for(let j = 0; j < gameOptions.boardyrange; j++) {
-                scene.createBlank(i, j);
+                scene.createBlank(i, j, scene.zoneGroup); // 새로운 group을 인수로 전달합니다.
             }
         }
         scene.zoneGroup.setDepth(2);
+        //alphacards 선택할때 생긴 선 저장하는 group
+        scene.graphicGroup = new Phaser.GameObjects.Group(scene);
 
         // 자신이 낸 카드를 되돌려받는 button
         const returnButton = scene.add.sprite(1815, 640, "returnButton(N)")
@@ -215,7 +218,9 @@ export default class GameScene extends Phaser.Scene {
         .setDepth(1)
         .on("pointerup",() => {
             scene.buttonClicksound.play();
-            if (scene.myTurn && scene.dropped && scene.alphaCards.length>1 && scene.sortWord()) {
+            scene.sortWord();
+            console.log(scene.alphaCards,scene.SubmitWord())
+            if (scene.myTurn && scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
                 sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word, type:"finish"});
             };
         });
@@ -405,7 +410,7 @@ export default class GameScene extends Phaser.Scene {
                     scene.cleardropCards();
                     sharedData.socket.emit("firstDrop", sharedData.roomKey);
                 }
-                sharedData.socket.emit("cardDrop", {roomKey:sharedData.roomKey, cardval:card.value, x:card.i, y:card.j});
+                sharedData.socket.emit("cardDrop", {roomKey:sharedData.roomKey, cardval:card.value, i:card.i, j:card.j});
                 sharedData.socket.emit("currentCardUpdate", sharedData.roomKey, sharedData.socket.id, scene.handGroup.countActive());
                 scene.cardPreview.visible = false;
                 card.destroy();
@@ -433,7 +438,6 @@ export default class GameScene extends Phaser.Scene {
             let dropcardvals = [];
             scene.direction = "row";
             for(let i = 0; i<scene.dropCards.length; i++) {
-                scene.createBlank(scene.dropCards[i].i, scene.dropCards[i].j);
                 // board를 update한다
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
@@ -445,7 +449,7 @@ export default class GameScene extends Phaser.Scene {
                         targets: scene.dropCards[i],
                         x: coordinates.x,
                         y: coordinates.y,
-                        duration: 500,
+                        duration: 300,
                         onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
                             dropcard.destroy();
                         },
@@ -474,6 +478,7 @@ export default class GameScene extends Phaser.Scene {
                 scene.alphaCards[i].canclick = true;
             }
             scene.alphaCards = [];
+            scene.graphicGroup.clear(true);
             scene.arrangeCardsInHand();
             scene.cleardropCards();
         });
@@ -567,9 +572,8 @@ export default class GameScene extends Phaser.Scene {
             console.log("center card set!");
             let card = scene.add.sprite(gameOptions.firstBlankX + gameOptions.betweenBlank * 8, gameOptions.firstBlankY + gameOptions.betweenBlank * 5, scene.deckArray[value]).setDepth(3).setInteractive().on("pointerdown",() => {
                 if(scene.myTurn && card.canclick &&scene.validLocation(card.i, card.j, "click")) {
-                    card.alpha = 0.5;
-                    card.canclick = false;
-                    scene.alphaCards.push(card);
+                    console.log(card.value);
+                    sharedData.socket.emit("addalphacards", {roomKey:sharedData.roomKey, val:card.value, i:card.i, j:card.j});
                 }
             });
             card.displayWidth = gameOptions.cardWidth * gameOptions.blankSizeRatio;
@@ -596,19 +600,22 @@ export default class GameScene extends Phaser.Scene {
         // 다른 유저가 card를 drop하면 자신의 board에 반영한다
         sharedData.socket.on("cardDrop", (cardData) => {
             scene.cardDropsound.play();
-            let card = scene.add.sprite(gameOptions.firstBlankX + gameOptions.betweenBlank * cardData.x, gameOptions.firstBlankY + gameOptions.betweenBlank * cardData.y, scene.deckArray[cardData.cardval]).setDepth(3).setInteractive().on("pointerdown",() => {
+            let card = scene.add.sprite(gameOptions.firstBlankX + gameOptions.betweenBlank * cardData.i, gameOptions.firstBlankY + gameOptions.betweenBlank * cardData.j, scene.deckArray[cardData.cardval])
+            .setDepth(3)
+            .setInteractive()
+            .on("pointerdown",() => {
                 if(scene.myTurn && card.canclick && scene.validLocation(card.i, card.j, "click")) {
-                    card.alpha = 0.5;
-                    card.canclick = false;
-                    scene.alphaCards.push(card);
+                    console.log(card.value);
+                    sharedData.socket.emit("addalphacards", {roomKey:sharedData.roomKey, val:card.value, i:card.i, j:card.j});
                 }
             });
             card.value = cardData.cardval;
-            card.i = cardData.x;
-            card.j = cardData.y;
+            card.i = cardData.i;
+            card.j = cardData.j;
             card.canclick = true;
             card.displayWidth = gameOptions.cardWidth * (gameOptions.blankSizeRatio+0.3);
             card.displayHeight =  gameOptions.cardHeight * (gameOptions.blankSizeRatio+0.3);
+            scene.boardGroup.add(card);
             scene.tweens.add({
                 targets: card,
                 x: card.x,
@@ -618,23 +625,45 @@ export default class GameScene extends Phaser.Scene {
                 duration: 150,
                 ease: 'easeInOut',
                 onComplete: function() {
-                    scene.boardGroup.add(card);
+                    if (scene.myTurn) {
+                        sharedData.socket.emit("addalphacards", {roomKey:sharedData.roomKey, cardval:card.value, i:card.i, j:card.j});
+                    }
                 }
             });
-            if (scene.myTurn) {
-                if(scene.alphaCards.length >= 2) {
-                    if(scene.alphaCards[0].i === card.i) scene.direction = "column";
-                }
-                card.alpha = 0.5;
-                card.canclick = false;
-                scene.alphaCards.push(card);
-            }
             // 다른 유저가 drop한 card들을 배열에 저장한다
             scene.dropCards.push(card);
             // board를 update한다
-            scene.board[cardData.y][cardData.x].posval = 1;
-            scene.board[cardData.y][cardData.x].cardval = cardData.cardval;
+            scene.board[cardData.j][cardData.i].posval = 1;
+            scene.board[cardData.j][cardData.i].cardval = cardData.cardval;
         });
+
+        sharedData.socket.on("addalphacards", (cardData) => {
+            let card;
+            scene.boardGroup.getChildren().forEach((boardcard) => {
+                console.log(boardcard.i,cardData.i,boardcard.j,cardData.j)
+                if (boardcard.i == cardData.i && boardcard.j == cardData.j){
+                    card = boardcard;
+                }
+            });
+            scene.tweens.add({
+                targets: card,
+                alpha: 0.5,
+                duration: 200,
+                onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                    // 그래픽 생성
+                    const graphics = scene.add.graphics();
+                    graphics.lineStyle(6, 0x66FFFF, 1); // 두께, 색상, 투명도
+                    graphics.strokeRect(card.x - gameOptions.cardWidth / 2 * gameOptions.blankSizeRatio - 2.5, card.y - gameOptions.cardHeight / 2 * gameOptions.blankSizeRatio - 2.5, gameOptions.cardWidth * gameOptions.blankSizeRatio + 5, gameOptions.cardHeight * gameOptions.blankSizeRatio + 5);
+                    scene.graphicGroup.add(graphics);
+                    card.canclick = false;
+                    scene.alphaCards.push(card);
+                    if(scene.alphaCards.length >= 2) {
+                        if(scene.alphaCards[0].i === scene.alphaCards[1].i) scene.direction = "column";
+                    }
+                },
+                onCompleteParams: [card]
+            });   
+        })
       
         // 다른 유저의 turn이 끝나면 objection을 활성화한다
         sharedData.socket.on("turnEnd", (data) => {
@@ -643,11 +672,6 @@ export default class GameScene extends Phaser.Scene {
                 scene.whetherObjection = true;
                 scene.lastWord.setStyle(WordStyle);
                 scene.lastWord.setText(data.word);
-                if (scene.myTurn){
-                    for (let i=0;i<scene.dropCards.length;i++) {
-                        scene.boardGroup.add(scene.dropCards[i]);
-                    }
-                }
             }
             else if (data.type === "deck") {
                 scene.whetherObjection = false;
@@ -655,7 +679,6 @@ export default class GameScene extends Phaser.Scene {
                     // drop한 card를 모두 제거한다
                     let dropcardvals = []
                     for(let i = 0; i<scene.dropCards.length; i++) {
-                        scene.createBlank(scene.dropCards[i].i, scene.dropCards[i].j);
                         // board를 update한다
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
@@ -677,7 +700,6 @@ export default class GameScene extends Phaser.Scene {
                 if (scene.dropped) {
                     let dropcardvals = []
                     for(let i = 0; i<scene.dropCards.length; i++) {
-                        scene.createBlank(scene.dropCards[i].i, scene.dropCards[i].j);
                         // board를 update한다
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
@@ -703,7 +725,6 @@ export default class GameScene extends Phaser.Scene {
             else if (data.type === "disconnection") {
                 if (scene.dropped) {
                     for(let i = 0; i<scene.dropCards.length; i++) {
-                        scene.createBlank(scene.dropCards[i].i, scene.dropCards[i].j);
                         // board를 update한다
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
@@ -727,6 +748,7 @@ export default class GameScene extends Phaser.Scene {
                 scene.alphaCards[i].canclick = true;
             }
             scene.alphaCards = [];
+            scene.graphicGroup.clear(true);
             if (data.id === sharedData.socket.id) {
                 sharedData.socket.emit("nextTurn", sharedData.roomKey);
             }
@@ -739,7 +761,6 @@ export default class GameScene extends Phaser.Scene {
             scene.verificationFalsesound.play();
             let dropcardvals = []
             for(let i = 0; i<scene.dropCards.length; i++) {
-                scene.createBlank(scene.dropCards[i].i, scene.dropCards[i].j);
                 // board를 update한다
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
@@ -849,8 +870,9 @@ export default class GameScene extends Phaser.Scene {
         .on("pointerover", () => {
             this.tweens.add({
                 targets: card,
-                displayWidth: gameOptions.cardWidth * 1.5,
-                displayHeight: gameOptions.cardHeight * 1.5,
+                displayWidth: gameOptions.cardWidth * 1.2,
+                displayHeight: gameOptions.cardHeight * 1.2,
+                y: gameOptions.firstCardY - 50,
                 duration: 150,
             })
         })
@@ -859,6 +881,7 @@ export default class GameScene extends Phaser.Scene {
                 targets: card,
                 displayWidth: gameOptions.cardWidth,
                 displayHeight: gameOptions.cardHeight,
+                y: gameOptions.firstCardY,
                 duration: 150,
             })
         });
@@ -924,37 +947,56 @@ export default class GameScene extends Phaser.Scene {
 
     // 제출할 단어를 만들기 위해 배열을 정렬한다
     sortWord() {
-        this.word = "";
         this.alphaCards.sort((a, b) => {
             if (a.x === b.x) {
               return a.y - b.y;
             }
             return a.x - b.x;
         });
-        this.alphaCards.forEach((val) => {
-            console.log(val);
-            this.word += this.deckArray[val.value];
-        });
-
-        let check=true
-        for (let i=0;i<this.alphaCards.length-1;i++){
-            if(this.alphaCards[i].i === this.alphaCards[i+1].i) {
-                if((this.alphaCards[i+1].j - this.alphaCards[i].j) != 1) check=false
-            } else if(this.alphaCards[i].i === this.alphaCards[i+1].j) {
-                if((this.alphaCards[i+1].i - this.alphaCards[i].i) != 1) check=false
-            }
-        }
-        return check
     }
+
+    SubmitWord() {
+        this.word = "";
+        this.alphaCards.forEach((val) => {
+          this.word += this.deckArray[val.value];
+        });
+      
+        let check = true;
+      
+        for (let i = 0; i < this.alphaCards.length; i++) {
+          const currentCard = this.alphaCards[i];
+          const nextCard = this.alphaCards[i + 1];
+      
+          if (nextCard) {
+            console.log("card",currentCard,nextCard);
+            if (currentCard.i === nextCard.i) {
+              if ((nextCard.j - currentCard.j) !== 1) {
+                check = false;
+                break;
+              }
+            } else if (currentCard.j === nextCard.j) {
+              if ((nextCard.i - currentCard.i) !== 1) {
+                check = false;
+                break;
+              }
+            } else {
+              check = false;
+              break;
+            }
+          }
+        }
+        return check;
+      }
+      
 
     validLocation(x, y, type) {
         console.log("valid", type, this.direction);
         if (this.alphaCards.length >= 1) {
-            if(this.alphaCards[0].j != y && this.alphaCards[0].i != x) return false
+            if(this.alphaCards[0].j != y && this.alphaCards[0].i != x) return false;
         }
         if (this.alphaCards.length > 1) {
-            if (this.direction === "row" && this.alphaCards[0].j != y) return false
-            else if (this.direction === "column" && this.alphaCards[0].i != x) return false
+            if (this.direction === "row" && this.alphaCards[0].j != y) return false;
+            else if (this.direction === "column" && this.alphaCards[0].i != x) return false;
         }
         if (type === "drop") {
             if(this.board[y][x].posval == -1){
