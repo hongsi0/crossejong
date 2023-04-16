@@ -21,6 +21,9 @@ import GameRoomScene from "./scenes/GameRoomScene";
 import GameScene from "./scenes/GameScene";
 import sharedData from "./shared";
 import LoginScene from "./scenes/LoginScene";
+import VerificationScene from "./scenes/verificationScene";
+import GameEndScene from "./scenes/GameEndScene";
+import TutorialScene from "./scenes/TutorialScene";
 
 export class Game extends Phaser.Game {
   constructor() {
@@ -33,6 +36,9 @@ export class Game extends Phaser.Game {
     this.scene.add("MakeroomScene", MakeroomScene);
     this.scene.add("GameRoomScene", GameRoomScene);
     this.scene.add("GameScene", GameScene);
+    this.scene.add("VerificationScene", VerificationScene);
+    this.scene.add("GameEndScene", GameEndScene);
+    this.scene.add("TutorialScene", TutorialScene);
 
     this.socket = io();
 

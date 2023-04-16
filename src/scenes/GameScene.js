@@ -732,9 +732,6 @@ export default class GameScene extends Phaser.Scene {
                     }
                     scene.cleardropCards();
                 }
-                if (data.id === sharedData.socket.id) {
-                    sharedData.socket.emit("nextTurn", sharedData.roomKey);
-                }
             }
 
             for(let j=0; j<gameOptions.boardyrange; j++) {
