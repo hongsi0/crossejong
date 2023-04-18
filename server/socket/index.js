@@ -13,7 +13,6 @@ const gameRooms = {
     // turnCount: 0,
     // lastWord: "",
     // criticalSection: true,
-    // lastTurn:  "",
     // readycheck: false,
     // currentTurn: "",
     // deck: [0,1,2 ... 47],
@@ -93,7 +92,6 @@ module.exports = (io) => {
       roomInfo.turnCount = 0;
       roomInfo.lastWord = "";
       roomInfo.criticalSection = true;
-      roomInfo.lastTurn = "";
       roomInfo.currentTurn = "";
       roomInfo.deck = shuffledeck();
       console.log(roomInfo.deck);
@@ -179,9 +177,6 @@ module.exports = (io) => {
           let nextIndex = roomInfo.turnCount % roomInfo.startingPlayers.length
           if(playedplayers.includes(roomInfo.startingPlayers[nextIndex])) {
             roomInfo.currentTurn = roomInfo.startingPlayers[nextIndex];
-            console.log(1);
-            console.log(roomInfo.currentTurn);
-            console.log(roomInfo.players);
             io.to(roomKey).emit('nextTurn', roomInfo.currentTurn);
             io.to(roomKey).emit('currentPlayers', roomInfo.players);
             break;
@@ -202,14 +197,11 @@ module.exports = (io) => {
       const roomInfo = gameRooms[data.roomKey];
       const playerlist = Object.keys(roomInfo.players);
       playerlist.forEach((player) => {
-        if (player === roomInfo.lastTurn) {
-          if (roomInfo.players[roomInfo.lastTurn].card === 0) {
-            roomInfo.players[roomInfo.lastTurn].played = false
-          }
+        if (roomInfo.players[roomInfo.currentTurn].card === 0) {
+          roomInfo.players[roomInfo.currentTurn].played = false
         }
       })
       roomInfo.time = 30;
-      roomInfo.lastTurn = data.id;
       roomInfo.lastWord = data.word;
       roomInfo.criticalSection = true;
       io.to(data.roomKey).emit('turnEnd', {id:data.id, word:data.word, type:data.type});
@@ -278,7 +270,7 @@ module.exports = (io) => {
           // 존재하지 않는 단어일 때
           if(def === null){
               console.log("존재하지 않는 단어입니다.");
-              io.to(val.roomKey).emit('verificationFalse', {id:roomInfo.currentTurn, nick:roomInfo.players[roomInfo.lastTurn].playerNickname });
+              io.to(val.roomKey).emit('verificationFalse', {id:roomInfo.currentTurn, nick:roomInfo.players[roomInfo.currentTurn].playerNickname});
           }
           // 존재하는 단어일 때
           else {
