@@ -411,6 +411,7 @@ module.exports = (io) => {
         roomInfo.time -= 1;
       } else {
           roomInfo.time = 30;
+          roomInfo.timeState = "InGame"
           console.log("No verification. Go back to playing.");
           io.to(roomKey).emit("verificationEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
       }
