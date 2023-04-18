@@ -46,8 +46,6 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("board", "assets/image/board.png");
         this.load.image("뒷면", "assets/image/뒷면.png");
         this.load.image("okButton", "assets/image/okButton.png");
-        this.load.image("verificationTrueBox", "assets/image/verificationTrueBox.png");
-        this.load.image("verificationFalseBox", "assets/image/verificationFalseBox.png");
         this.load.image("rightArrange", "assets/image/rightArrange.png");
         this.load.image("leftArrange", "assets/image/leftArrange.png");
         this.load.image("myturnImage", "assets/image/myturn.png");
@@ -110,7 +108,6 @@ export default class GameScene extends Phaser.Scene {
         this.load.audio("카드클릭", "assets/sound/딸깍.mp3");
         this.load.audio("카드내려놓기", "assets/sound/놓기.mp3");
         this.load.audio("버튼클릭", "assets/sound/클릭.mp3");
-        this.load.audio("이의제기", "assets/sound/이의제기.mp3");
         this.load.audio("이의제기맞음", "assets/sound/맞음.mp3");
         this.load.audio("이의제기틀림", "assets/sound/틀림.mp3");
         this.load.audio("내턴", "assets/sound/내턴.mp3");
@@ -140,7 +137,6 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("launchVerifiScene");
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
-        scene.whetherObjection = false; // objection의 가능 여부를 나타낸다
         scene.word = ""; // 제출하는 단어
         scene.direction = "row"; // 자신의 card drop이 row인지 column인지를 나타낸다
         scene.dropped = false; // drop을 1번 이상 했는지를 나타낸다
@@ -150,7 +146,6 @@ export default class GameScene extends Phaser.Scene {
         scene.cardClicksound = scene.sound.add("카드클릭",{loop:false});
         scene.cardDropsound = scene.sound.add("카드내려놓기",{loop:false});
         scene.buttonClicksound = scene.sound.add("버튼클릭",{loop:false});
-        scene.verificationsound = scene.sound.add("이의제기",{loop:false});
         scene.verificationTruesound = scene.sound.add("이의제기맞음",{loop:false});
         scene.verificationFalsesound = scene.sound.add("이의제기틀림",{loop:false});
         scene.myturnsound = scene.sound.add("내턴",{loop:false});
@@ -226,21 +221,6 @@ export default class GameScene extends Phaser.Scene {
             };
         });
       
-        // objection을 신청하는 button
-        const objectionButton = scene.add.sprite(1815, 860, "objectionButton(N)")
-        .setInteractive()
-        .setDepth(1)
-        .setScale(0.35)
-        .on("pointerup",() => {
-            if(scene.whetherObjection) sharedData.socket.emit("objection", sharedData.roomKey, sharedData.socket.id);
-        })
-        .on('pointerover', () => {
-            objectionButton.setTexture("objectionButton(Y)");
-        })
-        .on("pointerout", ()=> {
-            objectionButton.setTexture("objectionButton(N)");
-        })
-      
         // 게임 배경, 로고, 보드, 마지막 단어 바, 마지막 단어
         scene.background = scene.add.sprite(game.config.width / 2, game.config.height / 2, "background");
         scene.logo = scene.add.sprite(200, 120, "logo");
@@ -256,22 +236,6 @@ export default class GameScene extends Phaser.Scene {
         scene.cardPreview.displayWidth = gameOptions.cardWidth * gameOptions.blankSizeRatio;
         scene.cardPreview.displayHeight = gameOptions.cardHeight * gameOptions.blankSizeRatio;
         scene.cardPreview.setDepth(3);
-      
-        // 이의신청 결과에 따른 안내 메시지 박스와 확인 버튼
-        scene.verificationTrueBox = scene.add.sprite(1050, 500, "verificationTrueBox");
-        scene.verificationTrueBox.setDepth(5);
-        scene.verificationTrueBox.visible = false;
-        scene.verificationFalseBox = scene.add.sprite(1050, 500, "verificationFalseBox");
-        scene.verificationFalseBox.setDepth(5);
-        scene.verificationFalseBox.visible = false;
-        scene.okButton = scene.add.sprite(1050, 500 + 220, "okButton").setInteractive().on("pointerup",() => {
-            scene.cardClicksound.play();
-            scene.verificationTrueBox.visible = false;
-            scene.verificationFalseBox.visible = false;
-            scene.okButton.visible = false;
-        });
-        scene.okButton.visible = false;
-        scene.okButton.setDepth(6);
       
         scene.countArrange = 0;
         // handGroup에 있는 카드 목록을 왼쪽, 오른쪽으로 이동시키는 버튼
@@ -434,9 +398,6 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("launchVerifiScene", (data) => {
             scene.scene.launch("VerificationScene", {turnPlayer: data.id, word:data.word});
         })
-        sharedData.socket.on("objection", () => {
-            scene.verificationsound.play();
-        });
 
         sharedData.socket.on("returnCard", (id) => {
             let dropcardvals = [];
@@ -596,8 +557,6 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("firstDrop", () => {
             scene.cardDropsound.play();
             scene.dropped = true;
-            scene.whetherObjection = false;
-            console.log("whetherObjection: " + scene.whetherObjection);
             scene.dropCards = [];
         });
       
@@ -673,12 +632,10 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("turnEnd", (data) => {
             console.log("turnend data",data);
             if (data.type === "finish") {
-                scene.whetherObjection = true;
                 scene.lastWord.setStyle(WordStyle);
                 scene.lastWord.setText(data.word);
             }
             else if (data.type === "deck") {
-                scene.whetherObjection = false;
                 if (scene.dropped) {
                     // drop한 card를 모두 제거한다
                     let dropcardvals = []
@@ -700,7 +657,6 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
             else if (data.type === "time") {
-                scene.whetherObjection = false;
                 if (scene.dropped) {
                     let dropcardvals = []
                     for(let i = 0; i<scene.dropCards.length; i++) {
@@ -757,58 +713,56 @@ export default class GameScene extends Phaser.Scene {
             scene.dropped = false;
         });
       
-        // 마지막 유저가 제출한 단어에 대해 objection을 신청한 결과로 존재하지 않는 단어일 때
-        sharedData.socket.on("verificationFalse", (id) => {
-            scene.verificationFalsesound.play();
-            let dropcardvals = []
-            for(let i = 0; i<scene.dropCards.length; i++) {
-                // board를 update한다
-                scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
-                scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
-                // 만약 자신이 마지막 유저라면 제거한 card를 모두 hand로 가져온 후 추가로 card를 1장 생성한다
-                dropcardvals.push(scene.dropCards[i].value);
-                let coordinates = this.setHandCoordinates(this.handGroup.countActive());
-                scene.tweens.add({
-                    targets: scene.dropCards[i],
-                    x: coordinates.x,
-                    y: coordinates.y,
-                    duration: 1500,
-                    onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
-                        dropcard.destroy();
-                    },
-                    onCompleteParams: [scene.dropCards[i]]
-                });
-            }
-            if (id === sharedData.socket.id) {
-                for (let i=0; i<scene.dropCards.length;i++){
-                    scene.createCard(dropcardvals[i]);
+        sharedData.socket.on("verificationresult", (data) => {
+            if(data.result === "true") { //verificationTrue
+                scene.verificationTruesound.play();
+                // 자신이 이의신청한 유저라면 카드를 1장 생성한다
+                if (data.id === sharedData.socket.id) {
+                    sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"verification"});
                 }
-                sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"verification"});
+            } else if(data.result === "false"){ // verificationFalse
+                scene.verificationFalsesound.play();
+                let dropcardvals = []
+                for(let i = 0; i<scene.dropCards.length; i++) {
+                    // board를 update한다
+                    scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
+                    scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
+                    // 만약 자신이 마지막 유저라면 제거한 card를 모두 hand로 가져온 후 추가로 card를 1장 생성한다
+                    dropcardvals.push(scene.dropCards[i].value);
+                    if (data.id === sharedData.socket.id) {
+                        let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+                        scene.tweens.add({
+                            targets: scene.dropCards[i],
+                            x: coordinates.x,
+                            y: coordinates.y,
+                            duration: 300,
+                            onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                                dropcard.destroy();
+                            },
+                            onCompleteParams: [scene.dropCards[i]]
+                        });
+                    } else {
+                        scene.tweens.add({
+                            targets: scene.dropCards[i],
+                            displayWidth: 0,
+                            displayHeight: 0,
+                            duration: 300,
+                            onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                                dropcard.destroy();
+                            },
+                            onCompleteParams: [scene.dropCards[i]]
+                        });
+                    } 
+                }
+                if (data.id === sharedData.socket.id) {
+                    for (let i=0; i<scene.dropCards.length;i++){
+                        scene.createCard(dropcardvals[i]);
+                    }
+                    sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"verification"});
+                }
+                scene.cleardropCards();
             }
-            scene.cleardropCards();
-            // 존재하지 않는 단어라는 메시지 박스를 띄운다
-            scene.verificationFalseBox.visible = true;
-            scene.okButton.visible = true;
-        });
-      
-        // 마지막 유저가 제출한 단어에 대해 objection을 신청한 결과로 존재하는 단어일 때
-        sharedData.socket.on("verificationTrue", (data) => {
-            scene.verificationTruesound.play();
-            let meaningStyle = {font: "30px BR-R", fill: "black"};
-            // 자신이 이의신청한 유저라면 카드를 1장 생성한다
-            if (data.id === sharedData.socket.id) {
-                console.log("존재하는 단어입니다.");
-                scene.whetherObjection = false;
-                console.log("whetherObjection: " + scene.whetherObjection);
-                sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"verification"});
-            }
-            // 단어를 설명한다
-            scene.lastWord.setStyle(meaningStyle);
-            scene.lastWord.setText(data.word + " " + data.pos + " " + data.def);
-            // 존재하는 단어라는 메시지 박스를 띄운다
-            scene.verificationTrueBox.visible = true;
-            scene.okButton.visible = true;
-        });
+        })
       
         function updatePlayerList(players) {
             while (player_list.firstChild) {
@@ -854,8 +808,6 @@ export default class GameScene extends Phaser.Scene {
     cleardropCards() {
         // 배열을 초기화한다
         this.dropCards = [];
-        this.whetherObjection = false;
-        console.log("whetherObjection: " + this.whetherObjection);
     }
  
     // card value값을 받아서 해당 값을 가지는 card를 생성한다

@@ -111,6 +111,7 @@ module.exports = (io) => {
       let readynum = playerlist.filter(player => roomInfo.players[player].played).length;
 
       if(readynum === playerlist.length) {
+          roomInfo.timeState = "InGame";
           roomInfo.currentTurn = playerlist[0];
           playerlist.forEach((player) => {
             let playercard = [];
@@ -137,6 +138,8 @@ module.exports = (io) => {
 
     socket.on("launchVerifiScene", (data) => {
       const roomInfo = gameRooms[data.roomKey];
+      roomInfo.time = 7;
+      roomInfo.timeState = "Verificate";
       io.to(data.roomKey).emit("launchVerifiScene", {id:data.id, word:data.word})
     })
 
@@ -216,20 +219,25 @@ module.exports = (io) => {
       socket.broadcast.to(roomKey).emit('firstDrop');
     });
 
+    socket.on("verificationresult", (data) => {
+      const roomInfo = gameRooms[data.roomKey];
+      io.to(data.roomKey).emit("verificationresult",{result:data.result, id:data.id});
+    })
+
     socket.on('currentCardUpdate', (roomKey, id, number) => {
       const roomInfo = gameRooms[roomKey];
       roomInfo.players[id].card = number
       io.to(roomKey).emit('currentCardUpdate', roomInfo.players);
     });
 
-    socket.on('objection', (roomKey, id) => {
-      const roomInfo = gameRooms[roomKey];
+    socket.on('objection', (val) => {
+      const roomInfo = gameRooms[val.roomKey];
+      roomInfo.time = 7;
       if (roomInfo.criticalSection)
           roomInfo.criticalSection = false;
       else
           return 0;
-      console.log(roomInfo.lastWord);
-      const url = `https://krdict.korean.go.kr/api/search?certkey_no=4549&key=487E5EEAB2BE2EB3932C7B599847D5DC&type_search=search&part=word&q=${roomInfo.lastWord}&sort=dict&advanced=y&method=exact`;
+      const url = `https://krdict.korean.go.kr/api/search?certkey_no=4549&key=487E5EEAB2BE2EB3932C7B599847D5DC&type_search=search&part=word&q=${val.word}&sort=dict&advanced=y&method=exact`;
       const options = {
           method: "get",
           httpsAgent: new https.Agent({
@@ -270,12 +278,12 @@ module.exports = (io) => {
           // 존재하지 않는 단어일 때
           if(def === null){
               console.log("존재하지 않는 단어입니다.");
-              io.to(roomKey).emit('verificationFalse', {id:roomInfo.lastTurn, nick:roomInfo.players[roomInfo.lastTurn].playerNickname });
+              io.to(val.roomKey).emit('verificationFalse', {id:roomInfo.currentTurn, nick:roomInfo.players[roomInfo.lastTurn].playerNickname });
           }
           // 존재하는 단어일 때
           else {
               console.log(word, pos, def);
-              io.to(roomKey).emit('verificationTrue', {id:id, nick:roomInfo.players[id].playerNickname, word:word, pos:pos, def:def});
+              io.to(val.roomKey).emit('verificationTrue', {id:val.id, nick:roomInfo.players[val.id].playerNickname, word:word, pos:pos, def:def});
           }
       });
     });
@@ -388,7 +396,6 @@ module.exports = (io) => {
   function decreaseTime(roomKey) {
     const roomInfo = gameRooms[roomKey];
     if(roomInfo.timeState === "InGame"){
-      if (roomInfo.turnCount === 0 && !roomInfo.readycheck) roomInfo.time = 30;
       if (roomInfo.time > 0) {
         io.to(roomKey).emit("timeDecrease", roomInfo.time);
         roomInfo.time -= 1;
@@ -405,7 +412,7 @@ module.exports = (io) => {
       } else {
           roomInfo.time = 30;
           console.log("No verification. Go back to playing.");
-          io.to(roomKey).emit("turnEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
+          io.to(roomKey).emit("verificationEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
       }
     }
   }

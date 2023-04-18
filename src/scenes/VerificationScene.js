@@ -6,10 +6,10 @@ export default class VerificationScene extends Phaser.Scene {
         super("VerificationScene");
     }
 
-    // init(data){
-    //     this.turnPlayer = data.turnPlayer;
-    //     this.word = data.word;
-    // }
+    init(data){
+        this.turnPlayer = data.turnPlayer;
+        this.word = data.word;
+    }
 
     preload() {
         this.load.image("verificationbackground", "assets/image/verificationbackground.png");
@@ -22,18 +22,21 @@ export default class VerificationScene extends Phaser.Scene {
 
         sharedData.socket.removeAllListeners("verificationFalse");
         sharedData.socket.removeAllListeners("verificationTrue");
+        sharedData.socket.removeAllListeners("verTimeDecrease");
+        sharedData.socket.removeAllListeners("verificationEnd");
 
-        let check = false;
+        let result = "";
+        let cardgetplayer = "";
 
         //BACKGROUND
         let bg = scene.add.image(1050, 500, "verificationbackground");
 
         let Toptext = scene.add.text(0, 0, "이의제기 가능", {font: "70px BR-R", color: "#523b33"});
-        let wordText = scene.add.text(0, 0, "scene.word", {font: "70px BR-R", color: "#523b33"});
-        let resultText = scene.add.text(0, 0, "10", {font: "60px BR-R", color: "#523b33"});
+        let wordText = scene.add.text(0, 0, scene.word, {font: "70px BR-R", color: "#523b33"});
+        let resultText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
         let meanText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
         let playerText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
-        let timeText = scene.add.text(0, 0, "5", {font: "60px BR-R", color: "#523b33"});
+        let timeText = scene.add.text(0, 0, "5초 후에 게임으로 돌아갑니다.", {font: "60px BR-R", color: "#523b33"});
         
         Phaser.Display.Align.In.Center(Toptext, bg);
         Phaser.Display.Align.In.Center(wordText, bg);
@@ -56,8 +59,7 @@ export default class VerificationScene extends Phaser.Scene {
         .setScale(0.7)
         .on("pointerup",() => {
             if (this.turnPlayer != sharedData.socket.id){
-                sharedData.socket.emit("objection", sharedData.roomKey, sharedData.socket.id);
-                check = true;
+                sharedData.socket.emit("objection", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word});
             }
         })
         .on('pointerover', () => {
@@ -85,6 +87,10 @@ export default class VerificationScene extends Phaser.Scene {
             playerText.y = 650;
 
             objectionButton.visible = false;
+
+            result = "false";
+            cardgetplayer = data.id;
+            scene.word = "";
         });
 
         sharedData.socket.on("verificationTrue", (data) => {
@@ -106,6 +112,27 @@ export default class VerificationScene extends Phaser.Scene {
             playerText.y = 650;
 
             objectionButton.visible = false;
+
+            result = "true";
+            cardgetplayer = data.id;
+        });
+
+        sharedData.socket.on("verTimeDecrease", (timer) => {
+            timeText.setText(`${timer}초 후에 게임으로 돌아갑니다.`);
+            Phaser.Display.Align.In.Center(timeText, bg);
+            timeText.y = 800;
+        });
+
+        sharedData.socket.on("verificationEnd", (data) => {
+            scene.scene.stop("VerificationScene");
+            if (data.id === sharedData.socket.id) {
+                if(result === ""){
+                    sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word, type:"finish"});
+                } else {
+                    sharedData.socket.emit("verificationresult", {roomKey:sharedData.roomKey, result:result, id:cardgetplayer});
+                    sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word, type:"finish"});
+                }
+            }
         });
     }
 }

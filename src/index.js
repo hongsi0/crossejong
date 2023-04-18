@@ -21,7 +21,7 @@ import GameRoomScene from "./scenes/GameRoomScene";
 import GameScene from "./scenes/GameScene";
 import sharedData from "./shared";
 import LoginScene from "./scenes/LoginScene";
-import VerificationScene from "./scenes/verificationScene";
+import VerificationScene from "./scenes/VerificationScene";
 import GameEndScene from "./scenes/GameEndScene";
 import TutorialScene from "./scenes/TutorialScene";
 
@@ -48,7 +48,7 @@ export class Game extends Phaser.Game {
 
     // Start the game with the mainscene
     // << START GAME WITH MAIN SCENE HERE >>
-    this.scene.start("VerificationScene");
+    this.scene.start("LoginScene");
   }
 }
 // Create new instance of game
