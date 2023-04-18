@@ -39,10 +39,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("blank", "assets/image/blank.png");
         this.load.image("deck", "assets/image/deck.png");
         this.load.image("finishButton", "assets/image/finishButton.png");
-        this.load.image("objectionButton(N)", "assets/image/objectionButton(N).png");
-        this.load.image("objectionButton(Y)", "assets/image/objectionButton(Y).png");
         this.load.image("logo", "assets/image/logo.png");
-        this.load.image("lastWordBar", "assets/image/lastWordBar.png");
         this.load.image("board", "assets/image/board.png");
         this.load.image("뒷면", "assets/image/뒷면.png");
         this.load.image("okButton", "assets/image/okButton.png");
@@ -124,23 +121,20 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("firstDrop");
         sharedData.socket.removeAllListeners("cardDrop");
         sharedData.socket.removeAllListeners("turnEnd");
-        sharedData.socket.removeAllListeners("verificationFalse");
-        sharedData.socket.removeAllListeners("verificationTrue");
         sharedData.socket.removeAllListeners("currentPlayers");
         sharedData.socket.removeAllListeners("disconnected");
         sharedData.socket.removeAllListeners("currentCardUpdate");
         sharedData.socket.removeAllListeners("gameEnd");
         sharedData.socket.removeAllListeners("returnCard");
         sharedData.socket.removeAllListeners("timeDecrease");
-        sharedData.socket.removeAllListeners("objection");
         sharedData.socket.removeAllListeners("addalphacards");
         sharedData.socket.removeAllListeners("launchVerifiScene");
+        sharedData.socket.removeAllListeners("verificationresult");        
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
         scene.word = ""; // 제출하는 단어
         scene.direction = "row"; // 자신의 card drop이 row인지 column인지를 나타낸다
         scene.dropped = false; // drop을 1번 이상 했는지를 나타낸다
-        let WordStyle = {font: "60px BR-R", fill: "black"};
         let isMouseOver = false;
 
         scene.cardClicksound = scene.sound.add("카드클릭",{loop:false});
@@ -153,7 +147,7 @@ export default class GameScene extends Phaser.Scene {
       
         scene.players = {
         //   [playerid]: {playerId:, playerNickname:, played:, card:}
-        }
+        };
         
         // 자신 및 다른 유저가 drop한 card들을 저장하는 배열과 그 수를 세는 변수
         scene.dropCards = [];
@@ -167,7 +161,7 @@ export default class GameScene extends Phaser.Scene {
             for (let i=0; i<gameOptions.boardxrange; i++) {
                 scene.board[j].push({posval:-1, cardval:-1});
             }
-        }
+        };
       
         // 게임에서 사용하는 deck
         scene.deckArray = ["가", "거", "고", "구", "그", "금", "기", "나", "다", "대",
@@ -206,7 +200,7 @@ export default class GameScene extends Phaser.Scene {
         })
         .on("pointerout", ()=> {
             returnButton.setTexture("returnButton(N)");
-        })
+        });
       
         // 자신의 turn을 끝내는 button
         const finishButton = scene.add.sprite(1815, 750, "finishButton")
@@ -225,12 +219,9 @@ export default class GameScene extends Phaser.Scene {
         scene.background = scene.add.sprite(game.config.width / 2, game.config.height / 2, "background");
         scene.logo = scene.add.sprite(200, 120, "logo");
         scene.boardImage = scene.add.sprite(1050, 505, "board").setScale(1.02);
-        scene.lastWordBar = scene.add.sprite(1050, 60, "lastWordBar");
-        scene.lastWord = scene.add.text(1050, 60, "", WordStyle);
-        scene.lastWord.setOrigin(0.5, 0.5);
         
         // card를 drop하는 위치에 생기는 preview
-        scene.cardPreview = scene.add.sprite(200, 200, "뒷면");
+        scene.cardPreview = scene.add.sprite(0, 0, "뒷면");
         scene.cardPreview.visible = false;
         scene.cardPreview.alpha = 0.75;
         scene.cardPreview.displayWidth = gameOptions.cardWidth * gameOptions.blankSizeRatio;
@@ -336,7 +327,7 @@ export default class GameScene extends Phaser.Scene {
                     y: pointer.y,
                     duration: 150
                 });
-            };
+            }
         });
       
         // // card를 drag하면 pointer를 따라다니도록 한다
@@ -372,7 +363,7 @@ export default class GameScene extends Phaser.Scene {
                 // If scene is the first card drop, initialize some letiables and emit an event to other players
                 if (!scene.dropped) {
                     scene.dropped = true;
-                    scene.cleardropCards();
+                    scene.dropCards = [];
                     sharedData.socket.emit("firstDrop", sharedData.roomKey);
                 }
                 sharedData.socket.emit("cardDrop", {roomKey:sharedData.roomKey, cardval:card.value, i:card.i, j:card.j});
@@ -384,11 +375,6 @@ export default class GameScene extends Phaser.Scene {
                 if (!scene.handGroup.contains(card) && !scene.boardGroup.contains(card)) {
                     scene.handGroup.add(card);
                     scene.arrangeCardsInHand();
-                    scene.tweens.add({
-                        targets: scene.background,
-                        alpha: 1,
-                        duration: 150
-                    });
                 }
             }
         });
@@ -445,7 +431,7 @@ export default class GameScene extends Phaser.Scene {
             scene.alphaCards = [];
             scene.graphicGroup.clear(true);
             scene.arrangeCardsInHand();
-            scene.cleardropCards();
+            scene.dropCards = [];
         });
       
         sharedData.socket.on("pickcard", (data) => {
@@ -453,7 +439,7 @@ export default class GameScene extends Phaser.Scene {
             scene.cardPreview.x = 1810;
             scene.cardPreview.y = 490;
             scene.cardPreview.visible = true;
-            scene.cardPreview.alpha = 1
+            scene.cardPreview.alpha = 1;
             let coordinates = this.setHandCoordinates(this.handGroup.countActive());
             if (coordinates.x > gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax){
                 coordinates.x = gameOptions.firstCardX + gameOptions.betweenCrad *  (gameOptions.handCardMax-1);
@@ -484,7 +470,7 @@ export default class GameScene extends Phaser.Scene {
                 scene.cardPreview.x = 1810;
                 scene.cardPreview.y = 490;
                 scene.cardPreview.visible = true;
-                scene.cardPreview.alpha = 1
+                scene.cardPreview.alpha = 1;
                 let coordinates = this.setHandCoordinates(this.handGroup.countActive());
                 if (coordinates.x > gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax){
                     coordinates.x = gameOptions.firstCardX + gameOptions.betweenCrad * (gameOptions.handCardMax-1);
@@ -631,10 +617,7 @@ export default class GameScene extends Phaser.Scene {
         // 다른 유저의 turn이 끝나면 objection을 활성화한다
         sharedData.socket.on("turnEnd", (data) => {
             console.log("turnend data",data);
-            if (data.type === "finish") {
-                scene.lastWord.setStyle(WordStyle);
-                scene.lastWord.setText(data.word);
-            }
+            if (data.type === "finish") {}
             else if (data.type === "deck") {
                 if (scene.dropped) {
                     // drop한 card를 모두 제거한다
@@ -653,7 +636,7 @@ export default class GameScene extends Phaser.Scene {
                         }
                     }
                     scene.arrangeCardsInHand();
-                    scene.cleardropCards();
+                    scene.dropCards = [];
                 }
             }
             else if (data.type === "time") {
@@ -673,7 +656,7 @@ export default class GameScene extends Phaser.Scene {
                         }
                     }
                     scene.arrangeCardsInHand();
-                    scene.cleardropCards();
+                    scene.dropCards = [];
                 }
                 if(scene.myTurn) {
                     // card를 1장 생성한다
@@ -681,7 +664,6 @@ export default class GameScene extends Phaser.Scene {
                     sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"time"});
                 }
             }
-
             else if (data.type === "disconnection") {
                 if (scene.dropped) {
                     for(let i = 0; i<scene.dropCards.length; i++) {
@@ -690,7 +672,7 @@ export default class GameScene extends Phaser.Scene {
                         scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
                         scene.dropCards[i].destroy();
                     }
-                    scene.cleardropCards();
+                    scene.dropCards = [];
                 }
             }
 
@@ -760,7 +742,7 @@ export default class GameScene extends Phaser.Scene {
                     }
                     sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"verification"});
                 }
-                scene.cleardropCards();
+                scene.dropCards = [];
             }
         })
       
@@ -768,9 +750,7 @@ export default class GameScene extends Phaser.Scene {
             while (player_list.firstChild) {
               player_list.removeChild(player_list.firstChild);
             }
-          
             scene.players = players;
-          
             Object.keys(scene.players).forEach((playerkey) => {
               const playerbox = document.createElement("div");
               playerbox.setAttribute("class", "playerbox");
@@ -804,11 +784,6 @@ export default class GameScene extends Phaser.Scene {
         });
     }
     update() {}
-
-    cleardropCards() {
-        // 배열을 초기화한다
-        this.dropCards = [];
-    }
  
     // card value값을 받아서 해당 값을 가지는 card를 생성한다
     createCard(n) {
