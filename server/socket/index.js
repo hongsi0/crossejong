@@ -19,6 +19,7 @@ const gameRooms = {
     // deck: [0,1,2 ... 47],
     // difficulty:,
     // time:,
+    // timeState: "", // "InGame", "Verificate"
   // }
 };
 
@@ -386,7 +387,7 @@ module.exports = (io) => {
   // 시간을 1초에 -1씩 감소시키는 함수
   function decreaseTime(roomKey) {
     const roomInfo = gameRooms[roomKey];
-    if (roomInfo.playing) {
+    if(roomInfo.timeState === "InGame"){
       if (roomInfo.turnCount === 0 && !roomInfo.readycheck) roomInfo.time = 30;
       if (roomInfo.time > 0) {
         io.to(roomKey).emit("timeDecrease", roomInfo.time);
@@ -394,6 +395,16 @@ module.exports = (io) => {
       } else {
           roomInfo.time = 30;
           console.log("time over",roomInfo.currentTurn);
+          io.to(roomKey).emit("turnEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
+      }
+    }
+    else if(roomInfo.timeState === "Verificate"){
+      if (roomInfo.time > 0) {
+        io.to(roomKey).emit("verTimeDecrease", roomInfo.time);
+        roomInfo.time -= 1;
+      } else {
+          roomInfo.time = 30;
+          console.log("No verification. Go back to playing.");
           io.to(roomKey).emit("turnEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
       }
     }
