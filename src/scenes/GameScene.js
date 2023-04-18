@@ -137,6 +137,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("timeDecrease");
         sharedData.socket.removeAllListeners("objection");
         sharedData.socket.removeAllListeners("addalphacards");
+        sharedData.socket.removeAllListeners("launchVerifiScene");
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
         scene.whetherObjection = false; // objection의 가능 여부를 나타낸다
@@ -221,7 +222,7 @@ export default class GameScene extends Phaser.Scene {
             scene.sortWord();
             console.log(scene.alphaCards,scene.SubmitWord())
             if (scene.myTurn && scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
-                sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word, type:"finish"});
+                sharedData.socket.emit("launchVerifiScene",{roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word});
             };
         });
       
@@ -430,6 +431,9 @@ export default class GameScene extends Phaser.Scene {
       
         sharedData.socket.emit("ready", sharedData.roomKey);
 
+        sharedData.socket.on("launchVerifiScene", (data) => {
+            scene.scene.launch("VerificationScene", {turnPlayer: data.id, word:data.word});
+        })
         sharedData.socket.on("objection", () => {
             scene.verificationsound.play();
         });

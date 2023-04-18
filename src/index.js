@@ -48,7 +48,7 @@ export class Game extends Phaser.Game {
 
     // Start the game with the mainscene
     // << START GAME WITH MAIN SCENE HERE >>
-    this.scene.start("GameEndScene");
+    this.scene.start("VerificationScene");
   }
 }
 // Create new instance of game

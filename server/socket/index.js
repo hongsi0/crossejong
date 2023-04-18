@@ -134,6 +134,11 @@ module.exports = (io) => {
       io.to(data.roomKey).emit("returnCard", data.id)
     })
 
+    socket.on("launchVerifiScene", (data) => {
+      const roomInfo = gameRooms[data.roomKey];
+      io.to(data.roomKey).emit("launchVerifiScene", {id:data.id, word:data.word})
+    })
+
     socket.on("pickcard", (data) => {
       console.log("pickcard");
       const roomInfo = gameRooms[data.roomKey];
@@ -218,7 +223,6 @@ module.exports = (io) => {
 
     socket.on('objection', (roomKey, id) => {
       const roomInfo = gameRooms[roomKey];
-      io.to(roomKey).emit("objection");
       if (roomInfo.criticalSection)
           roomInfo.criticalSection = false;
       else
@@ -265,13 +269,12 @@ module.exports = (io) => {
           // 존재하지 않는 단어일 때
           if(def === null){
               console.log("존재하지 않는 단어입니다.");
-              io.to(roomKey).emit('verificationFalse', roomInfo.lastTurn);
+              io.to(roomKey).emit('verificationFalse', {id:roomInfo.lastTurn, nick:roomInfo.players[roomInfo.lastTurn].playerNickname });
           }
           // 존재하는 단어일 때
           else {
               console.log(word, pos, def);
-
-              io.to(roomKey).emit('verificationTrue', {id:id, word:word, pos:pos, def:def});
+              io.to(roomKey).emit('verificationTrue', {id:id, nick:roomInfo.players[id].playerNickname, word:word, pos:pos, def:def});
           }
       });
     });

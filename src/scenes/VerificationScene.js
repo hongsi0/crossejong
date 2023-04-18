@@ -6,16 +6,15 @@ export default class VerificationScene extends Phaser.Scene {
         super("VerificationScene");
     }
 
-    // init(word){
-    //     this.word = word;
+    // init(data){
+    //     this.turnPlayer = data.turnPlayer;
+    //     this.word = data.word;
     // }
 
     preload() {
         this.load.image("verificationbackground", "assets/image/verificationbackground.png");
         this.load.image("objectionButton(N)", "assets/image/objectionButton(N).png");
         this.load.image("objectionButton(Y)", "assets/image/objectionButton(Y).png");
-        this.load.image("ok(N)", "assets/image/ok(N).png");
-        this.load.image("ok(Y)", "assets/image/ok(Y).png");
     }
 
     create() {
@@ -32,51 +31,40 @@ export default class VerificationScene extends Phaser.Scene {
         let Toptext = scene.add.text(0, 0, "이의제기 가능", {font: "70px BR-R", color: "#523b33"});
         let wordText = scene.add.text(0, 0, "scene.word", {font: "70px BR-R", color: "#523b33"});
         let resultText = scene.add.text(0, 0, "10", {font: "60px BR-R", color: "#523b33"});
-        let meanText = scene.add.text(0, 0, "단어뜻", {font: "60px BR-R", color: "#523b33"});
-        let playerText = scene.add.text(0, 0, "플레이어", {font: "60px BR-R", color: "#523b33"});
+        let meanText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
+        let playerText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
+        let timeText = scene.add.text(0, 0, "5", {font: "60px BR-R", color: "#523b33"});
         
         Phaser.Display.Align.In.Center(Toptext, bg);
         Phaser.Display.Align.In.Center(wordText, bg);
         Phaser.Display.Align.In.Center(resultText, bg);
         Phaser.Display.Align.In.Center(meanText, bg);
         Phaser.Display.Align.In.Center(playerText, bg);
+        Phaser.Display.Align.In.Center(timeText, bg);
 
         Toptext.y = 140;
         wordText.y = 300;
         resultText.y = 430;
         meanText.y = 550;
         playerText.y = 650;
+        timeText.y = 800;
 
-        // // objection을 신청하는 button
-        // const objectionButton = scene.add.sprite(1050, 620, "objectionButton(N)")
-        // .setInteractive()
-        // .setDepth(1)
-        // .setScale(0.7)
-        // .on("pointerup",() => {
-        //     // sharedData.socket.emit("objection", sharedData.roomKey, sharedData.socket.id);
-        //     check = true;
-        //     console.log(check);
-        // })
-        // .on('pointerover', () => {
-        //     objectionButton.setTexture("objectionButton(Y)");
-        // })
-        // .on("pointerout", ()=> {
-        //     objectionButton.setTexture("objectionButton(N)");
-        // });
-
-        const okButton = scene.add.sprite(1050, 830, "ok(N)")
+        // objection을 신청하는 button
+        const objectionButton = scene.add.sprite(1050, 620, "objectionButton(N)")
         .setInteractive()
         .setDepth(1)
+        .setScale(0.7)
         .on("pointerup",() => {
-            // sharedData.socket.emit("objection", sharedData.roomKey, sharedData.socket.id);
-            check = true;
-            console.log(check);
+            if (this.turnPlayer != sharedData.socket.id){
+                sharedData.socket.emit("objection", sharedData.roomKey, sharedData.socket.id);
+                check = true;
+            }
         })
         .on('pointerover', () => {
-            okButton.setTexture("ok(Y)");
+            objectionButton.setTexture("objectionButton(Y)");
         })
         .on("pointerout", ()=> {
-            okButton.setTexture("ok(N)");
+            objectionButton.setTexture("objectionButton(N)");
         });
 
         sharedData.socket.on("verificationFalse", (data) => {
