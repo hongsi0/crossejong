@@ -168,6 +168,7 @@ module.exports = (io) => {
           playing: false,
           readycheck: false,
           startingPlayers:roomInfo.startingPlayers,
+          timeState: "",
         }
         gameRooms[roomKey] = temp_roomInfo;
         io.to(roomKey).emit("gameEnd");
