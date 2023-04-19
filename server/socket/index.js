@@ -11,14 +11,12 @@ const gameRooms = {
     // numPlayers: 0,
     // playing: false,
     // turnCount: 0,
-    // lastWord: "",
-    // criticalSection: true,
-    // readycheck: false,
     // currentTurn: "",
     // deck: [0,1,2 ... 47],
     // difficulty:,
-    // time:,
+    // time: 30,
     // timeState: "", // "InGame", "Verificate"
+    // playerRank: [],
   // }
 };
 
@@ -50,7 +48,6 @@ module.exports = (io) => {
         playerId: socket.id,
         playerNickname: socket.nickname,
         played: false,
-        readycheck: false,
       }
       gamestate.numPlayers = 1;
       gamestate['players'] = playerlist;
@@ -90,10 +87,9 @@ module.exports = (io) => {
       const roomInfo = gameRooms[roomKey];
       roomInfo.playing = true;
       roomInfo.turnCount = 0;
-      roomInfo.lastWord = "";
-      roomInfo.criticalSection = true;
       roomInfo.currentTurn = "";
       roomInfo.deck = shuffledeck();
+      roomInfo.timeState = "InGame";
       console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
       roomInfo.startingPlayers = playerlist;
@@ -116,14 +112,13 @@ module.exports = (io) => {
             for (let i=0;i<6;i++){
               playercard.push(roomInfo.deck.pop())
             }
-            roomInfo.players[player].card = 6
+            roomInfo.players[player].card = 6;
             io.to(player).emit("firstcard", playercard);
           });
           io.to(roomKey).emit("nextTurn", playerlist[0]);
           io.to(roomKey).emit('centerCard', roomInfo.deck.pop());
           io.to(roomKey).emit('currentPlayers', roomInfo.players);
           roomInfo.time = 30;
-          roomInfo.readycheck = true;
           console.log("ready");
           console.log(roomInfo.players);
         }
@@ -166,7 +161,6 @@ module.exports = (io) => {
           players: roomInfo.players,
           numPlayers: playerlist.length,
           playing: false,
-          readycheck: false,
           startingPlayers:roomInfo.startingPlayers,
           timeState: "",
         }
@@ -203,8 +197,6 @@ module.exports = (io) => {
         }
       })
       roomInfo.time = 30;
-      roomInfo.lastWord = data.word;
-      roomInfo.criticalSection = true;
       io.to(data.roomKey).emit('turnEnd', {id:data.id, word:data.word, type:data.type});
     });
 
@@ -226,10 +218,6 @@ module.exports = (io) => {
     socket.on('objection', (val) => {
       const roomInfo = gameRooms[val.roomKey];
       roomInfo.time = 7;
-      if (roomInfo.criticalSection)
-          roomInfo.criticalSection = false;
-      else
-          return 0;
       const url = `https://krdict.korean.go.kr/api/search?certkey_no=4549&key=487E5EEAB2BE2EB3932C7B599847D5DC&type_search=search&part=word&q=${val.word}&sort=dict&advanced=y&method=exact`;
       const options = {
           method: "get",
@@ -404,7 +392,7 @@ module.exports = (io) => {
         roomInfo.time -= 1;
       } else {
           roomInfo.time = 30;
-          roomInfo.timeState = "InGame"
+          roomInfo.timeState = "InGame";
           console.log("No verification. Go back to playing.");
           io.to(roomKey).emit("verificationEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
       }
