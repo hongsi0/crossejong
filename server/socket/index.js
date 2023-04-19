@@ -15,7 +15,7 @@ const gameRooms = {
     // deck: [0,1,2 ... 47],
     // difficulty:,
     // time: 30,
-    // timeState: "", // "InGame", "Verificate"
+    // timeState: "", // "InGame", "Verificate", "Result"
     // playerRank: [],
   // }
 };
@@ -93,6 +93,7 @@ module.exports = (io) => {
       console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
       roomInfo.startingPlayers = playerlist;
+      roomInfo.playerRank = [];
       console.log("first turn: " + playerlist[0]);
       io.to(roomKey).emit("gamestart");
     });
@@ -115,7 +116,7 @@ module.exports = (io) => {
             roomInfo.players[player].card = 6;
             io.to(player).emit("firstcard", playercard);
           });
-          io.to(roomKey).emit("nextTurn", playerlist[0]);
+          io.to(playerlist[0]).emit("nextTurn");
           io.to(roomKey).emit('centerCard', roomInfo.deck.pop());
           io.to(roomKey).emit('currentPlayers', roomInfo.players);
           roomInfo.time = 30;
@@ -153,26 +154,17 @@ module.exports = (io) => {
         }
       });
       if(playedplayers.length === 1){ //끝나지 않은 플레이어가 1명일 때
-        console.log("gameEnd");
-        playerlist.forEach((player) => {
-          roomInfo.players[player].played = false;
-        }) 
-        temp_roomInfo = {
-          players: roomInfo.players,
-          numPlayers: playerlist.length,
-          playing: false,
-          startingPlayers:roomInfo.startingPlayers,
-          timeState: "",
-        }
-        gameRooms[roomKey] = temp_roomInfo;
-        io.to(roomKey).emit("gameEnd");
+        roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
+        io.to(roomKey).emit("gameEnd", {playerRank:roomInfo.playerRank});
+        roomInfo.timeState = "Result";
+        roomInfo.time = 5;
       } else{ //끝나지 않은 플레이어가 2명 이상일 때
         while(true) {
           roomInfo.turnCount++;
           let nextIndex = roomInfo.turnCount % roomInfo.startingPlayers.length
           if(playedplayers.includes(roomInfo.startingPlayers[nextIndex])) {
             roomInfo.currentTurn = roomInfo.startingPlayers[nextIndex];
-            io.to(roomKey).emit('nextTurn', roomInfo.currentTurn);
+            io.to(roomInfo.currentTurn).emit('nextTurn');
             io.to(roomKey).emit('currentPlayers', roomInfo.players);
             break;
           }
@@ -193,6 +185,7 @@ module.exports = (io) => {
       const playerlist = Object.keys(roomInfo.players);
       playerlist.forEach((player) => {
         if (roomInfo.players[roomInfo.currentTurn].card === 0) {
+          roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
           roomInfo.players[roomInfo.currentTurn].played = false
         }
       })
@@ -394,7 +387,23 @@ module.exports = (io) => {
           roomInfo.time = 30;
           roomInfo.timeState = "InGame";
           console.log("No verification. Go back to playing.");
-          io.to(roomKey).emit("verificationEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
+          io.to(roomKey).emit("verificationEnd", {id: roomInfo.currentTurn});
+      }
+    }
+    else if(roomInfo.timeState === "Result") {
+      if (roomInfo.time > 0) {
+        roomInfo.time -= 1;
+      } else {
+          console.log("result time over. Go back to gameroom.");
+          temp_roomInfo = {
+            players: roomInfo.players,
+            numPlayers: playerlist.length,
+            playing: false,
+            startingPlayers:roomInfo.startingPlayers,
+            timeState: "",
+          }
+          gameRooms[roomKey] = temp_roomInfo;
+          io.to(roomKey).emit("gameexit")
       }
     }
   }

@@ -129,7 +129,8 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("timeDecrease");
         sharedData.socket.removeAllListeners("addalphacards");
         sharedData.socket.removeAllListeners("launchVerifiScene");
-        sharedData.socket.removeAllListeners("verificationresult");        
+        sharedData.socket.removeAllListeners("verificationresult");
+        sharedData.socket.removeAllListeners("gameexit")        
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
         scene.word = ""; // 제출하는 단어
@@ -493,29 +494,25 @@ export default class GameScene extends Phaser.Scene {
         });
       
         // turn이 시작될때 자신의 turn인지 확인한다
-        sharedData.socket.on("nextTurn", (id) => {
-            console.log(id, sharedData.socket.id);
-            if (id === sharedData.socket.id) {
-                scene.myturnsound.play();
-                console.log(id, sharedData.socket.id);
-                scene.myTurn = true;
-                scene.dropped = false;
-                console.log("My Turn! " + scene.myTurn);
+        sharedData.socket.on("nextTurn", () => {
+            scene.myturnsound.play();
+            scene.myTurn = true;
+            scene.dropped = false;
+            console.log("My Turn! " + scene.myTurn);
 
-                // Phaser 오브젝트 생성
-                let myturnImage = this.add.sprite(1050, 500, 'myturnImage');
-                myturnImage.setDepth(555);
-                // Tween 애니메이션 적용
-                scene.tweens.add({
-                    targets: myturnImage,
-                    alpha: 0, // 투명도를 0으로 조절하여 오브젝트가 서서히 사라지도록 함
-                    duration: 3000, // 1초 동안 애니메이션을 실행함
-                    onComplete: function (tween, targets, myturnImage) { // 애니메이션이 끝난 후 오브젝트를 삭제함
-                        myturnImage.destroy();
-                    },
-                    onCompleteParams: [myturnImage]
-                });
-            }
+            // Phaser 오브젝트 생성
+            let myturnImage = this.add.sprite(1050, 500, 'myturnImage');
+            myturnImage.setDepth(555);
+            // Tween 애니메이션 적용
+            scene.tweens.add({
+                targets: myturnImage,
+                alpha: 0, // 투명도를 0으로 조절하여 오브젝트가 서서히 사라지도록 함
+                duration: 3000, // 1초 동안 애니메이션을 실행함
+                onComplete: function (tween, targets, myturnImage) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                    myturnImage.destroy();
+                },
+                onCompleteParams: [myturnImage]
+            });
         });
       
         // 2명 이상 접속하면 board 중앙에 카드를 생성한다
@@ -778,10 +775,13 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("disconnected", updatePlayerList);
         sharedData.socket.on("currentCardUpdate",updatePlayerList);
       
-        sharedData.socket.on("gameEnd", () => {
-            console.log("gameEnd");
-            scene.scene.start("GameRoomScene");
+        sharedData.socket.on("gameEnd", (data) => {
+            scene.scene.launch("GameEndScene", {playerRank:data.playerRank});
         });
+
+        sharedData.socket.on("gameexit", () => {
+            scene.scene.start("GameRoomScene");
+        })
     }
     update() {}
  
@@ -798,8 +798,8 @@ export default class GameScene extends Phaser.Scene {
         .on("pointerover", () => {
             this.tweens.add({
                 targets: card,
-                displayWidth: gameOptions.cardWidth * 1.2,
-                displayHeight: gameOptions.cardHeight * 1.2,
+                displayWidth: gameOptions.cardWidth * 1.1,
+                displayHeight: gameOptions.cardHeight * 1.1,
                 y: gameOptions.firstCardY - 50,
                 duration: 150,
             })

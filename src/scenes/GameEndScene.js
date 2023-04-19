@@ -4,11 +4,10 @@ import "../fontLoader"; // can use the font as "BR-R"
 export default class GameEndScene extends Phaser.Scene {
     constructor() {
         super("GameEndScene");
-        //this.playerRank = null;
     }
 
-    init(){
-        //this.playerRank = data.playerRank;
+    init(data){
+        this.playerRank = data.playerRank;
     }
 
     preload() {
@@ -17,28 +16,18 @@ export default class GameEndScene extends Phaser.Scene {
     }
 
     create() {
+        const scene = this;
 
         let playerRank = [];
-        playerRank.push("nickname1");
-        playerRank.push("nickname2");
-        // playerRank.push("nickname3");
-        // playerRank.push("nickname4");
-
-
-        const scene = this;
+        for (let i=0;i<scene.playerRank.length;i++){
+            playerRank.push(scene.playerRank[i]);
+        }
+        
         let bg = scene.add.image(1050, 500, "rankbackground");
 
         let topText = scene.add.text(0, 140, "순위", {font: "70px BR-R", color: "#523b33"});
         Phaser.Display.Align.In.Center(topText, bg);
         topText.y = 140;
-
-        const finishButton = scene.add.sprite(1050, 830, "finishButton2")
-        .setInteractive()
-        .setDepth(1)
-        .setScale(1)
-        .on("pointerup",()=>{
-            //sharedData.socket.emit("");
-        })
 
         let text_space_y = 110;
         let text_start_y = 300;
