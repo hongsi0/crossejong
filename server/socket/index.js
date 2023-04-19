@@ -154,7 +154,7 @@ module.exports = (io) => {
         }
       });
       if(playedplayers.length === 1){ //끝나지 않은 플레이어가 1명일 때
-        roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
+        roomInfo.playerRank.push(roomInfo.players[playedplayers[0]].playerNickname);
         io.to(roomKey).emit("gameEnd", {playerRank:roomInfo.playerRank});
         roomInfo.timeState = "Result";
         roomInfo.time = 5;
@@ -185,7 +185,9 @@ module.exports = (io) => {
       const playerlist = Object.keys(roomInfo.players);
       playerlist.forEach((player) => {
         if (roomInfo.players[roomInfo.currentTurn].card === 0) {
-          roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
+          if (!roomInfo.playerRank.includes(roomInfo.players[roomInfo.currentTurn].playerNickname)) {
+            roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
+          }
           roomInfo.players[roomInfo.currentTurn].played = false
         }
       })
@@ -397,9 +399,9 @@ module.exports = (io) => {
           console.log("result time over. Go back to gameroom.");
           temp_roomInfo = {
             players: roomInfo.players,
-            numPlayers: playerlist.length,
+            numPlayers: Object.keys(roomInfo.players).length,
             playing: false,
-            startingPlayers:roomInfo.startingPlayers,
+            startingPlayers: roomInfo.startingPlayers,
             timeState: "",
           }
           gameRooms[roomKey] = temp_roomInfo;

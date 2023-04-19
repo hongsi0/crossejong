@@ -129,8 +129,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("timeDecrease");
         sharedData.socket.removeAllListeners("addalphacards");
         sharedData.socket.removeAllListeners("launchVerifiScene");
-        sharedData.socket.removeAllListeners("verificationresult");
-        sharedData.socket.removeAllListeners("gameexit")        
+        sharedData.socket.removeAllListeners("verificationresult");      
 
         scene.myTurn = false; // true면 자신의 turn임을 나타낸다
         scene.word = ""; // 제출하는 단어
@@ -776,12 +775,8 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("currentCardUpdate",updatePlayerList);
       
         sharedData.socket.on("gameEnd", (data) => {
-            scene.scene.launch("GameEndScene", {playerRank:data.playerRank});
+            scene.scene.start("GameEndScene", {playerRank:data.playerRank});
         });
-
-        sharedData.socket.on("gameexit", () => {
-            scene.scene.start("GameRoomScene");
-        })
     }
     update() {}
  

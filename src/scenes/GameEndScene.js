@@ -4,6 +4,7 @@ import "../fontLoader"; // can use the font as "BR-R"
 export default class GameEndScene extends Phaser.Scene {
     constructor() {
         super("GameEndScene");
+        this.playerRank = [];
     }
 
     init(data){
@@ -18,11 +19,9 @@ export default class GameEndScene extends Phaser.Scene {
     create() {
         const scene = this;
 
-        let playerRank = [];
-        for (let i=0;i<scene.playerRank.length;i++){
-            playerRank.push(scene.playerRank[i]);
-        }
-        
+        sharedData.socket.removeAllListeners("gameexit")
+
+        console.log(scene.playerRank);
         let bg = scene.add.image(1050, 500, "rankbackground");
 
         let topText = scene.add.text(0, 140, "순위", {font: "70px BR-R", color: "#523b33"});
@@ -31,7 +30,7 @@ export default class GameEndScene extends Phaser.Scene {
 
         let text_space_y = 110;
         let text_start_y = 300;
-        switch(playerRank.length) {
+        switch(scene.playerRank.length) {
             case 2:
                 text_space_y = 170;
                 text_start_y = 390;
@@ -44,12 +43,16 @@ export default class GameEndScene extends Phaser.Scene {
           
         let rankStyle = {font: "60px BR-R", color: "#523b33"};
         let texts = [];
-        for (let i = 0; i < playerRank.length; i++) {
-            let nickname = playerRank[i];
+        for (let i = 0; i < scene.playerRank.length; i++) {
+            let nickname = scene.playerRank[i];
             let text = scene.add.text(750, 0, `${i+1}등 : ${nickname}`, rankStyle);
             text.y = text_start_y + i * text_space_y;
             texts.push(text);
         }
+
+        sharedData.socket.on("gameexit", () => {
+            scene.scene.start("GameRoomScene");
+        })
     }
     update() {
     }
