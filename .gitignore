@@ -1,5 +1,5 @@
 node_modules/
 .DS_Store
-public/bunle.js
+public/bundle.js
 public/bundle.js.map
 public/.DS_Store
