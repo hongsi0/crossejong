@@ -4,7 +4,7 @@ import "../fontLoader"; // can use the font as "BR-R"
 export default class GameEndScene extends Phaser.Scene {
     constructor() {
         super("GameEndScene");
-        this.playerRank = null;
+        //this.playerRank = null;
     }
 
     init(data){
@@ -18,19 +18,15 @@ export default class GameEndScene extends Phaser.Scene {
 
     create() {
         const scene = this;
+
+        sharedData.socket.removeAllListeners("gameexit")
+
+        console.log(scene.playerRank);
         let bg = scene.add.image(1050, 500, "rankbackground");
 
         let topText = scene.add.text(0, 140, "순위", {font: "70px BR-R", color: "#523b33"});
         Phaser.Display.Align.In.Center(topText, bg);
         topText.y = 140;
-
-        const finishButton = scene.add.sprite(1050, 830, "finishButton2")
-        .setInteractive()
-        .setDepth(1)
-        .setScale(1)
-        .on("pointerup",()=>{
-            //sharedData.socket.emit("");
-        })
 
         let text_space_y = 110;
         let text_start_y = 300;
@@ -53,6 +49,10 @@ export default class GameEndScene extends Phaser.Scene {
             text.y = text_start_y + i * text_space_y;
             texts.push(text);
         }
+
+        sharedData.socket.on("gameexit", () => {
+            scene.scene.start("GameRoomScene");
+        })
     }
     update() {
     }
