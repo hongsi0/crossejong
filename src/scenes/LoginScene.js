@@ -40,9 +40,12 @@ export default class LoginScene extends Phaser.Scene {
         .setScale(1.25)
         .setDepth(5)
         .on('pointerup', () => {
-          profile = 'profile' + getRandProfileNum();
+          let new_profile = 'profile' + getRandProfileNum();
+          while (new_profile === profile) {
+            new_profile = 'profile' + getRandProfileNum();
+          }
+          profile = new_profile;
           profile_pic.setTexture(profile);
-          // console.log(profile);
         });
 
         scene.inputElement = scene.add.dom(400,800).createFromCache("loginform");
