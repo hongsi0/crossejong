@@ -97,7 +97,6 @@ export default class RoomScene extends Phaser.Scene {
     scene.boxes.fillRect(150, 380, 1200, 600);
 
     //profile_image
-    // console.log(sharedData.profile);
     scene.add.image(1430, 120, sharedData.socket.profile).setOrigin(0).setScale(0.32);
 
     //nickname
@@ -168,6 +167,18 @@ export default class RoomScene extends Phaser.Scene {
             button.style.backgroundColor = color.blue;
             break
         };
+
+        if(room.playing || room.num === 4) {
+          levelDiv.style.filter = "grayscale(100%)";
+          roomTitleDiv.style.filter = "grayscale(100%)";
+          playerNumDiv.style.filter = "grayscale(100%)";
+          button.style.filter = "grayscale(100%)";
+        } else {
+          levelDiv.style.filter = "grayscale(0%)";
+          roomTitleDiv.style.filter = "grayscale(0%)";
+          playerNumDiv.style.filter = "grayscale(0%)";
+          button.style.filter = "grayscale(0%)";
+        }
   
         button.addEventListener("click", (event) => {
           event.preventDefault();
