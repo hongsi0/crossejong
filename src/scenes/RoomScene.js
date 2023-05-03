@@ -16,6 +16,12 @@ export default class RoomScene extends Phaser.Scene {
     this.load.html("roomform", "assets/text/roomform.html");
     this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
     this.load.audio("click", "assets/sound/놓기.mp3");
+    this.load.image("profile1", "assets/profile/profile1.png");
+    this.load.image("profile2", "assets/profile/profile2.png");
+    this.load.image("profile3", "assets/profile/profile3.png");
+    this.load.image("profile4", "assets/profile/profile4.png");
+    this.load.image("profile5", "assets/profile/profile5.png");
+    this.load.image("profile6", "assets/profile/profile6.png");
   }
 
   create() {
@@ -90,8 +96,12 @@ export default class RoomScene extends Phaser.Scene {
     scene.boxes.strokeRect(150, 380, 1200, 600);
     scene.boxes.fillRect(150, 380, 1200, 600);
 
+    //profile_image
+    // console.log(sharedData.profile);
+    scene.add.image(1430, 120, sharedData.socket.profile).setOrigin(0).setScale(0.32);
+
     //nickname
-    scene.add.text(1480, 150, `별명: ${sharedData.socket.userNick}`,WordStyle);
+    scene.add.text(1470, 470, `별명: ${sharedData.socket.userNick}`,WordStyle);
 
     //roomlist
     scene.roomform = scene.add.dom(230,430).setOrigin(0,0).createFromCache("roomform");

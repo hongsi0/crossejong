@@ -778,9 +778,9 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("disconnected", updatePlayerList);
         sharedData.socket.on("currentCardUpdate",updatePlayerList);
       
-        sharedData.socket.on("gameEnd", () => {
-            console.log("gameEnd");
-            scene.scene.start("GameRoomScene");
+        sharedData.socket.on("gameEnd", (data) => {
+            console.log("gameEnd in GameScene");
+            scene.scene.launch("GameEndScene", {playerRank: data});
         });
     }
     update() {}

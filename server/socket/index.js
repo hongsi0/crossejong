@@ -5,7 +5,7 @@ const convert = require('xml-js');
 const gameRooms = {
   // [roomKey]: {
     // players: {
-    //   [playerid]: {playerId: , playerNickname:, played:, card:}
+    //   [playerid]: {playerId: , playerNickname:, profile: , played:, card:}
     // },
     // startingPlayers: [],
     // numPlayers: 0,
@@ -34,10 +34,9 @@ module.exports = (io) => {
     console.log(
       `A socket connection to the server has been made: ${socket.id}`
     );
-    socket.on("nickname", (nickname) => {
-      socket['nickname'] = nickname;
-      console.log(socket.nickname);
-      io.to(socket.id).emit("nickname", socket.nickname);
+    socket.on("userinfo", (data) => {
+      socket['nickname'] = data.nickname;
+      socket['profile'] = data.profile;
     });
 
     socket.on("createRoom", (roomKey) => {
@@ -90,6 +89,7 @@ module.exports = (io) => {
       roomInfo.currentTurn = "";
       roomInfo.deck = shuffledeck();
       roomInfo.timeState = "InGame";
+      roomInfo.playerRank = [];
       console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
       roomInfo.startingPlayers = playerlist;
@@ -156,6 +156,7 @@ module.exports = (io) => {
         console.log("gameEnd");
         playerlist.forEach((player) => {
           roomInfo.players[player].played = false;
+          roomInfo.playerRank.push(roomInfo.players[player].playerNickname);
         }) 
         temp_roomInfo = {
           players: roomInfo.players,
@@ -165,7 +166,7 @@ module.exports = (io) => {
           timeState: "",
         }
         gameRooms[roomKey] = temp_roomInfo;
-        io.to(roomKey).emit("gameEnd");
+        io.to(roomKey).emit("gameEnd", roomInfo.playerRank);
       } else{ //끝나지 않은 플레이어가 2명 이상일 때
         while(true) {
           roomInfo.turnCount++;
@@ -194,6 +195,7 @@ module.exports = (io) => {
       playerlist.forEach((player) => {
         if (roomInfo.players[roomInfo.currentTurn].card === 0) {
           roomInfo.players[roomInfo.currentTurn].played = false
+          roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
         }
       })
       roomInfo.time = 30;
