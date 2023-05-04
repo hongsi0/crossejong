@@ -14,16 +14,27 @@
         left: 200px;
     }
 
-    a, input {
+    .user-input {
         background-color: transparent;
         color: #3a2a24;
         font-family: "BR-R";
         font-size: 50px;
         padding: 0;
+        width: 500px;
+        padding: 10px;
+        border: 0px;
+    }
+    ::placeholder
+    {
+        color: #9b8573;
     }
 
-    input::placeholder {
-        color: #9b8573;
+    .a_text {
+        background-color: transparent;
+        color: #3a2a24;
+        font-family: "BR-R";
+        font-size: 50px;
+        padding: 0;
     }
 
     #roomname {
@@ -46,12 +57,6 @@
 
     #level {
         top: 325px;
-    }
-
-    input {
-        width: 500px;
-        padding: 10px;
-        border: 0px;
     }
 
     #difficultychoice {
@@ -88,7 +93,7 @@
         left: 450px;
     }
     
-    img {
+    .img {
         scale:1.1;
     }
 
@@ -101,24 +106,24 @@
 <div id="image-container">
     <img id="background" src="assets/image/createRoom.png">
     <div class="text-overlay" id="roomname">
-        <a>방이름</a>
+        <a class="a_text">방이름</a>
     </div>
     <div class="input-overlay" id="roomname_input">
-        <input type="text" placeholder="이름을 입력하세요" id="input_roomname">
+        <input type="text" class="user-input" placeholder="이름을 입력하세요" id="user_roomname">
     </div>
     <div class="text-overlay" id="password">
-        <a>비밀번호</a>
+        <a class="a_text">비밀번호</a>
     </div>
     <div class="input-overlay" id="password_input">
-        <input type="text" placeholder="(선택) 비밀번호를 설정하세요">
+        <input type="text" class="user-input" placeholder="(선택) 4자리 숫자" id="user_roompw">
     </div>
     <div class="text-overlay" id="level">
-        <a>난이도 설정</a>
+        <a class="a_text">난이도 설정</a>
     </div>
-    <div id="basicButton"><img src="assets/image/초급(N).png"></div>
-    <div id="normalButton"><img src="assets/image/중급(N).png"></div>
-    <div id="hardButton"><img src="assets/image/고급(N).png"></div>
-    <div id="makeButton"><img src="assets/image/방만들기(N).png"></div>
-    <div id="exitButton"><img src="assets/image/취소(N).png"></div>
+    <div id="basicButton"><img class="image" src="assets/image/초급(N).png"></div>
+    <div id="normalButton"><img class="image" src="assets/image/중급(N).png"></div>
+    <div id="hardButton"><img class="image" src="assets/image/고급(N).png"></div>
+    <div id="makeButton"><img class="image" src="assets/image/방만들기(N).png"></div>
+    <div id="exitButton"><img class="image" src="assets/image/취소(N).png"></div>
 </div>
   

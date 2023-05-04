@@ -2,6 +2,11 @@ import Phaser from "phaser";
 import sharedData from "../shared";
 import '../fontLoader';
 
+function isValidFourDigitNumber(str) {
+  const regex = /^\d{4}$/;
+  return regex.test(str);
+}
+
 export default class MakeroomScene extends Phaser.Scene {
   constructor() {
     super("MakeroomScene");
@@ -25,7 +30,8 @@ export default class MakeroomScene extends Phaser.Scene {
     let isMouseOver = false;
 
     scene.makeroomform = scene.add.dom(530, 210).setOrigin(0, 0).createFromCache("Makeroomform");
-    const input = scene.makeroomform.getChildByID("input_roomname");
+    const roomname = scene.makeroomform.getChildByID("user_roomname");
+    const password = scene.makeroomform.getChildByID("user_roompw");
     const basicButton = scene.makeroomform.getChildByID("basicButton");
     const normalButton = scene.makeroomform.getChildByID("normalButton");
     const hardButton = scene.makeroomform.getChildByID("hardButton");
@@ -202,9 +208,11 @@ export default class MakeroomScene extends Phaser.Scene {
     });
 
     makeButton.addEventListener("click", (event) => {
-      if(difficulty != "" && input.value != ""){
-        scene.clicksound.play();
-        sharedData.socket.emit("RoomKeyValid", (input.value));
+      if(difficulty != "" && roomname.value != "" && (password.value === "" || isValidFourDigitNumber(password.value))){
+        sharedData.socket.emit("RoomKeyValid", (roomname.value));
+      }
+      else {
+        console.log("Something wrong");
       }
     });
 
@@ -245,7 +253,7 @@ export default class MakeroomScene extends Phaser.Scene {
       console.log("이미 존재하는 방이름입니다.");
     });
     sharedData.socket.on("createRoomed", (roomKey) =>{
-      sharedData.socket.emit("makeroom", {roomKey:roomKey, difficulty:difficulty});
+      sharedData.socket.emit("makeroom", {roomKey:roomKey, difficulty:difficulty, password:password.value});
       sharedData.roomKey = roomKey;
       scene.scene.resume("RoomScene");
       scene.scene.sleep("MakeroomScene");

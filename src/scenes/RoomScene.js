@@ -2,6 +2,11 @@ import Phaser from "phaser";
 import sharedData from "../shared";
 import '../fontLoader';
 
+function isValidPassword(str) {
+  const regex = /^\d{4}$/;
+  return regex.test(str);
+}
+
 export default class RoomScene extends Phaser.Scene {
   constructor() {
     super("RoomScene");
@@ -14,6 +19,7 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("makeroomN", "assets/image/방만들기(N).png");
     this.load.image("makeroomY", "assets/image/방만들기(Y).png");
     this.load.html("roomform", "assets/text/roomform.html");
+    this.load.html("passwordform", "assets/text/passwordform.html");
     this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
     this.load.audio("click", "assets/sound/놓기.mp3");
     this.load.image("profile1", "assets/profile/profile1.png");
@@ -59,14 +65,14 @@ export default class RoomScene extends Phaser.Scene {
     .on("pointerout", ()=> {
       makeroomImage.setTexture("makeroomN");
     })
-    .on("pointerdown", () => {
+    .on("pointerup", () => {
       scene.clicksound.play();
       scene.scene.pause("RoomScene");
       scene.scene.launch("MakeroomScene");
     });
     
     //reload
-    const reloadImage = scene.add.image(1200, 250, 'reload')
+    scene.add.image(1200, 250, 'reload')
     .setOrigin(0)
     .setDepth(100)
     .setScale(1.2)
@@ -184,7 +190,36 @@ export default class RoomScene extends Phaser.Scene {
           event.preventDefault();
           if(room.playing === false) {//방에서 게임을 안하고 있을때
             if(room.num < 4) {
-              sharedData.socket.emit("isKeyValid", room.name);
+              if(room.locked) {
+                scene.passwordform = scene.add.dom(530, 210).setOrigin(0, 0).createFromCache("passwordform");
+                let password = scene.passwordform.getChildByID("input-password");
+                let accept_btn = scene.passwordform.getChildByID("pw-btn-accept");
+                let cancle_btn = scene.passwordform.getChildByID("pw-btn-cancle");
+                let pw_text = scene.passwordform.getChildByID("pw-text-below");
+
+                accept_btn.addEventListener("click", (event) => {
+                  if(isValidPassword(password.value)) {
+                    if(password.value === room.password) {
+                      sharedData.socket.emit("isKeyValid", room.name);
+                    } else {
+                      // 비밀번호 형식엔 맞지만 틀림
+                      console.log("비밀번호가 틀립니다.");
+                      pw_text.textContent = "비밀번호가 틀립니다.";
+                      pw_text.style.color = "red";
+                    }
+                  } else {
+                    console.log("비밀번호는 네 자리 숫자입니다.");
+                    pw_text.textContent = "비밀번호는 네 자리 숫자입니다.";
+                    pw_text.style.color = "red";
+                  }
+                });
+                cancle_btn.addEventListener("click", (event) => {
+                  scene.passwordform.destroy();
+                });
+                // sharedData.socket.emit("isPasswordRight", {password: password});
+              } else {
+                sharedData.socket.emit("isKeyValid", room.name); 
+              }
             } else{
               console.log("방이 가득찼습니다.");
             }

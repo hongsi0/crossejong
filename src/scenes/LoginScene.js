@@ -59,7 +59,7 @@ export default class LoginScene extends Phaser.Scene {
         .on("pointerup",() => {
           const input = scene.inputElement.getChildByName("name-form");
           if (input === "") {
-            console.log("이름을 적어주세요");
+            console.log("별명을 적어주세요");
           } else {
             console.log(input.value);
             sharedData.socket.userNick = input.value;

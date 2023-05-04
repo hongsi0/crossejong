@@ -7,6 +7,8 @@ const gameRooms = {
     // players: {
     //   [playerid]: {playerId: , playerNickname:, profile: , played:, card:}
     // },
+    // locked: false,
+    // password: "",
     // startingPlayers: [],
     // numPlayers: 0,
     // playing: false,
@@ -61,6 +63,8 @@ module.exports = (io) => {
         num: gameRooms[room].numPlayers,
         playing: gameRooms[room].playing,
         difficulty: gameRooms[room].difficulty,
+        locked: gameRooms[room].locked,
+        password: gameRooms[room].password,
       }));
       roomlist.forEach((gameRoom) => {
         console.log(gameRooms[gameRoom]);
@@ -302,6 +306,9 @@ module.exports = (io) => {
         playerNickname: socket.nickname
       };
       roomInfo.difficulty = roomvalue.difficulty;
+      roomInfo.password = roomvalue.password;
+      roomInfo.locked = roomvalue.password === "" ? false : true;
+      
       // update number of players
       roomInfo.numPlayers = Object.keys(roomInfo.players).length;
       roomInfo.playing = false;
@@ -376,7 +383,6 @@ module.exports = (io) => {
         ? io.to(socket.id).emit("RoomkeyIsValid", input)
         : io.to(socket.id).emit("RoomkeyNotValid", input);
     });
-
   });
   // 시간을 1초에 -1씩 감소시키는 함수
   function decreaseTime(roomKey) {
