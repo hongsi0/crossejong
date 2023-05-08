@@ -1,73 +1,96 @@
 <style>
-    @font-face {
-        font-family: "BR-R";
-        src: url("assets/fonts/BR-R.otf") format("opentype");
-        font-weight: normal;
-    }
+  @font-face {
+    font-family: "BR-R";
+    src: url("assets/fonts/BR-R.otf") format("opentype");
+    font-weight: normal;
+  }
 
-    form {
-        display: flex;
-        flex-direction: column; /*수직 정렬*/
-        align-items: center;
-        justify-content: center;
-    }
+  #login-container {
+    display: flex;
+    flex-direction: column; /*수직 정렬*/
+    align-items: center;
+    justify-content: center;
+  }
 
-    #input-div {
-        background-color: white;
-        margin: 0;
-        border: none;
-        width: 650px;
-        height: 110px;
-        overflow: visible;
+  #input-div {
+    background-color: white;
+    margin: 0;
+    border: none;
+    width: 650px;
+    height: 110px;
+    overflow: visible;
 
-        border-radius: 20px; 
-        margin-bottom: 20px;
-    }
+    border-radius: 20px; 
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+  }
 
-    #text {
-      font-family: "BR-R";
-      font-size: 40px;
-      color: #523b33;
-      height: 100%;
-      width: 25%;
-      float: left;
-      margin: 0;
-      border: none;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+  #text {
+    font-family: "BR-R";
+    font-size: 40px;
+    color: #523b33;
+    height: 100%;
+    width: 25%;
+    float: left;
+    border: none;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 
-    input {
-        height: 100%;
-        float: right;
-        width: 75%;
-        border: none;
-        font-size: 40px;
-        outline: none;
-        /* padding-left: 40px; */
-        font-family: "BR-R";
-        color: #523b33;
-        box-sizing: border-box;
+  #nickname {
+    height: 100%;
+    float: right;
+    width: 75%;
+    border: none;
+    font-size: 40px;
+    outline: none;
+    font-family: "BR-R";
+    color: #523b33;
+    box-sizing: border-box;
 
-        border-radius: 20px; 
-        margin-bottom: 20px;
-    }
-  </style>
-  
-  <div class="container">
-    <form>
-      <div id="input-div">
-        <div id="text">별명</div>
-        <input
-          type="text"
-          id="nickname"
-          name="name-form"
-          placeholder="여기에 입력하세요"
-        />
-      </div>
-    </form>
+    border-radius: 20px; 
+    margin-bottom: 20px;
+  }
+  ::placeholder {
+    font-size: 38px;
+    color: #a08d8795;
+  }
+
+  #nickname-text {
+    position: absolute;
+    right: 0;
+    bottom: 150px;
+    font-family: "BR-R";
+    font-size: 29px;
+    z-index: 1;
+    margin-right: 5px;
+  }
+
+  .origin {
+    color: #523b33;
+  }
+
+  .valid {
+    color: #1a4496;
+  }
+
+  .invalid {
+    color: #d73637;
+  }
+</style>
+
+<div id="login-container">
+  <div id="input-div">
+    <div id="text">별명</div>
+    <input
+      type="text"
+      id="nickname"
+      name="name-form"
+      placeholder="6자 이내로 입력하세요"
+    />
   </div>
-  
+  <div id="nickname-text" class="origin">한글과 숫자만 사용 가능합니다.</div>
+</div>

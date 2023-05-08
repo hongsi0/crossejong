@@ -7,6 +7,12 @@ function getRandProfileNum() {
   return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
 }
 
+function isValidNickname(str) {
+  // 6글자 이내 한글 혹은 숫자 (띄어쓰기 불가)
+  const regex = /^[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7A30-9]{1,6}$/;
+  return regex.test(str);
+}
+
 export default class LoginScene extends Phaser.Scene {
     constructor() {
         super("LoginScene");
@@ -49,24 +55,51 @@ export default class LoginScene extends Phaser.Scene {
           profile_pic.setTexture(profile);
         });
 
-        scene.inputElement = scene.add.dom(400,800).createFromCache("loginform");
+        scene.inputElement = scene.add.dom(400,810).createFromCache("loginform");
         //socket event 초기화
         sharedData.socket.removeAllListeners("nickname");
 
-        const LoginButton = scene.add.sprite(400, 930, "LoginButton(N)")
+        let input = scene.inputElement.getChildByName("name-form");
+        scene.nicknameTextElement = scene.inputElement.getChildByID("nickname-text");
+
+        input.addEventListener("input", function () {
+          const nicknameText = scene.nicknameTextElement;
+          if (input.value === "") {
+            nicknameText.innerHTML = "한글과 숫자만 사용 가능합니다.";
+            nicknameText.classList = "";
+            nicknameText.classList.add("origin");
+          } else if (isValidNickname(input.value)) {
+            nicknameText.innerHTML = "사용 가능한 닉네임입니다!";
+            nicknameText.classList = "";
+            nicknameText.classList.add("valid");
+          } else {
+            if(input.value.length > 6) {
+              nicknameText.innerHTML = "별명은 6자 이내여야 합니다!";
+            } else {
+              nicknameText.innerHTML = "한글과 숫자만 사용 가능합니다!";
+            }
+            nicknameText.classList = "";
+            nicknameText.classList.add("invalid");
+          }
+        });
+        
+        const LoginButton = scene.add.sprite(400, 940, "LoginButton(N)")
         .setInteractive()
         .setDepth(1)
         .setScale(0.465)
         .on("pointerup",() => {
-          const input = scene.inputElement.getChildByName("name-form");
           if (input === "") {
             console.log("별명을 적어주세요");
           } else {
             console.log(input.value);
-            sharedData.socket.userNick = input.value;
-            sharedData.socket.profile = profile;
-            sharedData.socket.emit("userinfo", {nickname: input.value, profile: profile});
-            scene.scene.start("RoomScene");
+            if(isValidNickname(input.value)) {
+              sharedData.socket.userNick = input.value;
+              sharedData.socket.profile = profile;
+              sharedData.socket.emit("userinfo", {nickname: input.value, profile: profile});
+              scene.scene.start("RoomScene");
+            } else {
+              console.log("별명은 6글자 이내의 한글 혹은 숫자로만 이뤄져야 합니다.");
+            }
           }
         })
         .on('pointerover', () => {
