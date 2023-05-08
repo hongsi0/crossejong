@@ -23,7 +23,8 @@ export default class LoginScene extends Phaser.Scene {
         this.load.image("profile4", "assets/profile/profile4.png");
         this.load.image("profile5", "assets/profile/profile5.png");
         this.load.image("profile6", "assets/profile/profile6.png");
-        this.load.image("shuffle", "assets/image/shuffle_icon.png");
+        this.load.image("shuffle", "assets/image/shuffle_button.png");
+        // this.load.image("shuffle", "assets/image/shuffle-button_2.png");
     }
 
     create() {
@@ -37,7 +38,7 @@ export default class LoginScene extends Phaser.Scene {
         scene.add.image(270,635, "shuffle")
         .setInteractive()
         .setOrigin(0)
-        .setScale(1.25)
+        .setScale(0.15)
         .setDepth(5)
         .on('pointerup', () => {
           let new_profile = 'profile' + getRandProfileNum();

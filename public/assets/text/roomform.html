@@ -8,7 +8,7 @@
   #listview {
     position: inherit;
     height: 570px;
-    width: 1210px;
+    width: 1200px;
     padding: 0;
     list-style-type: none;
     overflow-y: scroll;
@@ -19,22 +19,17 @@
     padding-bottom: 30px;
   }
 
-  #listview::-webkit-scrollbar {
-    width: 20px; /* 스크롤 바 너비 */
-    background-color: aqua;
-  }
-
   #listview li {
-    margin-left: 30px;
-    margin-top: 30px;
-    width: 550px;
+    margin-left: 40px;
+    margin-top: 40px;
+    width: 540px;
     float: left;
     left: 50%;
   } 
 
   .box {
     background-color: white;
-    width: 550px;
+    width: 540px;
     height: 180px;
 
     border: solid 0px transparent;
@@ -50,14 +45,14 @@
     font-size: 50px;
 
     position: relative;
-    height: 160px;
-    width: 100px;
+    height: 155px;
+    width: 120px;
     float: left;
     border: solid 0px transparent;
     border-radius: 20px 0px 0px 20px;
     display : flex;
     justify-content : center;
-    padding-top: 20px;
+    padding-top: 25px;
     color: white;
   }
 
@@ -68,12 +63,14 @@
     position: relative;
     border: solid 0px transparent;
     border-top-right-radius: 20px;
-    height: 90px;
-    width: 380px;
+    height: 65px;
+    width: 325px;
     float: left;
     display: flex;
-    align-items: center;
-    padding-left: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-left: 25px;
+    padding-top: 25px;
   }
 
   .playerNumDiv {
@@ -81,14 +78,14 @@
     position: relative;
     border: solid 0px white;
     height: 70px;
-    width: 200px;
+    width: 175px;
     float: left;
     display: flex;
     justify-content : flex-start;
     align-items: flex-end;
-    padding-left: 20px;
+    padding-left: 25px;
     padding-bottom: 20px;
-    font-size: 40px;
+    font-size: 42px;
   }
 
   .enterDiv {
@@ -96,8 +93,8 @@
     font-size: 50px;
     position: relative;
     float: right;
-    height: 90px;
-    width: 200px;
+    height: 85px;
+    width: 175px;
     border: solid 0px transparent;
     border-bottom-right-radius: 20px;
     z-index: 1;
@@ -105,7 +102,8 @@
     display: flex;
     justify-content : flex-end;
     align-items: center;
-    margin-right: 20px;
+    margin-right: 25px;
+    margin-bottom: 5px;
   }
 
   .enterButton {
@@ -120,7 +118,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    padding: 5px;
+    padding: 10px;
 
     box-shadow: 1px 2px 0 rgb(0,0,0,0.5);
   }
@@ -135,7 +133,86 @@
 
 
 <ul id="listview">
-  <!-- <li>
+<!-- 
+  <li>
+    <div class="box">
+      <div class="levelDiv">
+      </div>
+      <div class="roomTitleDiv">
+      </div>
+      <div class="playerNumDiv">
+      </div>
+      <div class="enterDiv">
+        <button type="button" class="enterButton">입장</button>
+      </div>
+    </div>
+  </li>
+  <li>
+    <div class="box">
+      <div class="levelDiv">
+      </div>
+      <div class="roomTitleDiv">
+      </div>
+      <div class="playerNumDiv">
+      </div>
+      <div class="enterDiv">
+        <button type="button" class="enterButton">입장</button>
+      </div>
+    </div>
+  </li>
+  <li>
+    <div class="box">
+      <div class="levelDiv">
+      </div>
+      <div class="roomTitleDiv">
+      </div>
+      <div class="playerNumDiv">
+      </div>
+      <div class="enterDiv">
+        <button type="button" class="enterButton">입장</button>
+      </div>
+    </div>
+  </li>
+  <li>
+    <div class="box">
+      <div class="levelDiv">
+      </div>
+      <div class="roomTitleDiv">
+      </div>
+      <div class="playerNumDiv">
+      </div>
+      <div class="enterDiv">
+        <button type="button" class="enterButton">입장</button>
+      </div>
+    </div>
+  </li>
+  <li>
+    <div class="box">
+      <div class="levelDiv">
+      </div>
+      <div class="roomTitleDiv">
+      </div>
+      <div class="playerNumDiv">
+      </div>
+      <div class="enterDiv">
+        <button type="button" class="enterButton">입장</button>
+      </div>
+    </div>
+  </li>
+  <li>
+    <div class="box">
+      <div class="levelDiv">
+      </div>
+      <div class="roomTitleDiv">
+      </div>
+      <div class="playerNumDiv">
+      </div>
+      <div class="enterDiv">
+        <button type="button" class="enterButton">입장</button>
+      </div>
+    </div>
+  </li>
+  <li>
     <div class="box">
       <div class="levelDiv">
       </div>

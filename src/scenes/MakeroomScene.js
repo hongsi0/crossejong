@@ -7,6 +7,12 @@ function isValidPassword(str) {
   return regex.test(str);
 }
 
+function isValidRoomname(str){
+  // 띄어쓰기 포함 8자 이내의 한글
+  const regex = /^[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7A3\s]{1,8}$/;
+  return regex.test(str);
+}
+
 export default class MakeroomScene extends Phaser.Scene {
   constructor() {
     super("MakeroomScene");
@@ -46,6 +52,7 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const newButton = document.createElement("img");
       newButton.src = "assets/image/초급(Y).png";
+      newButton.style.transform = "scale(1.25)";
       basicButton.appendChild(newButton);
 
       while (normalButton.firstChild) {
@@ -53,12 +60,14 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const normalimg = document.createElement("img");
       normalimg.src = "assets/image/중급(N).png";
+      normalimg.style.transform = "scale(1.25)";
       normalButton.appendChild(normalimg);
       while (hardButton.firstChild) {
         hardButton.removeChild(hardButton.firstChild);
       }
       const hardimg = document.createElement("img");
       hardimg.src = "assets/image/고급(N).png";
+      newButton.style.transform = "scale(1.25)";
       hardButton.appendChild(hardimg);
     });
 
@@ -69,6 +78,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/초급(Y).png";
+        newButton.style.transform = "scale(1.25)";
         basicButton.appendChild(newButton);
         isMouseOver = true;
       }
@@ -81,6 +91,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/초급(N).png";
+        newButton.style.transform = "scale(1.25)";
         basicButton.appendChild(newButton);
         isMouseOver = false
       }
@@ -94,6 +105,7 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const newButton = document.createElement("img");
       newButton.src = "assets/image/중급(Y).png";
+      newButton.style.transform = "scale(1.25)";
       normalButton.appendChild(newButton);
 
       while (basicButton.firstChild) {
@@ -101,6 +113,7 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const basicimg = document.createElement("img");
       basicimg.src = "assets/image/초급(N).png";
+      basicimg.style.transform = "scale(1.25)";
       basicButton.appendChild(basicimg);
 
       while (hardButton.firstChild) {
@@ -108,6 +121,7 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const hardimg = document.createElement("img");
       hardimg.src = "assets/image/고급(N).png"; 
+      hardimg.style.transform = "scale(1.25)";
       hardButton.appendChild(hardimg);
     });
     
@@ -118,6 +132,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/중급(Y).png";
+        newButton.style.transform = "scale(1.25)";
         normalButton.appendChild(newButton);
         isMouseOver = true;
       }
@@ -130,6 +145,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/중급(N).png";
+        newButton.style.transform = "scale(1.25)";
         normalButton.appendChild(newButton);
         isMouseOver = false
       }
@@ -143,6 +159,7 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const newButton = document.createElement("img");
       newButton.src = "assets/image/고급(Y).png";
+      newButton.style.transform = "scale(1.25)";
       hardButton.appendChild(newButton);
 
       while (basicButton.firstChild) {
@@ -150,12 +167,14 @@ export default class MakeroomScene extends Phaser.Scene {
       }
       const basicimg = document.createElement("img");
       basicimg.src = "assets/image/초급(N).png";
+      basicimg.style.transform = "scale(1.25)";
       basicButton.appendChild(basicimg);
       while (normalButton.firstChild) {
         normalButton.removeChild(normalButton.firstChild);
       }
       const normalimg = document.createElement("img");
       normalimg.src = "assets/image/중급(N).png";
+      normalimg.style.transform = "scale(1.25)";
       normalButton.appendChild(normalimg);
     });
 
@@ -166,6 +185,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/고급(Y).png";
+        newButton.style.transform = "scale(1.25)";
         hardButton.appendChild(newButton);
         isMouseOver = true;
       }
@@ -178,6 +198,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/고급(N).png";
+        newButton.style.transform = "scale(1.25)";
         hardButton.appendChild(newButton);
         isMouseOver = false
       }
@@ -190,6 +211,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/방만들기(Y).png";
+        newButton.style.transform = "scale(1.1)";
         makeButton.appendChild(newButton);
         isMouseOver = true;
       }
@@ -202,6 +224,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/방만들기(N).png";
+        newButton.style.transform = "scale(1.1)";
         makeButton.appendChild(newButton);
         isMouseOver = false
       }
@@ -211,8 +234,16 @@ export default class MakeroomScene extends Phaser.Scene {
       if(difficulty != "" && roomname.value != "" && (password.value === "" || isValidPassword(password.value))){
         sharedData.socket.emit("RoomKeyValid", (roomname.value));
       }
-      else {
-        console.log("Something wrong");
+      else{
+        if(difficulty == ""){
+          console.log("난이도 미설정");
+        }
+        if(roomname.value == ""){
+          console.log("방 이름 미설정");
+        }
+        if(password.value != "" && !isValidPassword(password.value)){
+          console.log("패스워드 형태 문제");
+        }
       }
     });
 
@@ -223,6 +254,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/취소(Y).png";
+        newButton.style.transform = "scale(1.1)";
         exitButton.appendChild(newButton);
         isMouseOver = true;
       }
@@ -235,6 +267,7 @@ export default class MakeroomScene extends Phaser.Scene {
         }
         const newButton = document.createElement("img");
         newButton.src = "assets/image/취소(N).png";
+        newButton.style.transform = "scale(1.1)";
         exitButton.appendChild(newButton);
         isMouseOver = false
       }

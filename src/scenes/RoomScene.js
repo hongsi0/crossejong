@@ -2,6 +2,12 @@ import Phaser from "phaser";
 import sharedData from "../shared";
 import '../fontLoader';
 
+function getRandProfileNum() {
+  let min = Math.ceil(1);
+  let max = Math.floor(6);
+  return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
+}
+
 function isValidPassword(str) {
   const regex = /^\d{4}$/;
   return regex.test(str);
@@ -28,6 +34,8 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("profile4", "assets/profile/profile4.png");
     this.load.image("profile5", "assets/profile/profile5.png");
     this.load.image("profile6", "assets/profile/profile6.png");
+    this.load.image("shuffle", "assets/image/shuffle_button.png");
+    // this.load.image("shuffle", "assets/image/shuffle-button_2.png");
   }
 
   create() {
@@ -103,7 +111,23 @@ export default class RoomScene extends Phaser.Scene {
     scene.boxes.fillRect(150, 380, 1200, 600);
 
     //profile_image
-    scene.add.image(1430, 120, sharedData.socket.profile).setOrigin(0).setScale(0.32);
+    let profile_pic = scene.add.image(1430, 120, sharedData.socket.profile).setOrigin(0).setScale(0.32);
+
+    //profile_shuffle
+    scene.add.image(1680,350, "shuffle")
+    .setInteractive()
+    .setOrigin(0)
+    .setScale(0.2)
+    .setDepth(5)
+    .on('pointerup', () => {
+      let new_profile = 'profile' + getRandProfileNum();
+      while (new_profile === sharedData.socket.profile) {
+        new_profile = 'profile' + getRandProfileNum();
+      }
+      sharedData.socket.profile = new_profile;
+      profile_pic.setTexture(sharedData.socket.profile);
+    });
+
 
     //nickname
     scene.add.text(1470, 470, `별명: ${sharedData.socket.userNick}`,WordStyle);
@@ -136,7 +160,7 @@ export default class RoomScene extends Phaser.Scene {
         levelDiv.appendChild(roomdifficulty);
         
         if (room.locked) {
-          const roomName = document.createTextNode(room.name+ " 🔒");
+          const roomName = document.createTextNode(room.name+ "🔒");
           roomTitleDiv.appendChild(roomName);
         } else {
           const roomName = document.createTextNode(room.name);
