@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import sharedData from "../shared";
 import '../fontLoader';
 
-function isValidFourDigitNumber(str) {
+function isValidPassword(str) {
   const regex = /^\d{4}$/;
   return regex.test(str);
 }
@@ -208,7 +208,7 @@ export default class MakeroomScene extends Phaser.Scene {
     });
 
     makeButton.addEventListener("click", (event) => {
-      if(difficulty != "" && roomname.value != "" && (password.value === "" || isValidFourDigitNumber(password.value))){
+      if(difficulty != "" && roomname.value != "" && (password.value === "" || isValidPassword(password.value))){
         sharedData.socket.emit("RoomKeyValid", (roomname.value));
       }
       else {

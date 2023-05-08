@@ -135,8 +135,13 @@ export default class RoomScene extends Phaser.Scene {
         const roomdifficulty = document.createTextNode(room.difficulty);
         levelDiv.appendChild(roomdifficulty);
         
-        const roomName = document.createTextNode(room.name);
-        roomTitleDiv.appendChild(roomName);
+        if (room.locked) {
+          const roomName = document.createTextNode(room.name+ " 🔒");
+          roomTitleDiv.appendChild(roomName);
+        } else {
+          const roomName = document.createTextNode(room.name);
+          roomTitleDiv.appendChild(roomName);
+        }
   
         const roomNum = document.createTextNode(`${room.num}/4`);
         playerNumDiv.appendChild(roomNum);
