@@ -73,7 +73,7 @@
         margin-right: 0px;
         padding: 0;
         flex: 1;
-        font-size: 30px;
+        font-size: 35px;
         z-index: 1;
         overflow-y: scroll;
     }
@@ -93,23 +93,31 @@
     #chat-input {
         color: #3a2a24;
         font-family: "BR-R";
+        font-size: 35px;
         flex: 1;
         margin-right: 10px;
-        font-size: 30px;
         border: none;
         background: transparent;
     }
-
-    #chat-form button {
-        color: #3a2a24;
-        font-family: "BR-R";
-        width: 80px;
+    ::placeholder {
+        color: #a08d8795;
+        font-size: 35px;
     }
-    
+
     #sendchat {
-        color: #3a2a24;
+        background-color: #7e5b43;
         font-family: "BR-R";
         font-size: 30px;
+        padding: 5px;
+        color: white;
+        border: solid 0px transparent;
+        border-radius: 10px;
+        box-shadow: 1px 2px 0 rgb(0,0,0,0.5);
+    }
+    #sendchat:active {
+        box-shadow: 0.5px 0.5px 0 rgb(0,0,0,0.5);
+        position: relative;
+        top:1px;
     }
 
     #chatbar {

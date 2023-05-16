@@ -1,6 +1,7 @@
 const https = require('https');
 const axios = require('axios');
 const convert = require('xml-js');
+const { error } = require('console');
 
 const gameRooms = {
   // [roomKey]: {
@@ -224,7 +225,11 @@ module.exports = (io) => {
       io.to(roomKey).emit('currentCardUpdate', roomInfo.players);
     });
 
-    socket.on('objection', (val) => {
+    function handleObjection(val, retryCount = 0) {
+
+      const maxRetryCount = 3; 
+      const retryDelay = 1000;
+      
       const roomInfo = gameRooms[val.roomKey];
       roomInfo.time = 7;
       const url = `https://krdict.korean.go.kr/api/search?certkey_no=4549&key=487E5EEAB2BE2EB3932C7B599847D5DC&type_search=search&part=word&q=${val.word}&sort=dict&advanced=y&method=exact`;
@@ -275,7 +280,20 @@ module.exports = (io) => {
               console.log(word, pos, def);
               io.to(val.roomKey).emit('verificationTrue', {id:val.id, nick:roomInfo.players[val.id].playerNickname, word:word, pos:pos, def:def});
           }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (retryCount < maxRetryCount) {
+          console.log(`Retrying... (${retryCount + 1}/${maxRetryCount})`);
+          setTimeout(() => handleObjection(val, retryCount + 1), retryDelay);
+        } else {
+          console.log('Failed after several retries.');
+        }
       });
+    };
+
+    socket.on('objection', (val) => {
+      handleObjection(val);
     });
 
     socket.on("outRoom", (roomKey) => {
