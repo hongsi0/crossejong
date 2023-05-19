@@ -358,6 +358,7 @@ export default class GameScene extends Phaser.Scene {
         scene.input.on("drop", (pointer, card, blank) => {
             card.i = blank.i;
             card.j = blank.j;
+            console.log("valid", scene.validLocation(card.i, card.j, "drop"));
             if (scene.myTurn && scene.validLocation(card.i, card.j, "drop")) {
                 scene.cardDropsound.play();
                 // If scene is the first card drop, initialize some letiables and emit an event to other players
@@ -367,7 +368,7 @@ export default class GameScene extends Phaser.Scene {
                     sharedData.socket.emit("firstDrop", sharedData.roomKey);
                 }
                 sharedData.socket.emit("cardDrop", {roomKey:sharedData.roomKey, cardval:card.value, i:card.i, j:card.j});
-                sharedData.socket.emit("currentCardUpdate", sharedData.roomKey, sharedData.socket.id, scene.handGroup.countActive());
+                sharedData.socket.emit("currentCardUpdate", {roomKey:sharedData.roomKey, id:sharedData.socket.id, number:scene.handGroup.countActive()});
                 scene.cardPreview.visible = false;
                 card.destroy();
             } else {
@@ -388,11 +389,11 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("returnCard", (id) => {
             let dropcardvals = [];
             scene.direction = "row";
-            for(let i = 0; i<scene.dropCards.length; i++) {
+            for(let i = 0; i < scene.dropCards.length; i++) {
                 // board를 update한다
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
                 scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
-                // 만약 자신이 마지막 유저라면 제거한 card를 모두 hand로 가져온 후 추가로 card를 1장 생성한다
+                // 내턴일때
                 dropcardvals.push(scene.dropCards[i].value);
                 if(id === sharedData.socket.id) {
                     let coordinates = this.setHandCoordinates(this.handGroup.countActive());
@@ -435,7 +436,6 @@ export default class GameScene extends Phaser.Scene {
         });
       
         sharedData.socket.on("pickcard", (data) => {
-            console.log("pickcard data",data);
             scene.cardPreview.x = 1810;
             scene.cardPreview.y = 490;
             scene.cardPreview.visible = true;
@@ -448,20 +448,22 @@ export default class GameScene extends Phaser.Scene {
                 targets: scene.cardPreview,
                 x: coordinates.x,
                 y: coordinates.y,
-                duration: 500, // 1초 동안 애니메이션을 실행함
+                duration: 500, // 0.5초 동안 애니메이션을 실행함
                 onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
                     card.visible = false;
                     card.alpha = 0.75;
                     scene.createCard(data.cardval);
                     scene.arrangeCardsInHand();
+                    sharedData.socket.emit("currentCardUpdate", {roomKey:sharedData.roomKey, id:sharedData.socket.id, number:scene.handGroup.countActive()});
+                    if(data.type === "end") {
+                        // turn을 종료한다
+                        sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, type:"deck"});
+                    } else if(data.type === "verification") {
+                        sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, type:"finish"})
+                    }
                 },
                 onCompleteParams: [scene.cardPreview]
             });
-            if(data.type === "end") {
-                // turn을 종료한다
-                sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:"", type:"deck"});
-            }
-            sharedData.socket.emit("currentCardUpdate", sharedData.roomKey, sharedData.socket.id, scene.handGroup.countActive());
         });
       
         //게임 시작 후 첫 카드를 받는다
@@ -497,6 +499,7 @@ export default class GameScene extends Phaser.Scene {
             scene.myturnsound.play();
             scene.myTurn = true;
             scene.dropped = false;
+            scene.mycardnum = this.handGroup.countActive();
             console.log("My Turn! " + scene.myTurn);
 
             // Phaser 오브젝트 생성
@@ -585,7 +588,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.on("addalphacards", (cardData) => {
             let card;
             scene.boardGroup.getChildren().forEach((boardcard) => {
-                console.log(boardcard.i,cardData.i,boardcard.j,cardData.j)
+                // console.log(boardcard.i,cardData.i,boardcard.j,cardData.j)
                 if (boardcard.i == cardData.i && boardcard.j == cardData.j){
                     card = boardcard;
                 }
@@ -603,7 +606,8 @@ export default class GameScene extends Phaser.Scene {
                     card.canclick = false;
                     scene.alphaCards.push(card);
                     if(scene.alphaCards.length >= 2) {
-                        if(scene.alphaCards[0].i === scene.alphaCards[1].i) scene.direction = "column";
+                        console.log("direction col",scene.alphaCards[0].i, cardData.i)
+                        if(scene.alphaCards[0].i === cardData.i) scene.direction = "column";
                     }
                 },
                 onCompleteParams: [card]
@@ -612,7 +616,6 @@ export default class GameScene extends Phaser.Scene {
       
         // 다른 유저의 turn이 끝나면 objection을 활성화한다
         sharedData.socket.on("turnEnd", (data) => {
-            console.log("turnend data",data);
             if (data.type === "finish") {}
             else if (data.type === "deck") {
                 if (scene.dropped) {
@@ -656,7 +659,6 @@ export default class GameScene extends Phaser.Scene {
                 }
                 if(scene.myTurn) {
                     // card를 1장 생성한다
-                    console.log("time pickcard");
                     sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"time"});
                 }
             }
@@ -684,6 +686,9 @@ export default class GameScene extends Phaser.Scene {
             }
             scene.alphaCards = [];
             scene.graphicGroup.clear(true);
+            if (scene.mycardnum != scene.handGroup.countActive()){
+                sharedData.socket.emit("currentCardUpdate", {roomKey:sharedData.roomKey, id:sharedData.socket.id, number:scene.handGroup.countActive()})
+            }
             if (data.id === sharedData.socket.id) {
                 sharedData.socket.emit("nextTurn", sharedData.roomKey);
             }

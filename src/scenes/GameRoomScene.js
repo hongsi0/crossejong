@@ -36,7 +36,7 @@ export default class GameRoomScene extends Phaser.Scene {
     sharedData.socket.removeAllListeners("chat");
     
     scene.players = [];
-    let WordStyle = {font: "60px BR-R", fill: "black"};
+    let WordStyle = {font: "50px BR-R", fill: "black"};
   
     //BACKGROUND
     scene.add.image(0, 0, "background").setOrigin(0);
@@ -45,8 +45,7 @@ export default class GameRoomScene extends Phaser.Scene {
     scene.logo = scene.add.sprite(200, 120, "logo");
     scene.roomnameBar = scene.add.sprite(990, 100, "roomnameBar");
     scene.roomnameBar.setScale(0.85);
-    scene.roomname = scene.add.text(550, 100, `방 ${sharedData.roomKey}`, WordStyle);
-    scene.roomname.setOrigin(0.5, 0.5);
+    scene.roomname = scene.add.text(480, 75, `방 ${sharedData.roomKey}`, WordStyle).setOrigin(0,0);
   
     const outbuttonImage = scene.add.image(1600, 800, 'outbutton(N)')
     .setOrigin(0)
@@ -121,8 +120,10 @@ export default class GameRoomScene extends Phaser.Scene {
       scene.clicksound.play();
       if (event.target.id === "sendchat") {
         const input = scene.inputElement.getChildByID("chat-input");
-        sharedData.socket.emit("chat", input.value, sharedData.roomKey);
-        input.value = "";
+        if(input.value != "") {
+          sharedData.socket.emit("chat", input.value, sharedData.roomKey);
+          input.value = "";
+        }
       }
     });
     scene.inputElement.on("submit", function (event) {

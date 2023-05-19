@@ -5,10 +5,8 @@ const convert = require('xml-js');
 const gameRooms = {
   // [roomKey]: {
     // players: {
-    //   [playerid]: {playerId: , playerNickname:, profile: , played:, card:}
+    //   [playerid]: {playerId: , playerNickname:, played:, card:}
     // },
-    // locked: false,
-    // password: "",
     // startingPlayers: [],
     // numPlayers: 0,
     // playing: false,
@@ -63,8 +61,6 @@ module.exports = (io) => {
         num: gameRooms[room].numPlayers,
         playing: gameRooms[room].playing,
         difficulty: gameRooms[room].difficulty,
-        locked: gameRooms[room].locked,
-        password: gameRooms[room].password,
       }));
       roomlist.forEach((gameRoom) => {
         console.log(gameRooms[gameRoom]);
@@ -93,7 +89,6 @@ module.exports = (io) => {
       roomInfo.currentTurn = "";
       roomInfo.deck = shuffledeck();
       roomInfo.timeState = "InGame";
-      roomInfo.playerRank = [];
       console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
       roomInfo.startingPlayers = playerlist;
@@ -158,19 +153,10 @@ module.exports = (io) => {
         }
       });
       if(playedplayers.length === 1){ //끝나지 않은 플레이어가 1명일 때
-        console.log("gameEnd");
-        playerlist.forEach((player) => {
-          roomInfo.players[player].played = false;
-        }) 
-        temp_roomInfo = {
-          players: roomInfo.players,
-          numPlayers: playerlist.length,
-          playing: false,
-          startingPlayers:roomInfo.startingPlayers,
-          timeState: "",
-        }
-        gameRooms[roomKey] = temp_roomInfo;
-        io.to(roomKey).emit("gameEnd");
+        roomInfo.playerRank.push(roomInfo.players[playedplayers[0]].playerNickname);
+        io.to(roomKey).emit("gameEnd", {playerRank:roomInfo.playerRank});
+        roomInfo.timeState = "Result";
+        roomInfo.time = 5;
       } else{ //끝나지 않은 플레이어가 2명 이상일 때
         while(true) {
           roomInfo.turnCount++;
@@ -202,11 +188,10 @@ module.exports = (io) => {
             roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
           }
           roomInfo.players[roomInfo.currentTurn].played = false
-          roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
         }
       })
       roomInfo.time = 30;
-      io.to(data.roomKey).emit('turnEnd', {id:data.id, word:data.word, type:data.type});
+      io.to(data.roomKey).emit('turnEnd', {id:data.id, type:data.type});
     });
 
     socket.on('firstDrop', (roomKey) => {
@@ -218,13 +203,17 @@ module.exports = (io) => {
       io.to(data.roomKey).emit("verificationresult",{result:data.result, id:data.id});
     })
 
-    socket.on('currentCardUpdate', (roomKey, id, number) => {
-      const roomInfo = gameRooms[roomKey];
-      roomInfo.players[id].card = number
-      io.to(roomKey).emit('currentCardUpdate', roomInfo.players);
+    socket.on('currentCardUpdate', (data) => {
+      const roomInfo = gameRooms[data.roomKey];
+      roomInfo.players[data.id].card = data.number
+      io.to(data.roomKey).emit('currentCardUpdate', roomInfo.players);
     });
 
-    socket.on('objection', (val) => {
+    function handleObjection(val, retryCount = 0) {
+
+      const maxRetryCount = 3; 
+      const retryDelay = 1000;
+      
       const roomInfo = gameRooms[val.roomKey];
       roomInfo.time = 7;
       const url = `https://krdict.korean.go.kr/api/search?certkey_no=4549&key=487E5EEAB2BE2EB3932C7B599847D5DC&type_search=search&part=word&q=${val.word}&sort=dict&advanced=y&method=exact`;
@@ -275,7 +264,20 @@ module.exports = (io) => {
               console.log(word, pos, def);
               io.to(val.roomKey).emit('verificationTrue', {id:val.id, nick:roomInfo.players[val.id].playerNickname, word:word, pos:pos, def:def});
           }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (retryCount < maxRetryCount) {
+          console.log(`Retrying... (${retryCount + 1}/${maxRetryCount})`);
+          setTimeout(() => handleObjection(val, retryCount + 1), retryDelay);
+        } else {
+          console.log('Failed after several retries.');
+        }
       });
+    };
+
+    socket.on('objection', (val) => {
+      handleObjection(val);
     });
 
     socket.on("outRoom", (roomKey) => {
@@ -367,7 +369,7 @@ module.exports = (io) => {
 
         if (roomInfo.currentTurn === socket.id) {
           console.log("disconnected", roomInfo.players);
-          io.to(roomKey).emit("turnEnd", {id: playerlist[0], word:"", type:"disconnection"});
+          io.to(roomKey).emit("turnEnd", {id: playerlist[0], type:"disconnection"});
         }
       }
     });
@@ -383,6 +385,7 @@ module.exports = (io) => {
         ? io.to(socket.id).emit("RoomkeyIsValid", input)
         : io.to(socket.id).emit("RoomkeyNotValid", input);
     });
+
   });
   // 시간을 1초에 -1씩 감소시키는 함수
   function decreaseTime(roomKey) {
@@ -394,7 +397,7 @@ module.exports = (io) => {
       } else {
           roomInfo.time = 30;
           console.log("time over",roomInfo.currentTurn);
-          io.to(roomKey).emit("turnEnd", {id: roomInfo.currentTurn, word:"", type:"time"});
+          io.to(roomKey).emit("turnEnd", {id: roomInfo.currentTurn, type:"time"});
       }
     }
     else if(roomInfo.timeState === "Verificate"){

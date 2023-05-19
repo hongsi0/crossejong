@@ -27,6 +27,7 @@ export default class VerificationScene extends Phaser.Scene {
 
         let result = "";
         let cardgetplayer = "";
+        let objectionButtonClicked = false;
 
         //BACKGROUND
         let bg = scene.add.image(1050, 500, "verificationbackground");
@@ -58,7 +59,8 @@ export default class VerificationScene extends Phaser.Scene {
         .setDepth(1)
         .setScale(0.7)
         .on("pointerup",() => {
-            if (this.turnPlayer != sharedData.socket.id){
+            if (!objectionButtonClicked && this.turnPlayer != sharedData.socket.id){
+                objectionButtonClicked = true;
                 sharedData.socket.emit("objection", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word});
             }
         })
@@ -127,10 +129,9 @@ export default class VerificationScene extends Phaser.Scene {
             scene.scene.stop("VerificationScene");
             if (data.id === sharedData.socket.id) {
                 if(result === ""){
-                    sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word, type:"finish"});
+                    sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, type:"finish"});
                 } else {
                     sharedData.socket.emit("verificationresult", {roomKey:sharedData.roomKey, result:result, id:cardgetplayer});
-                    sharedData.socket.emit("turnEnd", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word, type:"finish"});
                 }
             }
         });
