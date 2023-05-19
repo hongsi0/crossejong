@@ -1,6 +1,7 @@
 const https = require('https');
 const axios = require('axios');
 const convert = require('xml-js');
+const { error } = require('console');
 
 const gameRooms = {
   // [roomKey]: {
