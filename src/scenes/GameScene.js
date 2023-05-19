@@ -48,6 +48,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("myturnImage", "assets/image/myturn.png");
         this.load.image("returnButton(N)", "assets/image/return(N).png");
         this.load.image("returnButton(Y)", "assets/image/return(Y).png");
+        // 초급
         this.load.image("가", "assets/cards/가.png");
         this.load.image("거", "assets/cards/거.png");
         this.load.image("고", "assets/cards/고.png");
@@ -97,11 +98,51 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("하", "assets/cards/하.png");
         this.load.image("한", "assets/cards/한.png");
         this.load.image("해", "assets/cards/해.png");
+        // 중급
+        this.load.image("경", "assets/cards/경.png");
+        this.load.image("공", "assets/cards/공.png");
+        this.load.image("관", "assets/cards/관.png");
+        this.load.image("국", "assets/cards/국.png");
+        this.load.image("무", "assets/cards/무.png");
+        this.load.image("법", "assets/cards/법.png");
+        this.load.image("산", "assets/cards/산.png");
+        this.load.image("서", "assets/cards/서.png");
+        this.load.image("성", "assets/cards/성.png");
+        this.load.image("신", "assets/cards/신.png");
+        this.load.image("용", "assets/cards/용.png");
+        this.load.image("원", "assets/cards/원.png");
+        this.load.image("위", "assets/cards/위.png");
+        this.load.image("유", "assets/cards/유.png");
+        this.load.image("의", "assets/cards/의.png");
+        this.load.image("조", "assets/cards/조.png");
+        this.load.image("화", "assets/cards/화.png");
+        // 고급
+        this.load.image("강", "assets/cards/강.png");
+        this.load.image("교", "assets/cards/교.png");
+        this.load.image("군", "assets/cards/군.png");
+        this.load.image("김", "assets/cards/김.png");
+        this.load.image("문", "assets/cards/문.png");
+        this.load.image("박", "assets/cards/박.png");
+        this.load.image("선", "assets/cards/선.png");
+        this.load.image("영", "assets/cards/영.png");
+        this.load.image("재", "assets/cards/재.png");
+        this.load.image("천", "assets/cards/천.png");
+        this.load.image("학", "assets/cards/학.png");
+        this.load.image("호", "assets/cards/호.png");
+        // 초급 cardRotation
         this.load.image("믄", "assets/cards/믄.png");
         this.load.image("무", "assets/cards/무.png");
         this.load.image("여", "assets/cards/여.png");
         this.load.image("믕", "assets/cards/믕.png");
         this.load.image("으", "assets/cards/으.png");
+        // 중급 cardRotation
+        this.load.image("운", "assets/cards/운.png");
+        this.load.image("논", "assets/cards/논.png");
+        this.load.image("융", "assets/cards/융.png");
+        this.load.image("야", "assets/cards/야.png");
+        // 고급 cardRotation
+        this.load.image("곤", "assets/cards/곤.png");
+        this.load.image("곰", "assets/cards/곰.png");
         this.load.audio("카드클릭", "assets/sound/딸깍.mp3");
         this.load.audio("카드내려놓기", "assets/sound/놓기.mp3");
         this.load.audio("버튼클릭", "assets/sound/클릭.mp3");
@@ -164,11 +205,31 @@ export default class GameScene extends Phaser.Scene {
         };
       
         // 게임에서 사용하는 deck
-        scene.deckArray = ["가", "거", "고", "구", "그", "금", "기", "나", "다", "대",
+        scene.deckArray =
+        // 초급 index 0~48
+        ["가", "거", "고", "구", "그", "금", "기", "나", "다", "대",
         "도", "동", "드", "라", "로", "리", "마", "보", "부", "비",
         "사", "상", "생", "소", "수", "스", "시", "식", "아", "안",
         "어", "오", "요", "우", "음", "이", "인", "일", "자", "장",
-        "전", "정", "제", "주", "지", "진", "하", "한", "해"];
+        "전", "정", "제", "주", "지", "진", "하", "한", "해",
+        // 중급 index 49~97
+        "가", "경", "고", "공", "관", "구", "국", "기", "대", "도",
+        "동", "라", "로", "리", "무", "법", "보", "부", "비", "사",
+        "산", "상", "서", "성", "소", "수", "스", "시", "신", "아",
+        "안", "용", "원", "위", "유", "의", "이", "인", "일", "자",
+        "장", "전", "정", "제", "조", "주", "지", "해", "화",
+        // 고급 index 98~146
+        "가", "강", "경", "고", "교", "구", "국", "군", "기", "김",
+        "대", "도", "동", "리", "무", "문", "박", "보", "부", "사",
+        "산", "상", "서", "선", "성", "수", "시", "신", "안", "영",
+        "원", "유", "이", "인", "일", "자", "장", "재", "전", "정",
+        "제", "조", "주", "지", "진", "천", "학", "호", "화",
+        // 초급 cardRotation시에 새로 생기는 index 147~151
+        "믄", "무", "여", "믕", "으",
+        // 중급 cardRotation시에 새로 생기는 index 152~158
+        "운", "논", "마", "우", "융", "야", "으",
+        // 고급 cardRotation시에 새로 생기는 index 159~164
+        "논", "곤", "마", "곰", "야", "으"];
       
         // board에 drop된 card들을 저장하는 group
         scene.boardGroup = new Phaser.GameObjects.Group(scene);
@@ -949,63 +1010,186 @@ export default class GameScene extends Phaser.Scene {
     }
 
     cardRotation(card) {
-        if(card.value === "금") {
-            card.value = "믄";
+        // 금, 믄
+        if(card.value === 5) {
+            card.value = 147;
             card.angle += 180;
         }
-        else if(card.value === "믄") {
-            card.value = "금";
+        else if(card.value === 147) {
+            card.value = 5;
             card.angle += 180;
         }
-        else if(card.value === "마") {
-            card.value = "무";
+        // 마 무
+        else if(card.value === 16) {
+            card.value = 148;
             card.angle += 90;
         }
-        else if(card.value === "무") {
-            card.value = "마";
+        else if(card.value === 148) {
+            card.value = 16;
             card.angle += 270;
         }
-        else if(card.value === "아") {
-            card.value = "우";
+        // 아 우
+        else if(card.value === 28) {
+            card.value = 33;
             card.angle += 90;
         }
-        else if(card.value === "우") {
-            card.value = "아";
+        else if(card.value === 33) {
+            card.value = 28;
             card.angle += 270;
         }
-        else if(card.value === "어") {
-            card.value = "오";
+        // 어 오
+        else if(card.value === 30) {
+            card.value = 31;
             card.angle += 90;
         }
-        else if(card.value === "오") {
-            card.value = "어";
+        else if(card.value === 31) {
+            card.value = 30;
             card.angle += 270;
         }
-        else if(card.value === "요") {
-            card.value = "여";
+        // 요 여
+        else if(card.value === 32) {
+            card.value = 149;
             card.angle += 270;
         }
-        else if(card.value === "여") {
-            card.value = "요";
+        else if(card.value === 149) {
+            card.value = 32;
             card.angle += 90;
         }
-        else if(card.value === "음") {
-            card.value = "믕";
+        // 음 믕
+        else if(card.value === 34) {
+            card.value = 150;
             card.angle += 180;
         }
-        else if(card.value === "믕") {
-            card.value = "음";
+        else if(card.value === 150) {
+            card.value = 34;
             card.angle += 180;
         }
-        else if(card.value === "이") {
-            card.value = "으";
+        // 이 으
+        else if(card.value === 35) {
+            card.value = 151;
             card.angle += 90;
         }
-        else if(card.value === "으") {
-            card.value = "이";
+        else if(card.value === 151) {
+            card.value = 35;
             card.angle += 270;
         }
-        console.log(card.angle);
+        // 공 운
+        else if(card.value === 52) {
+            card.value = 152;
+            card.angle += 180;
+        }
+        else if(card.value === 152) {
+            card.value = 52;
+            card.angle += 180;
+        }
+        // 국 논
+        else if(card.value === 55) {
+            card.value = 153;
+            card.angle += 180;
+        }
+        else if(card.value === 153) {
+            card.value = 55;
+            card.angle += 180;
+        }
+        // 무 마
+        else if(card.value === 63) {
+            card.value = 154;
+            card.angle += 270;
+        }
+        else if(card.value === 154) {
+            card.value = 63;
+            card.angle += 90;
+        }
+        // 아 우
+        else if(card.value === 78) {
+            card.value = 155;
+            card.angle += 90;
+        }
+        else if(card.value === 155) {
+            card.value = 78;
+            card.angle += 270;
+        }
+        // 용 융
+        else if(card.value === 80) {
+            card.value = 156;
+            card.angle += 180;
+        }
+        else if(card.value === 156) {
+            card.value = 80;
+            card.angle += 180;
+        }
+        // 유 야
+        else if(card.value === 83) {
+            card.value = 157;
+            card.angle += 270;
+        }
+        else if(card.value === 157) {
+            card.value = 83;
+            card.angle += 90;
+        }
+        // 이 으
+        else if(card.value === 85) {
+            card.value = 158;
+            card.angle += 90;
+        }
+        else if(card.value === 158) {
+            card.value = 85;
+            card.angle += 270;
+        }
+        // 국 논
+        else if(card.value === 104) {
+            card.value = 159;
+            card.angle += 180;
+        }
+        else if(card.value === 159) {
+            card.value = 104;
+            card.angle += 180;
+        }
+        // 군 곤
+        else if(card.value === 105) {
+            card.value = 160;
+            card.angle += 180;
+        }
+        else if(card.value === 160) {
+            card.value = 105;
+            card.angle += 180;
+        }
+        // 무 마
+        else if(card.value === 112) {
+            card.value = 161;
+            card.angle += 270;
+        }
+        else if(card.value === 161) {
+            card.value = 112;
+            card.angle += 90;
+        }
+        // 문 곰
+        else if(card.value === 113) {
+            card.value = 162;
+            card.angle += 180;
+        }
+        else if(card.value === 162) {
+            card.value = 113;
+            card.angle += 180;
+        }
+        // 유 야
+        else if(card.value === 129) {
+            card.value = 163;
+            card.angle += 270;
+        }
+        else if(card.value === 163) {
+            card.value = 129;
+            card.angle += 90;
+        }
+        // 이 으
+        else if(card.value === 130) {
+            card.value = 164;
+            card.angle += 90;
+        }
+        else if(card.value === 164) {
+            card.value = 130;
+            card.angle += 270;
+        }
     }
 
     setCardOrigin(card) {

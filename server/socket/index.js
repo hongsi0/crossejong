@@ -21,10 +21,22 @@ const gameRooms = {
   // }
 };
 
-function shuffledeck() {
+function shuffledeck(difficulty) {
   let deck = []
-  for (let i=0;i<48;i++){
-    deck.push(i);
+  if (difficulty === "초급") {
+    for (let i=0;i<49;i++){
+      deck.push(i);
+    }
+  }
+  else if (difficulty === "중급") {
+    for (let i=49;i<98;i++){
+      deck.push(i);
+    }
+  }
+  else if (difficulty === "고급") {
+    for (let i=98;i<147;i++){
+      deck.push(i);
+    }
   }
   deck.sort(() => Math.random() - 0.5);
   return deck;
@@ -88,7 +100,7 @@ module.exports = (io) => {
       roomInfo.playing = true;
       roomInfo.turnCount = 0;
       roomInfo.currentTurn = "";
-      roomInfo.deck = shuffledeck();
+      roomInfo.deck = shuffledeck(roomInfo.difficulty);
       roomInfo.timeState = "InGame";
       console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
@@ -132,7 +144,7 @@ module.exports = (io) => {
 
     socket.on("launchVerifiScene", (data) => {
       const roomInfo = gameRooms[data.roomKey];
-      roomInfo.time = 7;
+      roomInfo.time = 5;
       roomInfo.timeState = "Verificate";
       io.to(data.roomKey).emit("launchVerifiScene", {id:data.id, word:data.word})
     })
@@ -140,7 +152,7 @@ module.exports = (io) => {
     socket.on("pickcard", (data) => {
       console.log("pickcard");
       const roomInfo = gameRooms[data.roomKey];
-      if (roomInfo.deck.length === 0) roomInfo.deck = shuffledeck();
+      if (roomInfo.deck.length === 0) roomInfo.deck = shuffledeck(roomInfo.difficulty);
       io.to(socket.id).emit("pickcard", {cardval:roomInfo.deck.pop(), type:data.type});
     });
 
@@ -216,7 +228,7 @@ module.exports = (io) => {
       const retryDelay = 1000;
       
       const roomInfo = gameRooms[val.roomKey];
-      roomInfo.time = 7;
+      roomInfo.time = 5;
       const url = `https://krdict.korean.go.kr/api/search?certkey_no=4549&key=487E5EEAB2BE2EB3932C7B599847D5DC&type_search=search&part=word&q=${val.word}&sort=dict&advanced=y&method=exact`;
       const options = {
           method: "get",
