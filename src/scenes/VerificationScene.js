@@ -39,7 +39,7 @@ export default class VerificationScene extends Phaser.Scene {
         let resultText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
         let meanText = scene.add.text(0, 0, "", {font: "30px BR-R", color: "#523b33"});
         let playerText = scene.add.text(0, 0, "", {font: "60px BR-R", color: "#523b33"});
-        let timeText = scene.add.text(0, 0, "7초 후에 게임으로 돌아갑니다.", {font: "60px BR-R", color: "#523b33"});
+        let timeText = scene.add.text(0, 0, "5초 후에 게임으로 돌아갑니다.", {font: "60px BR-R", color: "#523b33"});
         
         Phaser.Display.Align.In.Center(Toptext, bg);
         Phaser.Display.Align.In.Center(wordText, bg);
