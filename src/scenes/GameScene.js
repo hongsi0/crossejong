@@ -810,8 +810,9 @@ export default class GameScene extends Phaser.Scene {
               player_list.removeChild(player_list.firstChild);
             }
             scene.players = players;
+
             Object.keys(scene.players).forEach((playerkey) => {
-                if(scene.myTurn && sharedData.socket.id === playerkey) {
+                if(scene.players[playerkey].myturn) {
                     const playerbox = document.createElement("div");
                     playerbox.setAttribute("class", "myturnbox");
                     const textinbox = document.createElement("p");

@@ -6,7 +6,7 @@ const { error } = require('console');
 const gameRooms = {
   // [roomKey]: {
     // players: {
-    //   [playerid]: {playerId: , playerNickname:, played:, card:}
+    //   [playerid]: {playerId: , playerNickname:, played:, card:, myturn:false}
     // },
     // startingPlayers: [],
     // numPlayers: 0,
@@ -62,6 +62,7 @@ module.exports = (io) => {
         playerId: socket.id,
         playerNickname: socket.nickname,
         played: false,
+        myturn: false,
       }
       gamestate.numPlayers = 1;
       gamestate['players'] = playerlist;
@@ -127,6 +128,8 @@ module.exports = (io) => {
             for (let i=0;i<6;i++){
               playercard.push(roomInfo.deck.pop())
             }
+            if (player == playerlist[0]) roomInfo.players[player].myturn=true;
+            else roomInfo.players[player].myturn=false;
             roomInfo.players[player].card = 6;
             io.to(player).emit("firstcard", playercard);
           });
@@ -178,6 +181,10 @@ module.exports = (io) => {
           let nextIndex = roomInfo.turnCount % roomInfo.startingPlayers.length
           if(playedplayers.includes(roomInfo.startingPlayers[nextIndex])) {
             roomInfo.currentTurn = roomInfo.startingPlayers[nextIndex];
+            playerlist.forEach((player) => {
+              if (player == roomInfo.currentTurn) roomInfo.players[player].myturn=true;
+              else roomInfo.players[player].myturn=false;
+            });
             io.to(roomInfo.currentTurn).emit('nextTurn');
             io.to(roomKey).emit('currentPlayers', roomInfo.players);
             break;
