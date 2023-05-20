@@ -117,6 +117,8 @@ export default class VerificationScene extends Phaser.Scene {
 
             result = "true";
             cardgetplayer = data.id;
+
+            
         });
 
         sharedData.socket.on("verTimeDecrease", (timer) => {

@@ -12,42 +12,40 @@ export default class GameEndScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("rankbackground", "assets/image/verificationbackground.png");
-        this.load.image("finishButton2", "assets/image/okButton.png");
+        this.load.image("endbackground", "assets/image/gameEndBG.png");
+        this.load.image("rank_2p_first", "assets/image/rank_2p_first.png");
+        this.load.image("rank_2p_second", "assets/image/rank_2p_second.png");
+        this.load.image("rank_3p_first", "assets/image/rank_3p_first.png");
+        this.load.image("rank_3p_second", "assets/image/rank_3p_second.png");
+        this.load.image("rank_3p_third", "assets/image/rank_3p_third.png");
     }
 
     create() {
         const scene = this;
-
         sharedData.socket.removeAllListeners("gameexit")
-
         console.log(scene.playerRank);
-        let bg = scene.add.image(1050, 500, "rankbackground");
 
-        let topText = scene.add.text(0, 140, "순위", {font: "70px BR-R", color: "#523b33"});
-        Phaser.Display.Align.In.Center(topText, bg);
-        topText.y = 140;
+        scene.add.image(0, 0, "endbackground").setOrigin(0,0);
 
-        let text_space_y = 110;
-        let text_start_y = 300;
-        switch(scene.playerRank.length) {
-            case 2:
-                text_space_y = 170;
-                text_start_y = 390;
-                break;
-            case 3:
-                text_space_y = 125;
-                text_start_y = 340;
-                break;
-        }
-          
-        let rankStyle = {font: "60px BR-R", color: "#523b33"};
-        let texts = [];
+        let rank_first = scene.add.image(1050, 500, "rank_3p_first").setOrigin(0,0);
+        rank_first.displayHeight = 0;
+
+        scene.tweens.add({
+            targets: rank_first,
+            displayHeight: rank_first.height,
+            duration: 2000,
+            ease: 'Linear',
+            onComplete: function () {
+                console.log("애니메이션 완료");
+            }
+        });
+
+        // let rank_second = scene.add.image(1050, 400, "rank_3p_second");
+        // let rank_third = scene.add.image(1050, 600, "rank_3p_third");
+
         for (let i = 0; i < scene.playerRank.length; i++) {
             let nickname = scene.playerRank[i];
-            let text = scene.add.text(750, 0, `${i+1}등 : ${nickname}`, rankStyle);
-            text.y = text_start_y + i * text_space_y;
-            texts.push(text);
+            console.log(`${i+1}등 : ${nickname}`);
         }
 
         sharedData.socket.on("gameexit", () => {
