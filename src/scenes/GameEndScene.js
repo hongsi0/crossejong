@@ -13,35 +13,35 @@ export default class GameEndScene extends Phaser.Scene {
 
     preload() {
         this.load.image("endbackground", "assets/image/gameEndBG.png");
-        this.load.image("rank_2p_first", "assets/image/rank_2p_first.png");
-        this.load.image("rank_2p_second", "assets/image/rank_2p_second.png");
-        this.load.image("rank_3p_first", "assets/image/rank_3p_first.png");
-        this.load.image("rank_3p_second", "assets/image/rank_3p_second.png");
-        this.load.image("rank_3p_third", "assets/image/rank_3p_third.png");
+        this.load.image("rank_2p", "assets/image/rank_2p.png");
+        this.load.image("rank_3p", "assets/image/rank_3p.png");
     }
 
     create() {
         const scene = this;
-        sharedData.socket.removeAllListeners("gameexit")
+        sharedData.socket.removeAllListeners("gameexit");
         console.log(scene.playerRank);
+        const player_num = scene.playerRank.length;
 
         scene.add.image(0, 0, "endbackground").setOrigin(0,0);
 
-        let rank_first = scene.add.image(1050, 500, "rank_3p_first").setOrigin(0,0);
-        rank_first.displayHeight = 0;
+        let rank;
+        if(player_num == 2) { // 2 players
+            rank = scene.add.image(960,1080,"rank_2p").setOrigin(0.5, 1);
+        } else { // 3 or 4 players
+            rank = scene.add.image(960,1080,"rank_3p").setOrigin(0.5, 1);
+        }
+        rank.displayHeight = 0;
 
         scene.tweens.add({
-            targets: rank_first,
-            displayHeight: rank_first.height,
-            duration: 2000,
+            targets: rank,
+            displayHeight: rank.height,
+            duration: 1000,
             ease: 'Linear',
             onComplete: function () {
-                console.log("애니메이션 완료");
+              console.log("rank 애니메이션 완료");
             }
-        });
-
-        // let rank_second = scene.add.image(1050, 400, "rank_3p_second");
-        // let rank_third = scene.add.image(1050, 600, "rank_3p_third");
+          });
 
         for (let i = 0; i < scene.playerRank.length; i++) {
             let nickname = scene.playerRank[i];
