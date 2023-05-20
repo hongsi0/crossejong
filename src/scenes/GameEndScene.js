@@ -15,6 +15,7 @@ export default class GameEndScene extends Phaser.Scene {
         this.load.image("endbackground", "assets/image/gameEndBG.png");
         this.load.image("rank_2p", "assets/image/rank_2p.png");
         this.load.image("rank_3p", "assets/image/rank_3p.png");
+        this.load.audio("gameEndbgm", "assets/sound/gameEndbgm.mp3");
     }
 
     create() {
@@ -24,6 +25,9 @@ export default class GameEndScene extends Phaser.Scene {
         const player_num = scene.playerRank.length;
 
         scene.add.image(0, 0, "endbackground").setOrigin(0,0);
+
+        scene.gameEndbgm = scene.sound.add("gameEndbgm",{loop:false});
+        scene.gameEndbgm.play();
 
         let rank;
         if(player_num == 2) { // 2 players
