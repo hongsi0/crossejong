@@ -302,6 +302,36 @@ module.exports = (io) => {
       handleObjection(val);
     });
 
+    socket.on("translate", (val) => {
+      const apiKey = 'Pg8G1ze6ON3tNt2Thhg4'; // 발급받은 파파고 API 키
+      const clientSecret = 'F775HUSNfs'; // 발급받은 파파고 client secret
+      const sourceLang = 'ko'; // 원본 언어
+      const targetLang = 'en'; // 번역할 언어
+      const textToTranslate = val.text; // 번역할 텍스트
+
+      const translationEndpoint = 'https://openapi.naver.com/v1/papago/n2mt';
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'X-Naver-Client-Id': apiKey,
+          'X-Naver-Client-Secret': clientSecret,
+        },
+        body: `source=${sourceLang}&target=${targetLang}&text=${encodeURIComponent(textToTranslate)}`,
+      };
+
+      fetch(translationEndpoint, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          const translatedText = data.message.result.translatedText;
+          console.log("translatedText", translatedText);
+          io.to(val.id).emit("translateresult", translatedText);
+        })
+        .catch(error => {
+          console.error('Translation error:', error);
+        });
+    });
+
     socket.on("outRoom", (roomKey) => {
       console.log("out");
       const roomInfo = gameRooms[roomKey];

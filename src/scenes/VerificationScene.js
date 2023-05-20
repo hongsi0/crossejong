@@ -15,6 +15,7 @@ export default class VerificationScene extends Phaser.Scene {
         this.load.image("verificationbackground", "assets/image/verificationbackground.png");
         this.load.image("objectionButton(N)", "assets/image/objectionButton(N).png");
         this.load.image("objectionButton(Y)", "assets/image/objectionButton(Y).png");
+        this.load.image("translateButton", "assets/image/reload.png");
     }
 
     create() {
@@ -24,6 +25,7 @@ export default class VerificationScene extends Phaser.Scene {
         sharedData.socket.removeAllListeners("verificationTrue");
         sharedData.socket.removeAllListeners("verTimeDecrease");
         sharedData.socket.removeAllListeners("verificationEnd");
+        sharedData.socket.removeAllListeners("translateresult");
 
         let result = "";
         let cardgetplayer = "";
@@ -52,6 +54,14 @@ export default class VerificationScene extends Phaser.Scene {
         meanText.y = 550;
         playerText.y = 650;
         timeText.y = 800;
+
+        // 번역 button
+        const translateButton = scene.add.sprite(0, 350, "translateButton")
+        .setInteractive()
+        .setDepth(1)
+        .setScale(0.35)
+        Phaser.Display.Align.In.Center(translateButton, bg);
+        translateButton.visible = false;
 
         // objection을 신청하는 button
         const objectionButton = scene.add.sprite(1050, 620, "objectionButton(N)")
@@ -97,7 +107,11 @@ export default class VerificationScene extends Phaser.Scene {
 
         sharedData.socket.on("verificationTrue", (data) => {
             Toptext.setText("검증 결과");
-            resultText.setText(`${data.word} (${data.pos})`);
+            resultText.setText("");
+            translateButton.visible = true;
+            translateButton.on("pointerup",() => {
+                sharedData.socket.emit("translate", {text:data.def, id:sharedData.socket.id});
+            });
             meanText.setText(data.def);
             playerText.setText(`${data.nick}님이 카드 한장을 받습니다.`);
 
@@ -117,8 +131,14 @@ export default class VerificationScene extends Phaser.Scene {
 
             result = "true";
             cardgetplayer = data.id;
+        });
 
-            
+        sharedData.socket.on("translateresult", (translatedText) => {
+            console.log("trans", translatedText);
+            translateButton.visible = false;
+            resultText.setText(`${translatedText}`, {font: "30px BR-R", color: "#523b33"});
+            Phaser.Display.Align.In.Center(resultText, bg);
+            resultText.y = 430;
         });
 
         sharedData.socket.on("verTimeDecrease", (timer) => {
