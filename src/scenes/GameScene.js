@@ -811,25 +811,42 @@ export default class GameScene extends Phaser.Scene {
             }
             scene.players = players;
             Object.keys(scene.players).forEach((playerkey) => {
-              const playerbox = document.createElement("div");
-              playerbox.setAttribute("class", "playerbox");
-              const textinbox = document.createElement("p");
-              textinbox.setAttribute("class", "game_nickname");
-              const playerNick = document.createTextNode(scene.players[playerkey].playerNickname);
-              if(scene.myTurn && sharedData.socket.id === playerkey) {
-                playerNick.textContent = `${scene.players[playerkey].playerNickname}✔︎`;
-              }
-              const announce_card_text = document.createTextNode("남아있는 카드수");
-              const num_card = document.createTextNode(scene.players[playerkey].card);
-              const lineBreak1 = document.createElement("br");
-              const lineBreak2 = document.createElement("br");
-              textinbox.appendChild(playerNick);
-              textinbox.appendChild(lineBreak1); // 새로운 줄에 추가
-              textinbox.appendChild(announce_card_text)
-              textinbox.appendChild(lineBreak2); // 새로운 줄에 추가
-              textinbox.appendChild(num_card)
-              playerbox.appendChild(textinbox);
-              player_list.appendChild(playerbox);
+                if(scene.myTurn && sharedData.socket.id === playerkey) {
+                    const playerbox = document.createElement("div");
+                    playerbox.setAttribute("class", "myturnbox");
+                    const textinbox = document.createElement("p");
+                    textinbox.setAttribute("class", "game_nickname");
+                    const playerNick = document.createTextNode(scene.players[playerkey].playerNickname);
+                    const announce_card_text = document.createTextNode("남아있는 카드수");
+                    const num_card = document.createTextNode(scene.players[playerkey].card);
+                    const lineBreak1 = document.createElement("br");
+                    const lineBreak2 = document.createElement("br");
+                    textinbox.appendChild(playerNick);
+                    textinbox.appendChild(lineBreak1); // 새로운 줄에 추가
+                    textinbox.appendChild(announce_card_text)
+                    textinbox.appendChild(lineBreak2); // 새로운 줄에 추가
+                    textinbox.appendChild(num_card)
+                    playerbox.appendChild(textinbox);
+                    player_list.appendChild(playerbox);
+                } else {
+                    const playerbox = document.createElement("div");
+                    playerbox.setAttribute("class", "playerbox");
+                    const textinbox = document.createElement("p");
+                    textinbox.setAttribute("class", "game_nickname");
+                    const playerNick = document.createTextNode(scene.players[playerkey].playerNickname);
+                    const announce_card_text = document.createTextNode("남아있는 카드수");
+                    const num_card = document.createTextNode(scene.players[playerkey].card);
+                    const lineBreak1 = document.createElement("br");
+                    const lineBreak2 = document.createElement("br");
+                    textinbox.appendChild(playerNick);
+                    textinbox.appendChild(lineBreak1); // 새로운 줄에 추가
+                    textinbox.appendChild(announce_card_text)
+                    textinbox.appendChild(lineBreak2); // 새로운 줄에 추가
+                    textinbox.appendChild(num_card)
+                    playerbox.appendChild(textinbox);
+                    player_list.appendChild(playerbox);
+                }
+                
             });
         }
           

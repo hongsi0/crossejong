@@ -18,6 +18,8 @@ const gameRooms = {
     // time: 30,
     // timeState: "", // "InGame", "Verificate", "Result"
     // playerRank: [],
+    // password:,
+    // lock:,
   // }
 };
 
@@ -435,6 +437,9 @@ module.exports = (io) => {
             playing: false,
             startingPlayers: roomInfo.startingPlayers,
             timeState: "",
+            difficulty: roomInfo.difficulty,
+            password : roomInfo.password,
+            locked : roomInfo.password === "" ? false : true,
           }
           gameRooms[roomKey] = temp_roomInfo;
           io.to(roomKey).emit("gameexit")
