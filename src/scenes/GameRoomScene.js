@@ -14,7 +14,7 @@ export default class GameRoomScene extends Phaser.Scene {
     this.load.image("startbutton", "assets/image/startButton.png");
     this.load.image("outbutton(N)", "assets/image/out(N).png");
     this.load.image("outbutton(Y)", "assets/image/out(Y).png");
-    this.load.image("roomnameBar", "assets/image/lastWordBar.png");
+    this.load.image("roomnameBar", "assets/image/roomNameBar.png");
     this.load.html("playerlistform", "assets/text/playerlistform.html");
     this.load.html("chatform", "assets/text/chatform.html");
     this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
@@ -43,9 +43,8 @@ export default class GameRoomScene extends Phaser.Scene {
   
     //LOGO
     scene.logo = scene.add.sprite(200, 120, "logo");
-    scene.roomnameBar = scene.add.sprite(990, 100, "roomnameBar");
-    scene.roomnameBar.setScale(0.85);
-    scene.roomname = scene.add.text(480, 75, `방 ${sharedData.roomKey}`, WordStyle).setOrigin(0,0);
+    scene.roomnameBar = scene.add.sprite(990, 85, "roomnameBar");
+    scene.roomname = scene.add.text(490, 60, `방 ${sharedData.roomKey}`, WordStyle).setOrigin(0,0);
   
     const outbuttonImage = scene.add.image(1600, 800, 'outbutton(N)')
     .setOrigin(0)
@@ -109,7 +108,7 @@ export default class GameRoomScene extends Phaser.Scene {
     });
   
     //chat
-    scene.inputElement = scene.add.dom(940, 580).createFromCache("chatform");
+    scene.inputElement = scene.add.dom(940, 560).createFromCache("chatform");
     const chatlist = scene.inputElement.getChildByID("chat-messages");
   
     scene.inputElement.addListener("click");
