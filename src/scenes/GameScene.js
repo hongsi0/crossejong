@@ -143,6 +143,7 @@ export default class GameScene extends Phaser.Scene {
         // 고급 cardRotation
         this.load.image("곤", "assets/cards/곤.png");
         this.load.image("곰", "assets/cards/곰.png");
+
         this.load.audio("카드클릭", "assets/sound/딸깍.mp3");
         this.load.audio("카드내려놓기", "assets/sound/놓기.mp3");
         this.load.audio("버튼클릭", "assets/sound/클릭.mp3");
@@ -560,7 +561,6 @@ export default class GameScene extends Phaser.Scene {
             scene.myturnsound.play();
             scene.myTurn = true;
             scene.dropped = false;
-            scene.mycardnum = this.handGroup.countActive();
             console.log("My Turn! " + scene.myTurn);
 
             // Phaser 오브젝트 생성
@@ -747,9 +747,6 @@ export default class GameScene extends Phaser.Scene {
             }
             scene.alphaCards = [];
             scene.graphicGroup.clear(true);
-            if (scene.mycardnum != scene.handGroup.countActive()){
-                sharedData.socket.emit("currentCardUpdate", {roomKey:sharedData.roomKey, id:sharedData.socket.id, number:scene.handGroup.countActive()})
-            }
             if (data.id === sharedData.socket.id) {
                 sharedData.socket.emit("nextTurn", sharedData.roomKey);
             }
