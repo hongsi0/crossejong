@@ -24,6 +24,7 @@ import LoginScene from "./scenes/LoginScene";
 import VerificationScene from "./scenes/VerificationScene";
 import GameEndScene from "./scenes/GameEndScene";
 import TutorialScene from "./scenes/TutorialScene";
+import TutorialVerificationScene from "./scenes/TutorialVerificationScene";
 
 export class Game extends Phaser.Game {
   constructor() {
@@ -39,6 +40,7 @@ export class Game extends Phaser.Game {
     this.scene.add("VerificationScene", VerificationScene);
     this.scene.add("GameEndScene", GameEndScene);
     this.scene.add("TutorialScene", TutorialScene);
+    this.scene.add("TutorialVerificationScene", TutorialVerificationScene);
 
     this.socket = io();
 

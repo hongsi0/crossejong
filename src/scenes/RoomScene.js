@@ -35,6 +35,7 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("profile5", "assets/profile/profile5.png");
     this.load.image("profile6", "assets/profile/profile6.png");
     this.load.image("shuffle", "assets/image/shuffle_button.png");
+    this.load.image("tutorial", "assets/image/LoginButton.png");
     // this.load.image("shuffle", "assets/image/shuffle-button_2.png");
   }
 
@@ -90,6 +91,18 @@ export default class RoomScene extends Phaser.Scene {
       scene.clicksound.play();
       sharedData.socket.emit("getRooms");
     });
+
+    //makeroom
+    const tutorialImage = scene.add.image(1400, 600, 'makeroomN')
+    .setOrigin(0)
+    .setDepth(100)
+    .setScale(1.2)
+    .setInteractive()
+    .on("pointerup", () => {
+      scene.clicksound.play();
+      scene.waitbgm.stop();
+      scene.scene.start("TutorialScene");
+    });
   
     scene.popUp = scene.add.graphics();
     scene.boxes = scene.add.graphics();
@@ -125,6 +138,7 @@ export default class RoomScene extends Phaser.Scene {
         new_profile = 'profile' + getRandProfileNum();
       }
       sharedData.socket.profile = new_profile;
+      sharedData.socket.emit("userinfo",{nickname: sharedData.socket.nickname, profile: sharedData.socket.profile});
       profile_pic.setTexture(sharedData.socket.profile);
     });
 
