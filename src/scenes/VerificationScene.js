@@ -110,7 +110,7 @@ export default class VerificationScene extends Phaser.Scene {
             resultText.setText("");
             translateButton.visible = true;
             translateButton.on("pointerup",() => {
-                sharedData.socket.emit("translate", {text:data.def, id:sharedData.socket.id});
+                sharedData.socket.emit("translate", {text:data.word, id:sharedData.socket.id});
             });
             meanText.setText(data.def);
             playerText.setText(`${data.nick}님이 카드 한장을 받습니다.`);
@@ -133,12 +133,10 @@ export default class VerificationScene extends Phaser.Scene {
             cardgetplayer = data.id;
         });
 
-        sharedData.socket.on("translateresult", (translatedText) => {
-            console.log("trans", translatedText);
-            translateButton.visible = false;
-            resultText.setText(`${translatedText}`, {font: "30px BR-R", color: "#523b33"});
-            Phaser.Display.Align.In.Center(resultText, bg);
-            resultText.y = 430;
+        sharedData.socket.on("translateresult", (data) => {
+            wordText.setText(`${data.origin}(${data.trans})`);
+            Phaser.Display.Align.In.Center(wordText, bg);
+            wordText.y = 300;
         });
 
         sharedData.socket.on("verTimeDecrease", (timer) => {

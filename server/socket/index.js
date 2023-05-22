@@ -332,7 +332,7 @@ module.exports = (io) => {
         .then(data => {
           const translatedText = data.message.result.translatedText;
           console.log("translatedText", translatedText);
-          io.to(val.id).emit("translateresult", translatedText);
+          io.to(val.id).emit("translateresult", {origin:val.text, trans:translatedText});
         })
         .catch(error => {
           console.error('Translation error:', error);
@@ -445,6 +445,19 @@ module.exports = (io) => {
       Object.keys(gameRooms).includes(input)
         ? io.to(socket.id).emit("RoomkeyIsValid", input)
         : io.to(socket.id).emit("RoomkeyNotValid", input);
+    });
+
+    socket.on('TutorialcardDrop', (data) => {
+      console.log("TutorialcardDrop");
+      io.to(socket.id).emit('TutorialcardDrop', {cardval:data.cardval, i:data.i, j:data.j});
+    });
+
+    socket.on("Tutorialaddalphacards", (data) => {
+      io.to(socket.id).emit("Tutorialaddalphacards", {cardval:data.cardval, i:data.i, j:data.j})
+    });
+
+    socket.on("TutorialEnd", () => {
+      io.to(socket.id).emit("TutorialEnd");
     });
 
   });
