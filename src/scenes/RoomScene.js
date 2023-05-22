@@ -125,6 +125,7 @@ export default class RoomScene extends Phaser.Scene {
         new_profile = 'profile' + getRandProfileNum();
       }
       sharedData.socket.profile = new_profile;
+      sharedData.socket.emit("userinfo",{nickname: sharedData.socket.nickname, profile: sharedData.socket.profile});
       profile_pic.setTexture(sharedData.socket.profile);
     });
 

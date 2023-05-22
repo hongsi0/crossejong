@@ -6,7 +6,7 @@ const { error } = require('console');
 const gameRooms = {
   // [roomKey]: {
     // players: {
-    //   [playerid]: {playerId: , playerNickname:, played:, card:, myturn:false}
+    //   [playerid]: {playerId: , playerNickname:, played:, card:, myturn:false, playerProfile:,}
     // },
     // startingPlayers: [],
     // numPlayers: 0,
@@ -17,7 +17,7 @@ const gameRooms = {
     // difficulty:,
     // time: 30,
     // timeState: "", // "InGame", "Verificate", "Result"
-    // playerRank: [],
+    // playerRank: [ {key:, nickname:, profile:,} ],
     // password:,
     // lock:,
   // }
@@ -63,6 +63,7 @@ module.exports = (io) => {
         playerNickname: socket.nickname,
         played: false,
         myturn: false,
+        playerProfile: socket.profile
       }
       gamestate.numPlayers = 1;
       gamestate['players'] = playerlist;
@@ -171,10 +172,14 @@ module.exports = (io) => {
         }
       });
       if(playedplayers.length === 1){ //끝나지 않은 플레이어가 1명일 때
-        roomInfo.playerRank.push(roomInfo.players[playedplayers[0]].playerNickname);
+        roomInfo.playerRank.push({
+          key: playedplayers[0],
+          nickname: roomInfo.players[playedplayers[0]].playerNickname,
+          profile: roomInfo.players[playedplayers[0]].playerProfile
+        });
         io.to(roomKey).emit("gameEnd", {playerRank:roomInfo.playerRank});
         roomInfo.timeState = "Result";
-        roomInfo.time = 5;
+        roomInfo.time = 10;
       } else{ //끝나지 않은 플레이어가 2명 이상일 때
         while(true) {
           roomInfo.turnCount++;
@@ -199,19 +204,21 @@ module.exports = (io) => {
 
     socket.on("addalphacards", (data) => {
       io.to(data.roomKey).emit("addalphacards", {cardval:data.cardval, i:data.i, j:data.j})
-    })
+    });
 
     socket.on('turnEnd', (data) => {
       const roomInfo = gameRooms[data.roomKey];
-      const playerlist = Object.keys(roomInfo.players);
-      playerlist.forEach((player) => {
-        if (roomInfo.players[roomInfo.currentTurn].card === 0) {
-          if (!roomInfo.playerRank.includes(roomInfo.players[roomInfo.currentTurn].playerNickname)) {
-            roomInfo.playerRank.push(roomInfo.players[roomInfo.currentTurn].playerNickname);
-          }
-          roomInfo.players[roomInfo.currentTurn].played = false
+      if (roomInfo.players[roomInfo.currentTurn].card === 0) {
+        const isPlayerKeyExist = (key) => roomInfo.playerRank.some(player => player.key === key);
+        if (!isPlayerKeyExist(roomInfo.currentTurn)) {
+          roomInfo.playerRank.push({
+              key: roomInfo.currentTurn,
+              nickname: roomInfo.players[roomInfo.currentTurn].playerNickname,
+              profile: roomInfo.players[roomInfo.currentTurn].playerProfile
+          });
         }
-      })
+        roomInfo.players[roomInfo.currentTurn].played = false;
+      }
       roomInfo.time = 30;
       io.to(data.roomKey).emit('turnEnd', {id:data.id, type:data.type});
     });
@@ -357,7 +364,8 @@ module.exports = (io) => {
       const roomInfo = gameRooms[roomvalue.roomKey];
       roomInfo.players[socket.id] = {
         playerId: socket.id,
-        playerNickname: socket.nickname
+        playerNickname: socket.nickname,
+        playerProfile: socket.profile
       };
       roomInfo.difficulty = roomvalue.difficulty;
       roomInfo.password = roomvalue.password;
@@ -379,7 +387,8 @@ module.exports = (io) => {
       console.log("roomInfo", roomInfo);
       roomInfo.players[socket.id] = {
         playerId: socket.id,
-        playerNickname: socket.nickname
+        playerNickname: socket.nickname,
+        playerProfile: socket.profile
       };
 
       // update number of players
