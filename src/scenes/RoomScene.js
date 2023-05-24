@@ -153,6 +153,7 @@ export default class RoomScene extends Phaser.Scene {
     sharedData.socket.emit("getRooms");
   
     sharedData.socket.on("rooms", (rooms) => {
+      console.log("room",rooms);
       // 이전에 추가된 자식 엘리먼트들을 모두 삭제
       while (list.firstChild) {
         list.removeChild(list.firstChild);

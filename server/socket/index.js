@@ -19,7 +19,7 @@ const gameRooms = {
     // timeState: "", // "InGame", "Verificate", "Result"
     // playerRank: [ {key:, nickname:, profile:,} ],
     // password:,
-    // lock:,
+    // locked:,
   // }
 };
 
@@ -78,6 +78,8 @@ module.exports = (io) => {
         num: gameRooms[room].numPlayers,
         playing: gameRooms[room].playing,
         difficulty: gameRooms[room].difficulty,
+        password: gameRooms[room].password,
+        locked: gameRooms[room].locked,
       }));
       roomlist.forEach((gameRoom) => {
         console.log(gameRooms[gameRoom]);
@@ -105,8 +107,8 @@ module.exports = (io) => {
       roomInfo.turnCount = 0;
       roomInfo.currentTurn = "";
       roomInfo.deck = shuffledeck(roomInfo.difficulty);
+      roomInfo.time = 30;
       roomInfo.timeState = "InGame";
-      console.log(roomInfo.deck);
       const playerlist = Object.keys(roomInfo.players);
       roomInfo.startingPlayers = playerlist;
       roomInfo.playerRank = [];
@@ -370,7 +372,7 @@ module.exports = (io) => {
       roomInfo.difficulty = roomvalue.difficulty;
       roomInfo.password = roomvalue.password;
       roomInfo.locked = roomvalue.password === "" ? false : true;
-      
+
       // update number of players
       roomInfo.numPlayers = Object.keys(roomInfo.players).length;
       roomInfo.playing = false;
