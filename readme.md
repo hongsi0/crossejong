@@ -31,4 +31,4 @@ To install and run Crossejong on your local machine, follow these steps:
     ```
     
 ## Play
-[우왕좌왕 세종대왕](https://game.crossejong.io)
+[우왕좌왕 세종대왕](game.crossejong.io)
