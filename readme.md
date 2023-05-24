@@ -1,15 +1,12 @@
 # Crossejong
 
-Crossejong is a cross-platform implementation of the popular tile-based game Mahjong. It provides a user-friendly interface for playing Mahjong on various platforms, including desktop computers and mobile devices.
+우왕좌왕 세종대왕은 한글 낱자를 가지고 단어를 만드는 게임입니다.
 
 ## Features
 
-- Authentic Mahjong gameplay with traditional rules.
-- Multiple game modes, including single-player and multiplayer options.
-- Intuitive user interface with smooth animations and appealing graphics.
-- Customizable game settings, such as tile sets and backgrounds.
-- Detailed scoring system and game statistics to track your progress.
-- Cross-platform compatibility, allowing you to play on Windows, macOS, Linux, iOS, and Android.
+- 최대 4명이서 플레이 가능
+- 난이도 상,중,하 가능
+- phaser를 사용한 웹 기반 게임
 
 ## Installation
 
