@@ -17,17 +17,17 @@ To install and run Crossejong on your local machine, follow these steps:
 
 1. Clone the repository using the following command:
     ```bash
-   git clone https://github.com/hongsi0/crossejong.git
-   ```
+    git clone https://github.com/hongsi0/crossejong.git
+    ```
 2. Navigate to the project directory:
-   ```bash
-   cd crossejong
-   ```
+    ```bash
+    cd crossejong
+    ```
 3. Install the required dependencies. Make sure you have Node.js and npm installed on your system. Then run:
-  ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 4. Start the application:
-  ```bash
-   npm run start-dev
-   ```
+    ```bash
+    npm run start-dev
+    ```
