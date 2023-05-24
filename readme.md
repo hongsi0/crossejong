@@ -7,6 +7,7 @@
 - 최대 4명이서 플레이 가능
 - 난이도 상,중,하 가능
 - phaser를 사용한 웹 기반 게임
+- node js서버를 사용
 
 ## Installation
 
@@ -28,3 +29,6 @@ To install and run Crossejong on your local machine, follow these steps:
     ```bash
     npm run start-dev
     ```
+    
+## Play
+[우왕좌왕 세종대왕](https://game.crossejong.io)
