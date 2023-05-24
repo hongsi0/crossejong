@@ -15,7 +15,7 @@ export default class VerificationScene extends Phaser.Scene {
         this.load.image("verificationbackground", "assets/image/verificationbackground.png");
         this.load.image("objectionButton(N)", "assets/image/objectionButton(N).png");
         this.load.image("objectionButton(Y)", "assets/image/objectionButton(Y).png");
-        this.load.image("translateButton", "assets/image/reload.png");
+        this.load.image("translateENGButton", "assets/image/ENG.png");
     }
 
     create() {
@@ -56,12 +56,12 @@ export default class VerificationScene extends Phaser.Scene {
         timeText.y = 800;
 
         // 번역 button
-        const translateButton = scene.add.sprite(0, 350, "translateButton")
+        const translateENGButton = scene.add.sprite(0, 350, "translateENGButton")
         .setInteractive()
         .setDepth(1)
-        .setScale(0.35)
-        Phaser.Display.Align.In.Center(translateButton, bg);
-        translateButton.visible = false;
+        .setScale(0.3)
+        Phaser.Display.Align.In.Center(translateENGButton, bg);
+        translateENGButton.visible = false;
 
         // objection을 신청하는 button
         const objectionButton = scene.add.sprite(1050, 620, "objectionButton(N)")
@@ -108,9 +108,18 @@ export default class VerificationScene extends Phaser.Scene {
         sharedData.socket.on("verificationTrue", (data) => {
             Toptext.setText("검증 결과");
             resultText.setText("");
-            translateButton.visible = true;
-            translateButton.on("pointerup",() => {
+            translateENGButton.visible = true;
+            translateENGButton
+            .on("pointerup",() => {
+                translateENGButton.clearTint();
+                translateENGButton.x -= 2;
+                translateENGButton.y -= 2;
                 sharedData.socket.emit("translate", {text:data.word, id:sharedData.socket.id});
+            })
+            .on("pointerdown",() => {
+                translateENGButton.setTint(0x888888);
+                translateENGButton.x += 2;
+                translateENGButton.y += 2;
             });
             meanText.setText(data.def);
             playerText.setText(`${data.nick}님이 카드 한장을 받습니다.`);
