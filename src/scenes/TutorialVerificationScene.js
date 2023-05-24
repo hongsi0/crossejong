@@ -14,7 +14,7 @@ export default class TutorialVerificationScene extends Phaser.Scene {
         this.load.image("verificationbackground", "assets/image/verificationbackground.png");
         this.load.image("objectionButton(N)", "assets/image/objectionButton(N).png");
         this.load.image("objectionButton(Y)", "assets/image/objectionButton(Y).png");
-        this.load.image("translateButton", "assets/image/reload.png");
+        this.load.image("translateENGButton", "assets/image/ENG.png");
         this.load.image("okButton", "assets/image/ok(N).png");
     }
 
@@ -45,12 +45,12 @@ export default class TutorialVerificationScene extends Phaser.Scene {
         playerText.y = 650;
 
         // 번역 button
-        const translateButton = scene.add.sprite(0, 1000, "translateButton")
+        const translateENGButton = scene.add.sprite(0, 1000, "translateENGButton")
         .setInteractive()
         .setDepth(1)
         .setScale(0.35)
-        Phaser.Display.Align.In.Center(translateButton, bg);
-        translateButton.visible = false;
+        Phaser.Display.Align.In.Center(translateENGButton, bg);
+        translateENGButton.visible = false;
 
         // objection을 신청하는 button
         const objectionButton = scene.add.sprite(1050, 620, "objectionButton(N)")
@@ -64,10 +64,20 @@ export default class TutorialVerificationScene extends Phaser.Scene {
 
                 Toptext.setText("검증 결과");
                 resultText.setText("번역 버튼을 눌러보세요");
-                translateButton.visible = true;
-                Phaser.Display.Align.In.Center(translateButton, bg);
-                translateButton.y = 620;
-                translateButton.on("pointerup",() => {
+                translateENGButton.visible = true;
+                Phaser.Display.Align.In.Center(translateENGButton, bg);
+                translateENGButton.y = 620;
+                translateENGButton
+                .on("pointerdown",() => {
+                    translateENGButton.setTint(0x888888);
+                    translateENGButton.x += 2;
+                    translateENGButton.y += 2;
+                })
+                .on("pointerup",() => {
+                    translateENGButton.clearTint();
+                    translateENGButton.x -= 2;
+                    translateENGButton.y -= 2;
+
                     resultText.setText("확인 버튼을 눌러 나갈수 있습니다.")
                     if (scene.word === "무대"){
                         wordText.setText(`${scene.word}(stage)`);
