@@ -49,6 +49,21 @@ module.exports = (io) => {
     console.log(
       `A socket connection to the server has been made: ${socket.id}`
     );
+
+    socket.on("nicknamecheck", (nickname) => {
+      // 연결된 소켓들을 가져옵니다.
+      const connectedSockets = io.sockets.sockets;
+      let check = "False";
+
+      connectedSockets.forEach((user) => {
+        if (user['nickname'] && user['nickname'] == nickname){
+          check = "True";
+        }
+      });
+
+      io.to(socket.id).emit("nicknamecheck", (check));
+    })
+
     socket.on("userinfo", (data) => {
       socket['nickname'] = data.nickname;
       socket['profile'] = data.profile;

@@ -30,11 +30,13 @@ export default class LoginScene extends Phaser.Scene {
         this.load.image("profile5", "assets/profile/profile5.png");
         this.load.image("profile6", "assets/profile/profile6.png");
         this.load.image("shuffle", "assets/image/shuffle_button.png");
-        // this.load.image("shuffle", "assets/image/shuffle-button_2.png");
     }
 
     create() {
         const scene = this;
+
+        //socket event제거
+        sharedData.socket.removeAllListeners("nicknamecheck");
 
         scene.add.image(0,0, "login_background").setOrigin(0);
 
@@ -93,12 +95,9 @@ export default class LoginScene extends Phaser.Scene {
           } else {
             console.log(input.value);
             if(isValidNickname(input.value)) {
-              sharedData.socket.userNick = input.value;
-              sharedData.socket.profile = profile;
-              sharedData.socket.emit("userinfo", {nickname: input.value, profile: profile});
-              scene.scene.start("RoomScene");
+              sharedData.socket.emit("nicknamecheck", input.value);
             } else {
-              console.log("별명은 6글자 이내의 한글 혹은 숫자로만 이뤄져야 합니다.");
+              input.value = "";
             }
           }
         })
@@ -108,6 +107,21 @@ export default class LoginScene extends Phaser.Scene {
         .on("pointerout", ()=> {
             LoginButton.setTexture("LoginButton(N)");
         })
+
+        sharedData.socket.on("nicknamecheck", (result) => {
+          const nicknameText = scene.nicknameTextElement;
+          if(result == "False") {
+            sharedData.socket.emit("userinfo", {nickname: input.value, profile: profile});
+            sharedData.socket.userNick = input.value;
+            sharedData.socket.profile = profile;
+            scene.scene.start("RoomScene");
+          } else {
+            input.value = "";
+            nicknameText.innerHTML = "이미 사용중인 닉네임입니다.";
+            nicknameText.classList = "";
+            nicknameText.classList.add("invalid");
+          }
+        });
     }
     update() {
     }
