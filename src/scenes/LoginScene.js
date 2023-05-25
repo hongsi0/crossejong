@@ -43,18 +43,26 @@ export default class LoginScene extends Phaser.Scene {
         let profile = 'profile' + getRandProfileNum();
         let profile_pic = scene.add.image(100,480, profile).setOrigin(0).setScale(0.23).setInteractive();
 
-        scene.add.image(270,635, "shuffle")
+        const shuffle_btn = scene.add.image(270,635, "shuffle")
         .setInteractive()
         .setOrigin(0)
         .setScale(0.15)
         .setDepth(5)
         .on('pointerup', () => {
+          shuffle_btn.clearTint();
+          shuffle_btn.x -= 2;
+          shuffle_btn.y -= 2;
           let new_profile = 'profile' + getRandProfileNum();
           while (new_profile === profile) {
             new_profile = 'profile' + getRandProfileNum();
           }
           profile = new_profile;
           profile_pic.setTexture(profile);
+        })
+        .on('pointerdown', () => {
+          shuffle_btn.setTint(0x888888);
+          shuffle_btn.x += 2;
+          shuffle_btn.y += 2;
         });
 
         scene.inputElement = scene.add.dom(400,810).createFromCache("loginform");
@@ -71,7 +79,7 @@ export default class LoginScene extends Phaser.Scene {
             nicknameText.classList = "";
             nicknameText.classList.add("origin");
           } else if (isValidNickname(input.value)) {
-            nicknameText.innerHTML = "사용 가능한 닉네임입니다!";
+            nicknameText.innerHTML = "사용 가능한 별명입니다!";
             nicknameText.classList = "";
             nicknameText.classList.add("valid");
           } else {
@@ -117,7 +125,7 @@ export default class LoginScene extends Phaser.Scene {
             scene.scene.start("RoomScene");
           } else {
             input.value = "";
-            nicknameText.innerHTML = "이미 사용중인 닉네임입니다.";
+            nicknameText.innerHTML = "이미 사용중인 별명입니다.";
             nicknameText.classList = "";
             nicknameText.classList.add("invalid");
           }
