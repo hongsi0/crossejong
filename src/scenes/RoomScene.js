@@ -21,9 +21,11 @@ export default class RoomScene extends Phaser.Scene {
   preload() {
     this.load.image("background", "assets/image/background.png");
     this.load.image("logo", "assets/image/logo.png");
+    this.load.image("logo_pic", "assets/image/logo_pic.png");
     this.load.image("reload", "assets/image/reload.png");
-    this.load.image("makeroomN", "assets/image/방만들기(N).png");
-    this.load.image("makeroomY", "assets/image/방만들기(Y).png");
+    this.load.image("makeroom", "assets/image/makeroom_btn.png");
+    this.load.image("makeroom_cur", "assets/image/makeroom_btn_cur.png");
+    this.load.image("room_list", "assets/image/room_list.png");
     this.load.html("roomform", "assets/text/roomform.html");
     this.load.html("passwordform", "assets/text/passwordform.html");
     this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
@@ -35,12 +37,23 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("profile5", "assets/profile/profile5.png");
     this.load.image("profile6", "assets/profile/profile6.png");
     this.load.image("shuffle", "assets/image/shuffle_button.png");
-    this.load.image("tutorial", "assets/image/LoginButton.png");
-    // this.load.image("shuffle", "assets/image/shuffle-button_2.png");
+    this.load.image("tutorial_btn", "assets/image/tutorial_btn.png");
+    this.load.image("tutorial_btn_cur", "assets/image/tutorial_btn_cur.png");
+    this.load.image("crossejong_btn", "assets/image/crossejong_btn.png");
+    this.load.image("crossejong_btn_cur", "assets/image/crossejong_btn_cur.png");
+    this.load.image("ravnus_btn", "assets/image/ravnus_btn.png");
+    this.load.image("ravnus_btn_cur", "assets/image/ravnus_btn_cur.png");
+    this.load.image("list_background", "assets/image/new_room_bg.png");
+    this.load.image("out_btn", "assets/image/out_btn.png");
+    this.load.image("out_btn_cur", "assets/image/out_btn_cur.png");
+    this.load.image("menu", "assets/image/menu.png");
   }
 
   create() {
     const scene = this;
+    const graphics = scene.add.graphics();
+    graphics.fillStyle(0xe3c9ae, 1); // 배경 색상 설정
+    graphics.fillRect(0, 0, 1920, 1080); // 사각형 그리기
 
     //socket event 초기화
     sharedData.socket.removeAllListeners("rooms");
@@ -53,26 +66,23 @@ export default class RoomScene extends Phaser.Scene {
     
     scene.waitbgm.play();
 
-    let WordStyle = {font: "50px BR-R", fill: "black"};
-
     //BACKGROUND
-    scene.add.image(0, 0, "background").setOrigin(0);
+    // scene.add.image(0, 0, "background").setOrigin(0);
     
     //LOGO
-    const logo_image = scene.add.image(200,100, "logo").setOrigin(0).setDepth(100);
-    logo_image.scale = 1.2; //resize the logo
-  
+    scene.add.image(50,30, "logo").setOrigin(0,0).setDepth(10);
+    scene.add.image(460,58+10,"logo_pic").setOrigin(0,0).setScale(0.78);
+
     //makeroom
-    const makeroomImage = scene.add.image(950, 130, 'makeroomN')
-    .setOrigin(0)
-    .setDepth(100)
-    .setScale(1.2)
+    const makeroomImage = scene.add.image(50+1183, 322+10, 'makeroom')
+    .setOrigin(1,1)
+    .setDepth(10)
     .setInteractive()
     .on('pointerover', () => {
-      makeroomImage.setTexture("makeroomY");
+      makeroomImage.setTexture("makeroom_cur");
     })
     .on("pointerout", ()=> {
-      makeroomImage.setTexture("makeroomN");
+      makeroomImage.setTexture("makeroom");
     })
     .on("pointerup", () => {
       scene.clicksound.play();
@@ -81,10 +91,9 @@ export default class RoomScene extends Phaser.Scene {
     });
     
     //reload
-    scene.add.image(1200, 250, 'reload')
-    .setOrigin(0)
+    scene.add.image(50+1183-160-10, 310, 'reload')
+    .setOrigin(1,1)
     .setDepth(100)
-    .setScale(1.2)
     .setInteractive()
     .setScale(0.5)
     .on('pointerdown', function () {
@@ -92,61 +101,104 @@ export default class RoomScene extends Phaser.Scene {
       sharedData.socket.emit("getRooms");
     });
 
-    //makeroom
-    const tutorialImage = scene.add.image(1400, 600, 'makeroomN')
-    .setOrigin(0)
+    // player box
+    const player_box = scene.add.graphics();
+    player_box.lineStyle(10, 0x3a2a23, 1);
+    player_box.fillStyle(0xfbdfc1, 1);
+    player_box.strokeRoundedRect(1275, 32, 627-9, 281-9, 15);
+    player_box.fillRoundedRect(1275, 32, 627-9, 281-9, 15);
+
+    //profile_image
+    scene.add.image(1435, 168, sharedData.socket.profile).setOrigin(0.5,0.5).setScale(0.2).setDepth(1);
+
+    //nickname
+    scene.add.text(1700, 130, "별명", {font: "50px BR-R", fill: "#3a2a23"}).setDepth(1).setOrigin(0.5).setFontStyle('bold');
+    scene.add.text(1700, 215, sharedData.socket.userNick, {font: "60px BR-R", fill: "#3a2a23"}).setDepth(1).setOrigin(0.5).setFontStyle('bold');
+
+    let button_x = 1584;
+    let button_y = 540;
+    let button_gap = 145;
+
+    // 안내사항
+    scene.add.image(button_x, button_y-button_gap-10, "menu")
+    .setOrigin(0.5,0.5)
+    .setDepth(10);
+
+    //box_dark
+    const box_dark = scene.add.graphics();
+    box_dark.fillStyle(0xa5866d, 1);
+    box_dark.fillRoundedRect(1584-313.5, 375+49-10, 627, 635+20, 15);
+
+    //box_bright
+    const box_bright = scene.add.graphics();
+    box_bright.fillStyle(0xfcdfc1, 1);
+    box_bright.fillRoundedRect(1584-313.5+20, 375+49+30, 627-40, 460, 15);
+
+    //tutorial
+    const tutorialBtn = scene.add.image(button_x, button_y, "tutorial_btn")
+    .setOrigin(0.5,0.5)
     .setDepth(100)
-    .setScale(1.2)
     .setInteractive()
+    .on("pointerover", () => {
+      tutorialBtn.setTexture("tutorial_btn_cur");
+    })
+    .on("pointerout", () => {
+      tutorialBtn.setTexture("tutorial_btn");
+    })
     .on("pointerup", () => {
       scene.clicksound.play();
       scene.waitbgm.stop();
       scene.scene.start("TutorialScene");
     });
-  
-    scene.popUp = scene.add.graphics();
-    scene.boxes = scene.add.graphics();
-  
-    // for popup window
-    scene.popUp.lineStyle(1, 0xffffff);
-    scene.popUp.fillStyle(0xffffff, 0.5);
-  
-    // for boxes
-    scene.boxes.lineStyle(1, 0xffffff);
-    scene.boxes.fillStyle(0xa9a9a9, 1);
-  
-    // popup window
-    scene.popUp.strokeRect(100, 60, 1720, 960);
-    scene.popUp.fillRect(100, 60, 1720, 960);
-  
-    //popup
-    scene.boxes.strokeRect(150, 380, 1200, 600);
-    scene.boxes.fillRect(150, 380, 1200, 600);
 
-    //profile_image
-    let profile_pic = scene.add.image(1430, 120, sharedData.socket.profile).setOrigin(0).setScale(0.32);
-
-    //profile_shuffle
-    scene.add.image(1680,350, "shuffle")
+    //crossejong
+    const crossejongBtn = scene.add.image(button_x, button_y+button_gap+3, "crossejong_btn")
+    .setOrigin(0.5,0.5)
+    .setDepth(100)
     .setInteractive()
-    .setOrigin(0)
-    .setScale(0.2)
-    .setDepth(5)
-    .on('pointerup', () => {
-      let new_profile = 'profile' + getRandProfileNum();
-      while (new_profile === sharedData.socket.profile) {
-        new_profile = 'profile' + getRandProfileNum();
-      }
-      sharedData.socket.profile = new_profile;
-      sharedData.socket.emit("userinfo",{nickname: sharedData.socket.nickname, profile: sharedData.socket.profile});
-      profile_pic.setTexture(sharedData.socket.profile);
+    .on("pointerover", () => {
+      crossejongBtn.setTexture("crossejong_btn_cur");
+    })
+    .on("pointerout", () => {
+      crossejongBtn.setTexture("crossejong_btn");
+    })
+    .on("pointerup", () => {
+      window.open('https://crossejong.io', '_blank', 'noopener');
     });
 
+    //ravnus
+    const ravnusBtn = scene.add.image(button_x, button_y+button_gap*2+3, "ravnus_btn")
+    .setOrigin(0.5,0.5)
+    .setDepth(100)
+    .setInteractive()
+    .on("pointerover", () => {
+      ravnusBtn.setTexture("ravnus_btn_cur");
+    })
+    .on("pointerout", () => {
+      ravnusBtn.setTexture("ravnus_btn");
+    })
+    .on("pointerup", () => {
+      window.open('https://ravnus.com', '_blank', 'noopener');
+    });
 
-    //nickname
-    scene.add.text(1470, 470, `별명: ${sharedData.socket.userNick}`,WordStyle);
+    //놀이 종료
+    const outBtn = scene.add.image(button_x, button_y+button_gap*3+15, "out_btn")
+    .setOrigin(0.5,0.5)
+    .setDepth(10)
+    .setInteractive()
+    .on("pointerover", () => {
+      outBtn.setTexture("out_btn_cur");
+    })
+    .on("pointerout", () => {
+      outBtn.setTexture("out_btn");
+    })
+    .on("pointerup", () => {
+      //
+    });
 
     //roomlist
+    scene.add.image(50,240,"room_list").setOrigin(0,0);
+    scene.add.image(50,332,"list_background").setOrigin(0,0).setDepth(1);
     scene.roomform = scene.add.dom(230,430).setOrigin(0,0).createFromCache("roomform");
     const list = scene.roomform.getChildByID("listview");
   
