@@ -62,11 +62,16 @@ module.exports = (io) => {
       });
 
       io.to(socket.id).emit("nicknamecheck", (check));
-    })
+    });
 
     socket.on("userinfo", (data) => {
       socket['nickname'] = data.nickname;
       socket['profile'] = data.profile;
+    });
+
+    socket.on("resetprofile", () => {
+      socket['nickname'] = "";
+      socket['profile'] = "";
     });
 
     socket.on("createRoom", (roomKey) => {

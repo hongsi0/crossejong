@@ -193,7 +193,10 @@ export default class RoomScene extends Phaser.Scene {
       outBtn.setTexture("out_btn");
     })
     .on("pointerup", () => {
-      //
+      //LoginScene으로 이동
+      scene.waitbgm.stop();
+      scene.scene.start("LoginScene");
+      sharedData.socket.emit("resetprofile");
     });
 
     //roomlist
