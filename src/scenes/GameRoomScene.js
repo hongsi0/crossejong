@@ -57,7 +57,7 @@ export default class GameRoomScene extends Phaser.Scene {
     .on('pointerout', () =>{
       outbuttonImage.setTexture("outbutton(N)");
     })
-    .on('pointerdown', () => {
+    .on('pointerup', () => {
       scene.clicksound.play();
       scene.waitbgm.stop();
       console.log("click");

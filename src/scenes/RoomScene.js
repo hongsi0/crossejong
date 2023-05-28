@@ -251,7 +251,8 @@ export default class RoomScene extends Phaser.Scene {
         const color = {
           red: "#d73637",
           yellow: "#f39f3b",
-          blue: "#09398e"
+          blue: "#09398e",
+          green: "#017139"
         };
 
         switch(room.difficulty) {
@@ -272,6 +273,12 @@ export default class RoomScene extends Phaser.Scene {
             roomTitleDiv.style.color = color.blue;
             playerNumDiv.style.color = color.blue;
             button.style.backgroundColor = color.blue;
+            break
+          case "동화":
+            levelDiv.style.backgroundColor = color.green;
+            roomTitleDiv.style.color = color.green;
+            playerNumDiv.style.color = color.green;
+            button.style.backgroundColor = color.green;
             break
         };
 
@@ -311,7 +318,6 @@ export default class RoomScene extends Phaser.Scene {
                 cancle_btn.addEventListener("click", (event) => {
                   scene.passwordform.destroy();
                 });
-                // sharedData.socket.emit("isPasswordRight", {password: password});
               } else {
                 sharedData.socket.emit("isKeyValid", room.name); 
               }
