@@ -4,119 +4,99 @@
         src: url("assets/fonts/BR-R.otf") format("opentype");
         font-weight: normal;
   }
-
-  @font-face {
-        font-family: "BR-B";
-        src: url("assets/fonts/BR-B.otf") format("opentype");
-        font-weight: normal;
-  }
-
+  
   #listview {
     position: inherit;
-    height: 570px;
-    width: 1200px;
-    padding: 0;
+    height: 739px;
+    width: 1183px;
+    padding: 0px;
     list-style-type: none;
     overflow-y: scroll;
-    top: -50px;
-    left: -80px;
     padding-bottom: 30px;
+    box-sizing: border-box;
+    background-color: transparent;
   }
 
   #listview li {
-    margin-left: 30px;
-    margin-top: 30px;
-    width: 555px;
+    box-sizing: border-box;
+    margin-left: 59px;
+    margin-top: 50px;
+    width: 503px;
+    height: 181px;
     float: left;
     left: 50%;
-  } 
-
-  .box {
     background-color: white;
-    /* width: 555px;
-    height: 200px; */
-    width: 502px;
-    height: 181px;
-
-    border: solid 0px transparent;
-    border-radius: 20px;
-    overflow: hidden;
-
     font-family: "BR-R";
     font-size: 50px;
+    overflow: hidden;
+    border: solid 0px transparent;
+    border-radius: 20px;
   }
 
   .levelDiv {
-    font-family: "BR-B";
-    font-size: 50px;
-
     position: relative;
-    height: 141px;
-    width: 80px;
+    height: 181px;
+    width: 110px;
     float: left;
     border: solid 0px transparent;
     border-radius: 20px 0px 0px 20px;
     display : flex;
     justify-content : center;
-    padding-top: 25px;
+    padding-top: 18px;
     color: white;
+    font-weight: bold;
   }
 
   .roomTitleDiv {
-    font-family: "BR-B";
-    font-size: 50px;
-
     position: relative;
-    border: solid 0px transparent;
-    border-top-right-radius: 20px;
-    height: 50px;
-    width: 400px;
+    height: 90px;
+    width: 393px;
     float: left;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     padding-left: 20px;
-    padding-top: 20px;
+    padding-top: 18px;
+    box-sizing: border-box;
+    font-size: 45px;
+    font-weight: bold;
   }
 
   .playerNumDiv {
-    font-family: "BR-R";
+    font-size: 35px;
     position: relative;
     border: solid 0px white;
-    height: 60px;
+    height: 90px;
     width: 175px;
     float: left;
     display: flex;
-    justify-content : flex-start;
     align-items: flex-end;
-    padding-left: 25px;
+    justify-content : flex-start;
+    padding-left: 20px;
     padding-bottom: 20px;
-    font-size: 40px;
+    box-sizing: border-box;
   }
 
   .enterDiv {
-    font-family: "BR-R";
-    font-size: 50px;
     position: relative;
     float: right;
-    height: 70px;
+    height: 90px;
     width: 180px;
     border: solid 0px transparent;
     border-bottom-right-radius: 20px;
-    z-index: 1;
-
+    box-sizing: border-box;
     display: flex;
     justify-content : flex-end;
     align-items: center;
     margin-right: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
 
   .enterButton {
-    font-family: "BR-B";
+    font-family: "BR-R";
     font-size: 50px;
+    font-weight: bold;
 
-    width: 120px;
     border: solid 0px transparent;
     border-radius: 20px;
     color: white;
@@ -124,7 +104,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    padding: 10px;
+    padding: 10px 8px 10px 8px;
 
     box-shadow: 1px 2px 0 rgb(0,0,0,0.5);
   }
