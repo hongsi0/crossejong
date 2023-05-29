@@ -857,6 +857,7 @@ export default class GameScene extends Phaser.Scene {
       
         sharedData.socket.on("gameEnd", (data) => {
             scene.gamebgm.stop();
+            scene.scene.stop("GameScene");
             scene.scene.start("GameEndScene", {playerRank:data.playerRank});
         });
     }
