@@ -2,12 +2,6 @@ import Phaser from "phaser";
 import sharedData from "../shared";
 import '../fontLoader';
 
-function getRandProfileNum() {
-  let min = Math.ceil(1);
-  let max = Math.floor(6);
-  return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
-}
-
 function isValidPassword(str) {
   const regex = /^\d{4}$/;
   return regex.test(str);
@@ -19,7 +13,6 @@ export default class RoomScene extends Phaser.Scene {
   }
   
   preload() {
-    this.load.image("background", "assets/image/background.png");
     this.load.image("logo", "assets/image/logo.png");
     this.load.image("logo_pic", "assets/image/logo_pic.png");
     this.load.image("reload", "assets/image/reload.png");
@@ -43,7 +36,7 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("crossejong_btn_cur", "assets/image/crossejong_btn_cur.png");
     this.load.image("ravnus_btn", "assets/image/ravnus_btn.png");
     this.load.image("ravnus_btn_cur", "assets/image/ravnus_btn_cur.png");
-    this.load.image("list_background", "assets/image/new_room_bg.png");
+    this.load.image("list_background", "assets/image/room_bg.png");
     this.load.image("out_btn", "assets/image/out_btn.png");
     this.load.image("out_btn_cur", "assets/image/out_btn_cur.png");
     this.load.image("menu", "assets/image/menu.png");
@@ -65,9 +58,6 @@ export default class RoomScene extends Phaser.Scene {
     scene.clicksound = scene.sound.add("click",{loop:false});
     
     scene.waitbgm.play();
-
-    //BACKGROUND
-    // scene.add.image(0, 0, "background").setOrigin(0);
     
     //LOGO
     scene.add.image(50,30, "logo").setOrigin(0,0).setDepth(10);
@@ -91,14 +81,23 @@ export default class RoomScene extends Phaser.Scene {
     });
     
     //reload
-    scene.add.image(50+1183-160-10, 310, 'reload')
+    let reloadBtn = scene.add.image(50+1183-160-20, 320, 'reload')
     .setOrigin(1,1)
     .setDepth(100)
     .setInteractive()
     .setScale(0.5)
     .on('pointerdown', function () {
+      // reloadBtn.setTint(0x330000);
+      reloadBtn.x += 1;
+      reloadBtn.y += 1;
+
       scene.clicksound.play();
       sharedData.socket.emit("getRooms");
+    })
+    .on('pointerup', () => {
+      // reloadBtn.clearTint();
+      reloadBtn.x -= 1;
+      reloadBtn.y -= 1;
     });
 
     // player box
@@ -163,6 +162,7 @@ export default class RoomScene extends Phaser.Scene {
       crossejongBtn.setTexture("crossejong_btn");
     })
     .on("pointerup", () => {
+      scene.clicksound.play();
       window.open('https://crossejong.io', '_blank', 'noopener');
     });
 
@@ -178,6 +178,7 @@ export default class RoomScene extends Phaser.Scene {
       ravnusBtn.setTexture("ravnus_btn");
     })
     .on("pointerup", () => {
+      scene.clicksound.play();
       window.open('https://ravnus.com', '_blank', 'noopener');
     });
 
@@ -194,6 +195,7 @@ export default class RoomScene extends Phaser.Scene {
     })
     .on("pointerup", () => {
       //LoginScene으로 이동
+      scene.clicksound.play();
       scene.waitbgm.stop();
       scene.scene.start("LoginScene");
       sharedData.socket.emit("resetprofile");
@@ -202,7 +204,7 @@ export default class RoomScene extends Phaser.Scene {
     //roomlist
     scene.add.image(50,240,"room_list").setOrigin(0,0);
     scene.add.image(50,332,"list_background").setOrigin(0,0).setDepth(1);
-    scene.roomform = scene.add.dom(230,430).setOrigin(0,0).createFromCache("roomform");
+    scene.roomform = scene.add.dom(50,332).setOrigin(0,0).createFromCache("roomform");
     const list = scene.roomform.getChildByID("listview");
   
     sharedData.socket.emit("getRooms");
@@ -215,8 +217,8 @@ export default class RoomScene extends Phaser.Scene {
       }
       rooms.forEach((room) => {
         const li = document.createElement("li");
-        const box = document.createElement("div");
-        box.setAttribute("class","box");
+        // const box = document.createElement("div");
+        // box.setAttribute("class","box");
         const levelDiv = document.createElement("div");
         levelDiv.setAttribute("class", "levelDiv");
         const roomTitleDiv = document.createElement("div");
@@ -249,7 +251,8 @@ export default class RoomScene extends Phaser.Scene {
         const color = {
           red: "#d73637",
           yellow: "#f39f3b",
-          blue: "#09398e"
+          blue: "#09398e",
+          green: "#017139"
         };
 
         switch(room.difficulty) {
@@ -271,18 +274,18 @@ export default class RoomScene extends Phaser.Scene {
             playerNumDiv.style.color = color.blue;
             button.style.backgroundColor = color.blue;
             break
+          case "동화":
+            levelDiv.style.backgroundColor = color.green;
+            roomTitleDiv.style.color = color.green;
+            playerNumDiv.style.color = color.green;
+            button.style.backgroundColor = color.green;
+            break
         };
 
         if(room.playing || room.num === 4) {
-          levelDiv.style.filter = "grayscale(100%)";
-          roomTitleDiv.style.filter = "grayscale(100%)";
-          playerNumDiv.style.filter = "grayscale(100%)";
-          button.style.filter = "grayscale(100%)";
+          li.style.filter = "brightness(0.6)";
         } else {
-          levelDiv.style.filter = "grayscale(0%)";
-          roomTitleDiv.style.filter = "grayscale(0%)";
-          playerNumDiv.style.filter = "grayscale(0%)";
-          button.style.filter = "grayscale(0%)";
+          li.style.filter = "brightness(1.0)";
         }
   
         button.addEventListener("click", (event) => {
@@ -315,7 +318,6 @@ export default class RoomScene extends Phaser.Scene {
                 cancle_btn.addEventListener("click", (event) => {
                   scene.passwordform.destroy();
                 });
-                // sharedData.socket.emit("isPasswordRight", {password: password});
               } else {
                 sharedData.socket.emit("isKeyValid", room.name); 
               }
@@ -328,12 +330,17 @@ export default class RoomScene extends Phaser.Scene {
           } 
         })
   
-        box.appendChild(levelDiv);
-        box.appendChild(roomTitleDiv);
-        box.appendChild(playerNumDiv);
-        box.appendChild(enterDiv);
+        // box.appendChild(levelDiv);
+        // box.appendChild(roomTitleDiv);
+        // box.appendChild(playerNumDiv);
+        // box.appendChild(enterDiv);
   
-        li.appendChild(box);
+        // li.appendChild(box);
+
+        li.appendChild(levelDiv);
+        li.appendChild(roomTitleDiv);
+        li.appendChild(playerNumDiv);
+        li.appendChild(enterDiv);
   
         list.appendChild(li);
       });

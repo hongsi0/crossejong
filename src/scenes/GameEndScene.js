@@ -107,8 +107,8 @@ export default class GameEndScene extends Phaser.Scene {
                       }, 250);
                 }, 250);
                 setTimeout(function () {
-        console.log("rank 애니메이션 완료");
-      }, 1000);
+                    console.log("rank 애니메이션 완료");
+                }, 1000);
             }
         });
 
