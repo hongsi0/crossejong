@@ -73,7 +73,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.image("튜토리얼6", "assets/image/튜토리얼6.png");
         this.load.image("튜토리얼7", "assets/image/튜토리얼7.png");
         this.load.image("튜토리얼8", "assets/image/튜토리얼8.png");
-        this.load.image("튜토리얼9", "assets/image/튜토리얼9.png");
+        // this.load.image("튜토리얼9", "assets/image/튜토리얼9.png");
         this.load.image("튜토리얼10", "assets/image/튜토리얼10.png");
         this.load.image("튜토리얼11", "assets/image/튜토리얼11.png");
         this.load.image("튜토리얼12", "assets/image/튜토리얼12.png");
@@ -250,10 +250,22 @@ export default class TutorialScene extends Phaser.Scene {
         .setInteractive()
         .setScale(0.35)
         .setDepth(1)
+        .on("pointerover",() => {
+            finishButton.setTexture("finishButton_cur");
+        })
+        .on("pointerout",() => {
+            finishButton.setTexture("finishButton");
+        })
         .on("pointerdown",() => {
             scene.buttonClicksound.play();
+            finishButton.setTint(0x999999);
+            finishButton.x += 2;
+            finishButton.y += 2;
         })
         .on("pointerup",() => {
+            finishButton.clearTint();
+            finishButton.x -= 2;
+            finishButton.y -= 2;
             scene.sortWord();
             console.log(scene.alphaCards,scene.SubmitWord())
             if (scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {

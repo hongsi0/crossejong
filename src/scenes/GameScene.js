@@ -290,13 +290,27 @@ export default class GameScene extends Phaser.Scene {
         .setInteractive()
         .setScale(0.35)
         .setDepth(1)
+        .on("pointerover",() => {
+            finishButton.setTexture("finishButton_cur");
+        })
+        .on("pointerout",() => {
+            finishButton.setTexture("finishButton");
+        })
         .on("pointerup",() => {
-            scene.buttonClicksound.play();
+            finishButton.clearTint();
+            finishButton.x -= 2;
+            finishButton.y -= 2;
             scene.sortWord();
             console.log(scene.alphaCards,scene.SubmitWord())
             if (scene.myTurn && scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
                 sharedData.socket.emit("launchVerifiScene",{roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word});
             };
+        })
+        .on("pointerdown",() => {
+            scene.buttonClicksound.play();
+            finishButton.setTint(0x999999);
+            finishButton.x += 2;
+            finishButton.y += 2;
         });
       
         // 게임 배경, 로고, 보드, 마지막 단어 바, 마지막 단어
