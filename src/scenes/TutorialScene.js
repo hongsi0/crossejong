@@ -155,7 +155,7 @@ export default class TutorialScene extends Phaser.Scene {
         .setInteractive()
         .setDepth(1)
         .setScale(0.35)
-        .on("pointeron", () => {
+        .on("pointerup", () => {
             let dropcardvals = [];
             scene.direction = "row";
             for(let i = 0; i < scene.dropCards.length; i++) {
@@ -199,7 +199,7 @@ export default class TutorialScene extends Phaser.Scene {
         .setInteractive()
         .setDepth(1)
         .setScale(0.6)
-        .on('pointerover', () => {
+        .on('pointerup', () => {
             if (tutorialImage.texture.key === "튜토리얼1") {
                 tutorialImage.setTexture("튜토리얼2");
             } else if (tutorialImage.texture.key === "튜토리얼2") {
@@ -286,7 +286,7 @@ export default class TutorialScene extends Phaser.Scene {
                     onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
                         card.visible = false;
                         card.alpha = 0.75;
-                        scene.createCard(2);
+                        scene.createCard(1);
                     },
                     onCompleteParams: [scene.cardPreview]
                 });
