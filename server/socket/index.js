@@ -40,6 +40,11 @@ function shuffledeck(difficulty) {
       deck.push(i);
     }
   }
+  else if (difficulty === "동화") {
+    for (let i=165;i<210;i++){
+      deck.push(i)
+    }
+  }
   deck.sort(() => Math.random() - 0.5);
   return deck;
 }
