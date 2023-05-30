@@ -294,6 +294,8 @@ export default class GameScene extends Phaser.Scene {
             returnButton.x -= 2;
             returnButton.y -= 2;
         });
+
+        scene.finishButtonclick = 0
       
         // 자신의 turn을 끝내는 button
         const finishButton = scene.add.sprite(1815, 750, "finishButton")
@@ -312,7 +314,8 @@ export default class GameScene extends Phaser.Scene {
             finishButton.y -= 2;
             scene.sortWord();
             console.log(scene.alphaCards,scene.SubmitWord())
-            if (scene.myTurn && scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
+            if (scene.myTurn && scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord() && scene.finishButtonclick == 0) {
+                scene.finishButtonclick = 1;
                 sharedData.socket.emit("launchVerifiScene",{roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word});
             };
         })
@@ -818,6 +821,7 @@ export default class GameScene extends Phaser.Scene {
             scene.myTurn = false;
             scene.dropped = false;
             scene.deckclick = 0;
+            scene.finishButtonclick = 0;
         });
       
         sharedData.socket.on("verificationresult", (data) => {
