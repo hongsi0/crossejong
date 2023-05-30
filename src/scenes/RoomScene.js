@@ -236,8 +236,6 @@ export default class RoomScene extends Phaser.Scene {
       }
       rooms.forEach((room) => {
         const li = document.createElement("li");
-        // const box = document.createElement("div");
-        // box.setAttribute("class","box");
         const levelDiv = document.createElement("div");
         levelDiv.setAttribute("class", "levelDiv");
         const roomTitleDiv = document.createElement("div");
@@ -348,13 +346,6 @@ export default class RoomScene extends Phaser.Scene {
             console.log("게임 플레이중입니다.");
           } 
         })
-  
-        // box.appendChild(levelDiv);
-        // box.appendChild(roomTitleDiv);
-        // box.appendChild(playerNumDiv);
-        // box.appendChild(enterDiv);
-  
-        // li.appendChild(box);
 
         li.appendChild(levelDiv);
         li.appendChild(roomTitleDiv);
