@@ -9,7 +9,7 @@ let gameOptions = {
     firstBlankX: 500,
     firstBlankY: 155,
     betweenBlank: 70,
-    firstCardX: 600,
+    firstCardX: 650,
     firstCardY: 980,
     betweenCrad: 130,
     handCardMax: 9,
@@ -62,9 +62,30 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.audio("게임bgm", "assets/sound/게임bgm.mp3");
         this.load.image("mute", "assets/image/mute.png");
         this.load.image("unmute", "assets/image/unmute.png");
+        this.load.image("튜토리얼1", "assets/image/튜토리얼1.png");
+        this.load.image("튜토리얼2", "assets/image/튜토리얼2.png");
+        this.load.image("튜토리얼3", "assets/image/튜토리얼3.png");
+        this.load.image("튜토리얼4", "assets/image/튜토리얼4.png");
+        this.load.image("튜토리얼5", "assets/image/튜토리얼5.png");
+        this.load.image("튜토리얼6", "assets/image/튜토리얼6.png");
+        this.load.image("튜토리얼7", "assets/image/튜토리얼7.png");
+        this.load.image("튜토리얼8", "assets/image/튜토리얼8.png");
+        this.load.image("튜토리얼9", "assets/image/튜토리얼9.png");
+        this.load.image("튜토리얼10", "assets/image/튜토리얼10.png");
+        this.load.image("튜토리얼11", "assets/image/튜토리얼11.png");
+        this.load.image("튜토리얼12", "assets/image/튜토리얼12.png");
+        this.load.image("튜토리얼13", "assets/image/튜토리얼13.png");
+        this.load.image("튜토리얼14", "assets/image/튜토리얼14.png");
+        this.load.image("튜토리얼15", "assets/image/튜토리얼15.png");
+        this.load.image("튜토리얼16", "assets/image/튜토리얼16.png");
+
     }
     create() {
         const scene = this;
+        
+        scene.Deckclick = 0;
+        scene.rotate = 0;
+        scene.drop = 0;
 
         //socket event 초기화
         sharedData.socket.removeAllListeners("TutorialcardDrop");
@@ -134,12 +155,90 @@ export default class TutorialScene extends Phaser.Scene {
         .setInteractive()
         .setDepth(1)
         .setScale(0.35)
+        .on("pointeron", () => {
+            let dropcardvals = [];
+            scene.direction = "row";
+            for(let i = 0; i < scene.dropCards.length; i++) {
+                // board를 update한다
+                scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
+                scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
+                // 내턴일때
+                dropcardvals.push(scene.dropCards[i].value);
+                let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+                scene.tweens.add({
+                    targets: scene.dropCards[i],
+                    x: coordinates.x,
+                    y: coordinates.y,
+                    duration: 300,
+                    onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                        dropcard.destroy();
+                    },
+                    onCompleteParams: [scene.dropCards[i]]
+                });
+            }
+            for (let i=0; i<scene.dropCards.length;i++){
+                scene.createCard(dropcardvals[i]);
+            }
+            for (let i = 0; i < scene.alphaCards.length; i++) {
+                scene.alphaCards[i].alpha = 1;
+                scene.alphaCards[i].canclick = true;
+            }
+            scene.alphaCards = [];
+            scene.graphicGroup.clear(true);
+            scene.arrangeCardsInHand();
+            scene.dropCards = [];
+        })
         .on('pointerover', () => {
             returnButton.setTexture("returnButton(Y)");
         })
         .on("pointerout", ()=> {
             returnButton.setTexture("returnButton(N)");
         });
+
+        let tutorialImage = scene.add.sprite(300, 850, "튜토리얼1")
+        .setInteractive()
+        .setDepth(1)
+        .setScale(0.6)
+        .on('pointerover', () => {
+            if (tutorialImage.texture.key === "튜토리얼1") {
+                tutorialImage.setTexture("튜토리얼2");
+            } else if (tutorialImage.texture.key === "튜토리얼2") {
+                tutorialImage.setTexture("튜토리얼3");
+            } else if (tutorialImage.texture.key === "튜토리얼3") {
+                scene.Deckclick = 1;
+                tutorialImage.setTexture("튜토리얼4");
+            } else if (tutorialImage.texture.key === "튜토리얼4" && scene.Deckclick == 0) {
+                tutorialImage.setTexture("튜토리얼5");
+            } else if (tutorialImage.texture.key === "튜토리얼5") {
+                tutorialImage.setTexture("튜토리얼6");
+            } else if (tutorialImage.texture.key === "튜토리얼6") {
+                scene.rotate = 1;
+                tutorialImage.setTexture("튜토리얼7");
+            } else if (tutorialImage.texture.key === "튜토리얼7" && scene.rotate == 0) {
+                tutorialImage.setTexture("튜토리얼8");
+            } else if (tutorialImage.texture.key === "튜토리얼8") {
+                scene.drop = 1;
+                tutorialImage.setTexture("튜토리얼9");
+            } else if (tutorialImage.texture.key === "튜토리얼9") {
+                tutorialImage.setTexture("튜토리얼10");
+            } else if (tutorialImage.texture.key === "튜토리얼10") {
+                tutorialImage.setTexture("튜토리얼11");
+            } else if (tutorialImage.texture.key === "튜토리얼11") {
+                tutorialImage.setTexture("튜토리얼12");
+            } else if (tutorialImage.texture.key === "튜토리얼12") {
+                tutorialImage.setTexture("튜토리얼13");
+            } else if (tutorialImage.texture.key === "튜토리얼13") {
+                tutorialImage.setTexture("튜토리얼14");
+            } else if (tutorialImage.texture.key === "튜토리얼14") {
+                tutorialImage.setTexture("튜토리얼15");
+            } else if (tutorialImage.texture.key === "튜토리얼15") {
+                tutorialImage.setTexture("튜토리얼16");
+            } else if (tutorialImage.texture.key === "튜토리얼16") {
+                scene.scene.stop("TutorialVerificationScene");
+                scene.scene.stop("TutorialScene");
+                scene.scene.start("RoomScene");
+            }
+        })
       
         // 자신의 turn을 끝내는 button
         const finishButton = scene.add.sprite(1815, 750, "finishButton")
@@ -158,10 +257,6 @@ export default class TutorialScene extends Phaser.Scene {
         scene.background = scene.add.sprite(game.config.width / 2, game.config.height / 2, "background");
         scene.logo = scene.add.sprite(200, 120, "logo");
         scene.boardImage = scene.add.sprite(1050, 505, "board").setScale(1.02);
-
-        let fontStyle = {font: "50px BR-R", color: '#d73637', align: 'center'};
-
-        let textBox = this.add.text(600, 200, '가지고 있는 글자를 우클릭해 회전시킬 수 있어요', fontStyle).setOrigin(0,0);
         
         // card를 drop하는 위치에 생기는 preview
         scene.cardPreview = scene.add.sprite(0, 0, "뒷면");
@@ -170,9 +265,34 @@ export default class TutorialScene extends Phaser.Scene {
         scene.cardPreview.displayWidth = gameOptions.cardWidth * gameOptions.blankSizeRatio;
         scene.cardPreview.displayHeight = gameOptions.cardHeight * gameOptions.blankSizeRatio;
         scene.cardPreview.setDepth(3);
-      
+
         // 게임 시작 시 deck을 생성한다
         let deck = scene.add.sprite(1810, 490, "deck").setInteractive().on("pointerup",() => {
+            if(scene.Deckclick) {
+                //게임 시작 후 첫 카드를 받는다
+                scene.cardPreview.x = 1810;
+                scene.cardPreview.y = 490;
+                scene.cardPreview.visible = true;
+                scene.cardPreview.alpha = 1;
+                let coordinates = this.setHandCoordinates(this.handGroup.countActive());
+                if (coordinates.x > gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax){
+                    coordinates.x = gameOptions.firstCardX + gameOptions.betweenCrad * (gameOptions.handCardMax-1);
+                }
+                scene.tweens.add({
+                    targets: scene.cardPreview,
+                    x: coordinates.x,
+                    y: coordinates.y,
+                    duration: 300, // 1초 동안 애니메이션을 실행함
+                    onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
+                        card.visible = false;
+                        card.alpha = 0.75;
+                        scene.createCard(2);
+                    },
+                    onCompleteParams: [scene.cardPreview]
+                });
+                scene.arrangeCardsInHand();
+                scene.Deckclick = 0;
+            }
         });
         deck.setDepth(1);
       
@@ -258,7 +378,7 @@ export default class TutorialScene extends Phaser.Scene {
             card.i = blank.i;
             card.j = blank.j;
             console.log("drop", card.i, card.j)
-            if (card.i == 7 && card.j == 5){
+            if (card.i == 7 && card.j == 5 && scene.drop){
                 if (scene.validLocation(card.i, card.j, "drop")) {
                     scene.cardDropsound.play();
                     // If scene is the first card drop, initialize some letiables and emit an event to other players
@@ -269,8 +389,6 @@ export default class TutorialScene extends Phaser.Scene {
                     sharedData.socket.emit("TutorialcardDrop", {cardval:card.value, i:card.i, j:card.j});
                     scene.cardPreview.visible = false;
                     card.destroy();
-                    textBox.setText("대를 클릭후 완료버튼을 눌러주세요");
-                    textBox.x = 700;
                 } else {
                     // If it's not the player's turn, move the card back to their hand
                     if (!scene.handGroup.contains(card) && !scene.boardGroup.contains(card)) {
@@ -301,28 +419,6 @@ export default class TutorialScene extends Phaser.Scene {
         scene.board[centercard.j][centercard.i].posval = 2;
         scene.board[centercard.j][centercard.i].cardval = 0;
       
-        //게임 시작 후 첫 카드를 받는다
-        scene.cardPreview.x = 1810;
-        scene.cardPreview.y = 490;
-        scene.cardPreview.visible = true;
-        scene.cardPreview.alpha = 1;
-        let coordinates = this.setHandCoordinates(this.handGroup.countActive());
-        if (coordinates.x > gameOptions.firstCardX + gameOptions.betweenCrad * gameOptions.handCardMax){
-            coordinates.x = gameOptions.firstCardX + gameOptions.betweenCrad * (gameOptions.handCardMax-1);
-        }
-        scene.tweens.add({
-            targets: scene.cardPreview,
-            x: coordinates.x,
-            y: coordinates.y,
-            duration: 300, // 1초 동안 애니메이션을 실행함
-            onComplete: function (tween, targets, card) { // 애니메이션이 끝난 후 오브젝트를 삭제함
-                card.visible = false;
-                card.alpha = 0.75;
-                scene.createCard(2);
-            },
-            onCompleteParams: [scene.cardPreview]
-        });
-        scene.arrangeCardsInHand();
         scene.gamebgm.play();
       
         // 다른 유저가 card를 drop하면 자신의 board에 반영한다
@@ -403,8 +499,9 @@ export default class TutorialScene extends Phaser.Scene {
         let coordinates = this.setHandCoordinates(this.handGroup.countActive());
         let card = this.add.sprite(coordinates.x, coordinates.y, this.deckArray[n]).on("pointerdown",(pointer) => {
             if(pointer.rightButtonDown()) {
-                if(this.handGroup.contains(card)) {
+                if(this.handGroup.contains(card) && this.rotate) {
                     this.cardRotation(card);
+                    this.rotate = 0;
                 }
             }
         })
@@ -566,9 +663,6 @@ export default class TutorialScene extends Phaser.Scene {
         if(card.value === 1) {
             card.value = 2;
             card.angle += 90;
-        } else if(card.value === 2) {
-            card.value = 1;
-            card.angle -= 90;
         }
     }
 
