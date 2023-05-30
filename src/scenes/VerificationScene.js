@@ -41,8 +41,8 @@ export default class VerificationScene extends Phaser.Scene {
         let engText = scene.add.text(centerX, 455, "", {font: "60px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5);
         let resultText = scene.add.text(centerX, 520, "", {font: "40px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         let meanText = scene.add.text(centerX, 535, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
-        let playerText = scene.add.text(centerX, 680, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
-        let timeText = scene.add.text(centerX, 775, "5초 후에 게임으로 돌아갑니다.", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
+        let playerText = scene.add.text(centerX, 680, "", {font: "40px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
+        let timeText = scene.add.text(centerX, 780, "5초 후에 게임으로 돌아갑니다.", {font: "40px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         
         meanText.setMaxLines(2); // 최대 2줄로 제한
         meanText.setWordWrapWidth(680); // 최대 가로 길이 설정

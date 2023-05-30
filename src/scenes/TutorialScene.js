@@ -227,9 +227,8 @@ export default class TutorialScene extends Phaser.Scene {
                     let wordText = scene.add.text(centerX, 450, scene.word, {font: "80px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5).setDepth(10);
                     let engText = scene.add.text(centerX, 455, "", {font: "60px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5).setDepth(10);
                     let meanText = scene.add.text(centerX, 535, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
-                    let playerText = scene.add.text(centerX, 680, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
-                    let timeText = scene.add.text(centerX, 775, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
-                    
+                    let playerText = scene.add.text(centerX, 680, "", {font: "40px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
+                                        
                     meanText.setMaxLines(2); // 최대 2줄로 제한
                     meanText.setWordWrapWidth(680); // 최대 가로 길이 설정
                     meanText.setAlign('center'); // 가운데 정렬 설정
