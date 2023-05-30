@@ -353,13 +353,13 @@ export default class GameScene extends Phaser.Scene {
         .setInteractive()
         .setScale(0.2)
         .on("pointerup", () => {
-        if (soundImage.texture.key === "unmute") {
-            scene.gamebgm.pause();
-            soundImage.setTexture("mute");
-        } else if (soundImage.texture.key === "mute") {
-            scene.gamebgm.resume();
-            soundImage.setTexture("unmute");
-        }
+            if (soundImage.texture.key === "unmute") {
+                scene.gamebgm.pause();
+                soundImage.setTexture("mute");
+            } else if (soundImage.texture.key === "mute") {
+                scene.gamebgm.resume();
+                soundImage.setTexture("unmute");
+            }
         });
       
         // 게임 시작 시 deck을 생성한다

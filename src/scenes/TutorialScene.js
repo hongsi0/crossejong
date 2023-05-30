@@ -60,6 +60,8 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.audio("이의제기틀림", "assets/sound/틀림.mp3");
         this.load.audio("내턴", "assets/sound/내턴.mp3");
         this.load.audio("게임bgm", "assets/sound/게임bgm.mp3");
+        this.load.image("mute", "assets/image/mute.png");
+        this.load.image("unmute", "assets/image/unmute.png");
     }
     create() {
         const scene = this;
@@ -110,6 +112,22 @@ export default class TutorialScene extends Phaser.Scene {
         scene.zoneGroup.setDepth(2);
         //alphacards 선택할때 생긴 선 저장하는 group
         scene.graphicGroup = new Phaser.GameObjects.Group(scene);
+
+        // sound
+        const soundImage = scene.add.image(1880, 330, 'unmute')
+        .setOrigin(1, 1)
+        .setDepth(10)
+        .setInteractive()
+        .setScale(0.2)
+        .on("pointerup", () => {
+            if (soundImage.texture.key === "unmute") {
+                scene.gamebgm.pause();
+                soundImage.setTexture("mute");
+            } else if (soundImage.texture.key === "mute") {
+                scene.gamebgm.resume();
+                soundImage.setTexture("unmute");
+            }
+        });
 
         // 자신이 낸 카드를 되돌려받는 button
         const returnButton = scene.add.sprite(1815, 640, "returnButton(N)")
