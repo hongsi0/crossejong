@@ -373,7 +373,7 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // sound
-        const soundImage = scene.add.image(1880, 330, 'unmute')
+        const soundImage = scene.add.image(1850, 330, 'unmute')
         .setOrigin(1, 1)
         .setDepth(10)
         .setInteractive()
