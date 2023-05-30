@@ -195,47 +195,44 @@ export default class TutorialScene extends Phaser.Scene {
             returnButton.setTexture("returnButton(N)");
         });
 
-        let tutorialImage = scene.add.sprite(300, 850, "튜토리얼1")
+        scene.tutorialImage = scene.add.sprite(300, 850, "튜토리얼1")
         .setInteractive()
         .setDepth(1)
         .setScale(0.6)
         .on('pointerup', () => {
-            if (tutorialImage.texture.key === "튜토리얼1") {
-                tutorialImage.setTexture("튜토리얼2");
-            } else if (tutorialImage.texture.key === "튜토리얼2") {
-                tutorialImage.setTexture("튜토리얼3");
-            } else if (tutorialImage.texture.key === "튜토리얼3") {
+            if (scene.tutorialImage.texture.key === "튜토리얼1") {
+                scene.tutorialImage.setTexture("튜토리얼2");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼2") {
+                scene.tutorialImage.setTexture("튜토리얼3");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼3") {
                 scene.Deckclick = 1;
-                tutorialImage.setTexture("튜토리얼4");
-            } else if (tutorialImage.texture.key === "튜토리얼4" && scene.Deckclick == 0) {
-                tutorialImage.setTexture("튜토리얼5");
-            } else if (tutorialImage.texture.key === "튜토리얼5") {
-                tutorialImage.setTexture("튜토리얼6");
-            } else if (tutorialImage.texture.key === "튜토리얼6") {
+                scene.tutorialImage.setTexture("튜토리얼4");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼5") {
+                scene.tutorialImage.setTexture("튜토리얼6");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼6") {
                 scene.rotate = 1;
-                tutorialImage.setTexture("튜토리얼7");
-            } else if (tutorialImage.texture.key === "튜토리얼7" && scene.rotate == 0) {
-                tutorialImage.setTexture("튜토리얼8");
-            } else if (tutorialImage.texture.key === "튜토리얼8") {
+                scene.tutorialImage.setTexture("튜토리얼7");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼8") {
                 scene.drop = 1;
-                tutorialImage.setTexture("튜토리얼9");
-            } else if (tutorialImage.texture.key === "튜토리얼9") {
-                tutorialImage.setTexture("튜토리얼10");
-            } else if (tutorialImage.texture.key === "튜토리얼10") {
-                tutorialImage.setTexture("튜토리얼11");
-            } else if (tutorialImage.texture.key === "튜토리얼11") {
-                tutorialImage.setTexture("튜토리얼12");
-            } else if (tutorialImage.texture.key === "튜토리얼12") {
-                tutorialImage.setTexture("튜토리얼13");
-            } else if (tutorialImage.texture.key === "튜토리얼13") {
-                tutorialImage.setTexture("튜토리얼14");
-            } else if (tutorialImage.texture.key === "튜토리얼14") {
-                tutorialImage.setTexture("튜토리얼15");
-            } else if (tutorialImage.texture.key === "튜토리얼15") {
-                tutorialImage.setTexture("튜토리얼16");
-            } else if (tutorialImage.texture.key === "튜토리얼16") {
+                scene.tutorialImage.setTexture("튜토리얼9");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼9") {
+                scene.tutorialImage.setTexture("튜토리얼10");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼10") {
+                scene.tutorialImage.setTexture("튜토리얼11");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼11") {
+                scene.tutorialImage.setTexture("튜토리얼12");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼12") {
+                scene.tutorialImage.setTexture("튜토리얼13");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼13") {
+                scene.tutorialImage.setTexture("튜토리얼14");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼14") {
+                scene.tutorialImage.setTexture("튜토리얼15");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼15") {
+                scene.tutorialImage.setTexture("튜토리얼16");
+            } else if (scene.tutorialImage.texture.key === "튜토리얼16") {
                 scene.scene.stop("TutorialVerificationScene");
                 scene.scene.stop("TutorialScene");
+                scene.gamebgm.stop();
                 scene.scene.start("RoomScene");
             }
         })
@@ -292,6 +289,9 @@ export default class TutorialScene extends Phaser.Scene {
                 });
                 scene.arrangeCardsInHand();
                 scene.Deckclick = 0;
+                if (scene.tutorialImage.texture.key === "튜토리얼4" && scene.Deckclick == 0) {
+                    scene.tutorialImage.setTexture("튜토리얼5");
+                } 
             }
         });
         deck.setDepth(1);
@@ -502,6 +502,9 @@ export default class TutorialScene extends Phaser.Scene {
                 if(this.handGroup.contains(card) && this.rotate) {
                     this.cardRotation(card);
                     this.rotate = 0;
+                    if (this.tutorialImage.texture.key === "튜토리얼7" && this.rotate == 0) {
+                        this.tutorialImage.setTexture("튜토리얼8");
+                    } 
                 }
             }
         })
