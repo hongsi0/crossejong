@@ -129,6 +129,11 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("천", "assets/cards/천.png");
         this.load.image("학", "assets/cards/학.png");
         this.load.image("호", "assets/cards/호.png");
+        //동화
+        this.load.image("물", "assets/cards/물.png");
+        this.load.image("방", "assets/cards/방.png");
+        this.load.image("왕", "assets/cards/왕.png");
+        this.load.image("미", "assets/cards/미.png");
         // 초급 cardRotation
         this.load.image("믄", "assets/cards/믄.png");
         this.load.image("무", "assets/cards/무.png");
@@ -143,6 +148,10 @@ export default class GameScene extends Phaser.Scene {
         // 고급 cardRotation
         this.load.image("곤", "assets/cards/곤.png");
         this.load.image("곰", "assets/cards/곰.png");
+        // 동화 cardRotation
+        this.load.image("롬", "assets/cards/롬.png");
+        this.load.image("므", "assets/cards/므.png");
+
 
         this.load.audio("카드클릭", "assets/sound/딸깍.mp3");
         this.load.audio("카드내려놓기", "assets/sound/놓기.mp3");
@@ -230,7 +239,16 @@ export default class GameScene extends Phaser.Scene {
         // 중급 cardRotation시에 새로 생기는 index 152~158
         "운", "논", "마", "우", "융", "야", "으",
         // 고급 cardRotation시에 새로 생기는 index 159~164
-        "논", "곤", "마", "곰", "야", "으"];
+        "논", "곤", "마", "곰", "야", "으",
+        //동화 index 165~209
+        '가', '거', '고', '공', '구', '국', '기', '나', '대', '도',
+        '동', '리', '마', '무', '물', '미', '방', '보', '부', '비',
+        '사', '상', '생', '성', '소', '수', '시', '식', '신', '아',
+        '안', '어', '왕', '의', '이', '인', '일', '자', '장', '전',
+        '정', '제', '주', '지', '하',
+        // 동화 rotation 210 ~
+        "롬" , "므", "우", "오", "으"
+        ];
       
         // board에 drop된 card들을 저장하는 group
         scene.boardGroup = new Phaser.GameObjects.Group(scene);
@@ -1206,6 +1224,54 @@ export default class GameScene extends Phaser.Scene {
         else if(card.value === 164) {
             card.value = 130;
             card.angle += 270;
+        }
+        else if(card.value === 177) {
+            card.value = 178;
+            card.angle += 90;
+        }
+        else if(card.value === 178) {
+            card.value = 177;
+            card.angle -= 90;
+        }
+        else if(card.value === 179) {
+            card.value = 210;
+            card.angle += 180;
+        }
+        else if(card.value === 210) {
+            card.value = 179;
+            card.angle -= 180;
+        }
+        else if(card.value === 180) {
+            card.value = 211;
+            card.angle += 90;
+        }
+        else if(card.value === 211) {
+            card.value = 180;
+            card.angle -= 90;
+        }
+        else if(card.value === 194) {
+            card.value = 212;
+            card.angle += 90;
+        }
+        else if(card.value === 212) {
+            card.value = 194;
+            card.angle -= 90;
+        }
+        else if(card.value === 196) {
+            card.value = 213;
+            card.angle += 90;
+        }
+        else if(card.value = 213) {
+            card.value = 196;
+            card.angle -= 90;
+        }
+        else if(card.value = 199) {
+            card.value = 214;
+            card.angle += 90;
+        }
+        else if(card.value = 214) {
+            card.value = 199;
+            card.angle -= 90;
         }
     }
 
