@@ -283,6 +283,16 @@ export default class GameScene extends Phaser.Scene {
         })
         .on("pointerout", ()=> {
             returnButton.setTexture("returnButton(N)");
+        })
+        .on("pointerdown",() => {
+            returnButton.setTint(0xAAAAAA);
+            returnButton.x += 2;
+            returnButton.y += 2;
+        })
+        .on("pointerup",() => {
+            returnButton.clearTint();
+            returnButton.x -= 2;
+            returnButton.y -= 2;
         });
       
         // 자신의 turn을 끝내는 button
@@ -308,7 +318,7 @@ export default class GameScene extends Phaser.Scene {
         })
         .on("pointerdown",() => {
             scene.buttonClicksound.play();
-            finishButton.setTint(0x999999);
+            finishButton.setTint(0xAAAAAA);
             finishButton.x += 2;
             finishButton.y += 2;
         });
