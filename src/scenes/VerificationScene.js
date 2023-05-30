@@ -45,7 +45,7 @@ export default class VerificationScene extends Phaser.Scene {
         let timeText = scene.add.text(centerX, 775, "5초 후에 게임으로 돌아갑니다.", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         
         meanText.setMaxLines(2); // 최대 2줄로 제한
-        meanText.setWordWrapWidth(725); // 최대 가로 길이 설정
+        meanText.setWordWrapWidth(680); // 최대 가로 길이 설정
         meanText.setAlign('center'); // 가운데 정렬 설정
 
         // 번역 button
@@ -88,7 +88,7 @@ export default class VerificationScene extends Phaser.Scene {
             wordText.setFontSize(75);
             Toptext.setText("검증 결과");
             resultText.setText("존재하지 않는 단어입니다.");
-            playerText.setText(`${data.nick}님이 카드 한장을 받습니다.`);
+            playerText.setText(`${data.nick}님이 카드 한 장을 받습니다.`);
 
             wordText.y = 420;
 
@@ -114,7 +114,7 @@ export default class VerificationScene extends Phaser.Scene {
                 translateENGButton.y += 1;
             });
             meanText.setText(data.def);
-            playerText.setText(`${data.nick}님이 카드 한장을 받습니다.`);
+            playerText.setText(`${data.nick}님이 카드 한 장을 받습니다.`);
 
             wordText.y = 380;
 

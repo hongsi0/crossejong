@@ -34,7 +34,6 @@ export default class TutorialScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.html("playerlistform", "assets/text/playerlistform.html");
         this.load.image("background", "assets/image/background.png");
         this.load.image("blank", "assets/image/blank.png");
         this.load.image("deck", "assets/image/deck.png");
@@ -47,6 +46,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.image("leftArrange", "assets/image/leftArrange.png");
         this.load.image("returnButton(N)", "assets/image/return(N).png");
         this.load.image("returnButton(Y)", "assets/image/return(Y).png");
+
         // 초급
         this.load.image("대", "assets/cards/대.png");
         this.load.image("마", "assets/cards/마.png");
@@ -60,8 +60,10 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.audio("이의제기틀림", "assets/sound/틀림.mp3");
         this.load.audio("내턴", "assets/sound/내턴.mp3");
         this.load.audio("게임bgm", "assets/sound/게임bgm.mp3");
+
         this.load.image("mute", "assets/image/mute.png");
         this.load.image("unmute", "assets/image/unmute.png");
+
         this.load.image("튜토리얼1", "assets/image/튜토리얼1.png");
         this.load.image("튜토리얼2", "assets/image/튜토리얼2.png");
         this.load.image("튜토리얼3", "assets/image/튜토리얼3.png");
@@ -79,6 +81,10 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.image("튜토리얼15", "assets/image/튜토리얼15.png");
         this.load.image("튜토리얼16", "assets/image/튜토리얼16.png");
 
+        this.load.image("veri_box", "assets/image/veri_box.png");
+        this.load.image("objection_btn", "assets/image/objection_btn.png");
+        this.load.image("objection_btn_cur", "assets/image/objection_btn_cur.png");
+        this.load.image("translateENGButton", "assets/image/ENG.png");
     }
     create() {
         const scene = this;
@@ -96,6 +102,7 @@ export default class TutorialScene extends Phaser.Scene {
         scene.direction = "row"; // 자신의 card drop이 row인지 column인지를 나타낸다
         scene.dropped = false; // drop을 1번 이상 했는지를 나타낸다
         let isMouseOver = false;
+        let objectionButtonClicked = false;
 
         scene.cardClicksound = scene.sound.add("카드클릭",{loop:false});
         scene.cardDropsound = scene.sound.add("카드내려놓기",{loop:false});
@@ -230,7 +237,7 @@ export default class TutorialScene extends Phaser.Scene {
             } else if (scene.tutorialImage.texture.key === "튜토리얼15") {
                 scene.tutorialImage.setTexture("튜토리얼16");
             } else if (scene.tutorialImage.texture.key === "튜토리얼16") {
-                scene.scene.stop("TutorialVerificationScene");
+                // scene.scene.stop("TutorialVerificationScene");
                 scene.scene.stop("TutorialScene");
                 scene.gamebgm.stop();
                 scene.scene.start("RoomScene");
@@ -241,12 +248,83 @@ export default class TutorialScene extends Phaser.Scene {
         const finishButton = scene.add.sprite(1815, 750, "finishButton")
         .setInteractive()
         .setDepth(1)
-        .on("pointerup",() => {
+        .on("pointerdown",() => {
             scene.buttonClicksound.play();
+        })
+        .on("pointerup",() => {
             scene.sortWord();
             console.log(scene.alphaCards,scene.SubmitWord())
             if (scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
-                scene.scene.launch("TutorialVerificationScene", scene.word);
+                // scene.scene.launch("TutorialVerificationScene", scene.word);
+                let bg = scene.add.image(1050, 500, "veri_box").setScale(0.8).setDepth(9);
+                let centerX = bg.getCenter().x;
+
+                let Toptext = scene.add.text(centerX, 240, "이의제기 가능", {font: "65px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
+                let wordText = scene.add.text(centerX, 450, scene.word, {font: "80px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5).setDepth(10);
+                let engText = scene.add.text(centerX, 455, "", {font: "60px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5).setDepth(10);
+                let meanText = scene.add.text(centerX, 535, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
+                let playerText = scene.add.text(centerX, 680, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
+                let timeText = scene.add.text(centerX, 775, "5초 후에 게임으로 돌아갑니다.", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
+                
+                meanText.setMaxLines(2); // 최대 2줄로 제한
+                meanText.setWordWrapWidth(680); // 최대 가로 길이 설정
+                meanText.setAlign('center'); // 가운데 정렬 설정
+
+                // 번역 button
+                const translateENGButton = scene.add.sprite(centerX, 460, "translateENGButton")
+                .setInteractive()
+                .setDepth(11)
+                .setScale(0.75)
+                translateENGButton.visible = false;
+
+                // objection을 신청하는 button
+                const objectionButton = scene.add.sprite(1050, 670, "objection_btn")
+                .setInteractive()
+                .setDepth(11)
+                .setScale(0.8)
+                .on("pointerup",() => {
+                    if (!objectionButtonClicked){
+                        objectionButtonClicked = true;
+                        objectionButton.clearTint();
+                        objectionButton.x -= 2;
+                        objectionButton.y -= 2;
+                        objectionButton.visible = false;
+
+                        // verificationTrue
+                        wordText.setFontSize(70);
+                        wordText.y = 380;
+                        Toptext.setText("검증 결과");
+                        meanText.setText("연극, 무용, 음악 등을 공연하기 위하여 객석 앞에 좀 높게 만들어 놓은 넓은 자리.");
+                        playerText.setText("별명님이 카드 한 장을 받습니다.");
+                        translateENGButton.visible = true;
+                        translateENGButton
+                        .on("pointerup",() => {
+                            translateENGButton.clearTint();
+                            translateENGButton.x -= 1;
+                            translateENGButton.y -= 1;
+                            translateENGButton.visible = false;
+                            engText.setText("Stage");
+                        })
+                        .on("pointerdown",() => {
+                            translateENGButton.setTint(0x999999);
+                            translateENGButton.x += 1;
+                            translateENGButton.y += 1;
+                        });
+                    }
+                })
+                .on("pointerdown", () => {
+                    if (!objectionButtonClicked) {
+                        objectionButton.setTint(0x999999);
+                        objectionButton.x += 2;
+                        objectionButton.y += 2;
+                    }
+                })
+                .on('pointerover', () => {
+                    objectionButton.setTexture("objection_btn_cur");
+                })
+                .on("pointerout", ()=> {
+                    objectionButton.setTexture("objection_btn");
+                });
             };
         });
       
