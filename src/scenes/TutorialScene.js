@@ -73,14 +73,13 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.image("튜토리얼6", "assets/image/튜토리얼6.png");
         this.load.image("튜토리얼7", "assets/image/튜토리얼7.png");
         this.load.image("튜토리얼8", "assets/image/튜토리얼8.png");
-        // this.load.image("튜토리얼9", "assets/image/튜토리얼9.png");
+        this.load.image("튜토리얼9", "assets/image/튜토리얼9.png");
         this.load.image("튜토리얼10", "assets/image/튜토리얼10.png");
         this.load.image("튜토리얼11", "assets/image/튜토리얼11.png");
         this.load.image("튜토리얼12", "assets/image/튜토리얼12.png");
         this.load.image("튜토리얼13", "assets/image/튜토리얼13.png");
         this.load.image("튜토리얼14", "assets/image/튜토리얼14.png");
         this.load.image("튜토리얼15", "assets/image/튜토리얼15.png");
-        this.load.image("튜토리얼16", "assets/image/튜토리얼16.png");
 
         this.load.image("veri_box", "assets/image/veri_box.png");
         this.load.image("objection_btn", "assets/image/objection_btn.png");
@@ -163,7 +162,16 @@ export default class TutorialScene extends Phaser.Scene {
         .setInteractive()
         .setDepth(1)
         .setScale(0.35)
+        .on("pointerdown",() => {
+            returnButton.setTint(0xAAAAAA);
+            returnButton.x += 2;
+            returnButton.y += 2;
+        })
         .on("pointerup", () => {
+            returnButton.clearTint();
+            returnButton.x -= 2;
+            returnButton.y -= 2;
+
             let dropcardvals = [];
             scene.direction = "row";
             for(let i = 0; i < scene.dropCards.length; i++) {
@@ -238,7 +246,6 @@ export default class TutorialScene extends Phaser.Scene {
             } else if (scene.tutorialImage.texture.key === "튜토리얼15") {
                 scene.tutorialImage.setTexture("튜토리얼16");
             } else if (scene.tutorialImage.texture.key === "튜토리얼16") {
-                // scene.scene.stop("TutorialVerificationScene");
                 scene.scene.stop("TutorialScene");
                 scene.gamebgm.stop();
                 scene.scene.start("RoomScene");
@@ -258,7 +265,7 @@ export default class TutorialScene extends Phaser.Scene {
         })
         .on("pointerdown",() => {
             scene.buttonClicksound.play();
-            finishButton.setTint(0x999999);
+            finishButton.setTint(0xAAAAAA);
             finishButton.x += 2;
             finishButton.y += 2;
         })
@@ -269,7 +276,7 @@ export default class TutorialScene extends Phaser.Scene {
             scene.sortWord();
             console.log(scene.alphaCards,scene.SubmitWord())
             if (scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
-                // scene.scene.launch("TutorialVerificationScene", scene.word);
+                // verification
                 let bg = scene.add.image(1050, 500, "veri_box").setScale(0.8).setDepth(9);
                 let centerX = bg.getCenter().x;
 
