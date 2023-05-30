@@ -7,6 +7,7 @@ export default class VerificationScene extends Phaser.Scene {
     }
 
     init(data){
+        this.played = data.played;
         this.turnPlayer = data.turnPlayer;
         this.word = data.word;
     }
@@ -69,7 +70,7 @@ export default class VerificationScene extends Phaser.Scene {
         .setDepth(1)
         .setScale(0.7)
         .on("pointerup",() => {
-            if (!objectionButtonClicked && this.turnPlayer != sharedData.socket.id){
+            if (!objectionButtonClicked && this.turnPlayer != sharedData.socket.id && scene.played){
                 objectionButtonClicked = true;
                 sharedData.socket.emit("objection", {roomKey:sharedData.roomKey, id:sharedData.socket.id, word:scene.word});
             }

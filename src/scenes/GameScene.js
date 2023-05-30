@@ -373,7 +373,7 @@ export default class GameScene extends Phaser.Scene {
                     if (dropZone.y >= (yrange[i] - temp) && dropZone.y <= yrange[i]+ gameOptions.cardHeight * gameOptions.blankSizeRatio - temp){
                         ypos = yrange[i];
                     }
-                }
+                } 
                 if (xpos != 0 && ypos != 0){
                     scene.cardPreview.visible = true;
                     scene.cardPreview.x = xpos;
@@ -463,7 +463,7 @@ export default class GameScene extends Phaser.Scene {
         sharedData.socket.emit("ready", sharedData.roomKey);
 
         sharedData.socket.on("launchVerifiScene", (data) => {
-            scene.scene.launch("VerificationScene", {turnPlayer: data.id, word:data.word});
+            scene.scene.launch("VerificationScene", {turnPlayer: data.id, word:data.word, played:scene.players[sharedData.socket.id].played});
         })
 
         sharedData.socket.on("returnCard", (id) => {
