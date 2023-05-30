@@ -38,8 +38,8 @@ export default class VerificationScene extends Phaser.Scene {
 
         let Toptext = scene.add.text(centerX, 240, "이의제기 가능", {font: "65px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         let wordText = scene.add.text(centerX, 450, scene.word, {font: "80px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5);
-        let engText = scene.add.text(centerX, 455, "", {font: "55px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5);
-        let resultText = scene.add.text(centerX, 470, "", {font: "55px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
+        let engText = scene.add.text(centerX, 455, "", {font: "60px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5);
+        let resultText = scene.add.text(centerX, 520, "", {font: "40px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         let meanText = scene.add.text(centerX, 535, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         let playerText = scene.add.text(centerX, 680, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
         let timeText = scene.add.text(centerX, 775, "5초 후에 게임으로 돌아갑니다.", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5);
@@ -72,7 +72,7 @@ export default class VerificationScene extends Phaser.Scene {
         })
         .on("pointerdown", () => {
             if (!objectionButtonClicked && this.turnPlayer != sharedData.socket.id && scene.played){
-                objectionButton.setTint(0x888888);
+                objectionButton.setTint(0x999999);
                 objectionButton.x += 2;
                 objectionButton.y += 2;
             }
@@ -85,12 +85,12 @@ export default class VerificationScene extends Phaser.Scene {
         });
 
         sharedData.socket.on("verificationFalse", (data) => {
-            wordText.setFontSize(70);
+            wordText.setFontSize(75);
             Toptext.setText("검증 결과");
             resultText.setText("존재하지 않는 단어입니다.");
             playerText.setText(`${data.nick}님이 카드 한장을 받습니다.`);
 
-            wordText.y = 400;
+            wordText.y = 420;
 
             objectionButton.visible = false;
 
