@@ -387,11 +387,14 @@ export default class GameScene extends Phaser.Scene {
                 soundImage.setTexture("unmute");
             }
         });
+
+        scene.deckclick = 0
       
         // 게임 시작 시 deck을 생성한다
         let deck = scene.add.sprite(1810, 490, "deck").setInteractive().on("pointerup",() => {
             // 자신의 turn이며 아직 card를 drop하지 않았을 때 작동한다
-            if(scene.myTurn) {
+            if(scene.myTurn && scene.deckclick == 0) {
+                scene.deckclick = 1;
                 scene.cardClicksound.play();
                 // deck을 click하면 card를 1장 생성한다
                 sharedData.socket.emit("pickcard", {roomKey:sharedData.roomKey, type:"end"});
@@ -814,6 +817,7 @@ export default class GameScene extends Phaser.Scene {
             }
             scene.myTurn = false;
             scene.dropped = false;
+            scene.deckclick = 0;
         });
       
         sharedData.socket.on("verificationresult", (data) => {
