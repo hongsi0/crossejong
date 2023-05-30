@@ -227,12 +227,12 @@ export default class MakeroomScene extends Phaser.Scene {
 
     fairyButton.addEventListener("click", (event) => {
       scene.clicksound.play();
-      difficulty = "고급";
+      difficulty = "동화";
       while (fairyButton.firstChild) {
         fairyButton.removeChild(fairyButton.firstChild);
       }
       const newButton = document.createElement("img");
-      newButton.src = "assets/image/고급(Y).png";
+      newButton.src = "assets/image/동화(Y).png";
       newButton.style.transform = "scale(0.65)";
       fairyButton.appendChild(newButton);
 
@@ -273,7 +273,7 @@ export default class MakeroomScene extends Phaser.Scene {
     });
     
     fairyButton.addEventListener("mouseleave", (event) => {
-      if (isMouseOver && difficulty != "고급") {
+      if (isMouseOver && difficulty != "동화") {
         while (fairyButton.firstChild) {
           fairyButton.removeChild(fairyButton.firstChild);
         }
