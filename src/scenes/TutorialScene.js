@@ -73,7 +73,6 @@ export default class TutorialScene extends Phaser.Scene {
         this.load.image("튜토리얼6", "assets/image/튜토리얼6.png");
         this.load.image("튜토리얼7", "assets/image/튜토리얼7.png");
         this.load.image("튜토리얼8", "assets/image/튜토리얼8.png");
-        // this.load.image("튜토리얼9", "assets/image/튜토리얼9.png");
         this.load.image("튜토리얼10", "assets/image/튜토리얼10.png");
         this.load.image("튜토리얼11", "assets/image/튜토리얼11.png");
         this.load.image("튜토리얼12", "assets/image/튜토리얼12.png");
@@ -164,37 +163,6 @@ export default class TutorialScene extends Phaser.Scene {
         .setDepth(1)
         .setScale(0.35)
         .on("pointerup", () => {
-            let dropcardvals = [];
-            scene.direction = "row";
-            for(let i = 0; i < scene.dropCards.length; i++) {
-                // board를 update한다
-                scene.board[scene.dropCards[i].j][scene.dropCards[i].i].posval = -1;
-                scene.board[scene.dropCards[i].j][scene.dropCards[i].i].cardval = -1;
-                // 내턴일때
-                dropcardvals.push(scene.dropCards[i].value);
-                let coordinates = this.setHandCoordinates(this.handGroup.countActive());
-                scene.tweens.add({
-                    targets: scene.dropCards[i],
-                    x: coordinates.x,
-                    y: coordinates.y,
-                    duration: 300,
-                    onComplete: function (tween, targets, dropcard) { // 애니메이션이 끝난 후 오브젝트를 삭제함
-                        dropcard.destroy();
-                    },
-                    onCompleteParams: [scene.dropCards[i]]
-                });
-            }
-            for (let i=0; i<scene.dropCards.length;i++){
-                scene.createCard(dropcardvals[i]);
-            }
-            for (let i = 0; i < scene.alphaCards.length; i++) {
-                scene.alphaCards[i].alpha = 1;
-                scene.alphaCards[i].canclick = true;
-            }
-            scene.alphaCards = [];
-            scene.graphicGroup.clear(true);
-            scene.arrangeCardsInHand();
-            scene.dropCards = [];
         })
         .on('pointerover', () => {
             returnButton.setTexture("returnButton(Y)");
@@ -220,23 +188,12 @@ export default class TutorialScene extends Phaser.Scene {
             } else if (scene.tutorialImage.texture.key === "튜토리얼6") {
                 scene.rotate = 1;
                 scene.tutorialImage.setTexture("튜토리얼7");
-            } else if (scene.tutorialImage.texture.key === "튜토리얼8") {
-                scene.drop = 1;
-                scene.tutorialImage.setTexture("튜토리얼9");
-            } else if (scene.tutorialImage.texture.key === "튜토리얼9") {
-                scene.tutorialImage.setTexture("튜토리얼10");
             } else if (scene.tutorialImage.texture.key === "튜토리얼10") {
                 scene.tutorialImage.setTexture("튜토리얼11");
-            } else if (scene.tutorialImage.texture.key === "튜토리얼11") {
-                scene.tutorialImage.setTexture("튜토리얼12");
-            } else if (scene.tutorialImage.texture.key === "튜토리얼12") {
-                scene.tutorialImage.setTexture("튜토리얼13");
             } else if (scene.tutorialImage.texture.key === "튜토리얼13") {
                 scene.tutorialImage.setTexture("튜토리얼14");
             } else if (scene.tutorialImage.texture.key === "튜토리얼14") {
                 scene.tutorialImage.setTexture("튜토리얼15");
-            } else if (scene.tutorialImage.texture.key === "튜토리얼15") {
-                scene.tutorialImage.setTexture("튜토리얼16");
             } else if (scene.tutorialImage.texture.key === "튜토리얼16") {
                 // scene.scene.stop("TutorialVerificationScene");
                 scene.scene.stop("TutorialScene");
@@ -267,6 +224,9 @@ export default class TutorialScene extends Phaser.Scene {
             finishButton.x -= 2;
             finishButton.y -= 2;
             scene.sortWord();
+            if (scene.tutorialImage.texture.key === "튜토리얼11") {
+                scene.tutorialImage.setTexture("튜토리얼12");
+            }
             console.log(scene.alphaCards,scene.SubmitWord())
             if (scene.dropped && scene.alphaCards.length>1 && scene.SubmitWord()) {
                 // scene.scene.launch("TutorialVerificationScene", scene.word);
@@ -278,7 +238,7 @@ export default class TutorialScene extends Phaser.Scene {
                 let engText = scene.add.text(centerX, 455, "", {font: "60px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5).setDepth(10);
                 let meanText = scene.add.text(centerX, 535, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
                 let playerText = scene.add.text(centerX, 680, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
-                let timeText = scene.add.text(centerX, 775, "5초 후에 게임으로 돌아갑니다.", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
+                let timeText = scene.add.text(centerX, 775, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
                 
                 meanText.setMaxLines(2); // 최대 2줄로 제한
                 meanText.setWordWrapWidth(680); // 최대 가로 길이 설정
@@ -309,7 +269,7 @@ export default class TutorialScene extends Phaser.Scene {
                         wordText.y = 380;
                         Toptext.setText("검증 결과");
                         meanText.setText("연극, 무용, 음악 등을 공연하기 위하여 객석 앞에 좀 높게 만들어 놓은 넓은 자리.");
-                        playerText.setText("별명님이 카드 한 장을 받습니다.");
+                        playerText.setText(`${sharedData.userNick}님이 카드 한 장을 받습니다.`);
                         translateENGButton.visible = true;
                         translateENGButton
                         .on("pointerup",() => {
@@ -323,7 +283,14 @@ export default class TutorialScene extends Phaser.Scene {
                             translateENGButton.setTint(0x999999);
                             translateENGButton.x += 1;
                             translateENGButton.y += 1;
+                            if (scene.tutorialImage.texture.key === "튜토리얼15") {
+                                scene.tutorialImage.setTexture("튜토리얼16");
+                            }
                         });
+
+                        if (scene.tutorialImage.texture.key === "튜토리얼12") {
+                            scene.tutorialImage.setTexture("튜토리얼13");
+                        }
                     }
                 })
                 .on("pointerdown", () => {
@@ -488,6 +455,10 @@ export default class TutorialScene extends Phaser.Scene {
                         scene.arrangeCardsInHand();
                     }
                 }
+                if (scene.tutorialImage.texture.key === "튜토리얼8") {
+                    scene.drop = 0;
+                    scene.tutorialImage.setTexture("튜토리얼10");
+                } 
             } else {
                 scene.handGroup.add(card);
                 scene.arrangeCardsInHand();
@@ -595,8 +566,10 @@ export default class TutorialScene extends Phaser.Scene {
                     this.cardRotation(card);
                     this.rotate = 0;
                     if (this.tutorialImage.texture.key === "튜토리얼7" && this.rotate == 0) {
+                        this.drop = 1;
                         this.tutorialImage.setTexture("튜토리얼8");
-                    } 
+                    }
+                    this.setCardOrigin(card);
                 }
             }
         })
