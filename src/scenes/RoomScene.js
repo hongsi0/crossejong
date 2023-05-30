@@ -66,11 +66,11 @@ export default class RoomScene extends Phaser.Scene {
     scene.add.image(460,58+10,"logo_pic").setOrigin(0,0).setScale(0.78);
 
     // sound
-    const soundImage = scene.add.image(50+1160, 322-170, 'unmute')
+    const soundImage = scene.add.image(50+1160+10, 322-170, 'unmute')
     .setOrigin(1, 1)
     .setDepth(10)
     .setInteractive()
-    .setScale(0.2)
+    .setScale(0.13)
     .on("pointerup", () => {
       if (soundImage.texture.key === "unmute") {
         scene.waitbgm.pause();

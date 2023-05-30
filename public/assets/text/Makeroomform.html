@@ -7,12 +7,12 @@
 
     .text-overlay {
         position: absolute;
-        left: 0px;
+        left: -30px;
     }
 
     .input-overlay {
         position: absolute;
-        left: 230px;
+        left: 200px;
     }
 
     .user-input {
@@ -21,17 +21,13 @@
         font-family: "BR-R";
         font-size: 50px;
         padding: 5px;
-        width: 500px;
+        width: 550px;
         border: 0px;
     }
     ::placeholder
     {
         color: #9b8573;
         font-size: 47px;
-    }
-
-    #user_roompw {
-        width: 340px;
     }
 
     .a_text {
@@ -71,39 +67,46 @@
     
     #basicButton {
         position: absolute;
-        top: 430px;
-        left: 20px;
+        top: 400px;
+        left: -75px;
     }
 
     #normalButton {
         position: absolute;
-        top: 430px;
-        left: 290px;
+        top: 400px;
+        left: 140px;
     }
 
     #hardButton {
         position: absolute;
-        top: 430px;
-        left: 560px;
+        top: 400px;
+        left: 355px;
+    }
+
+    #fairyButton {
+        position: absolute;
+        top: 400px;
+        left: 570px;
     }
     
     #makeButton {
         position: absolute;
-        top: 570px;
+        top: 575px;
+        left: -10px;
     }
 
     #exitButton {
         position: absolute;
-        top: 570px;
-        left: 435px;
+        top: 575px;
+        left: 450px;
     }
     
     .level-image {
-        transform: scale(1.25);
+        transform: scale(0.65);
     }
 
     .confirm-image {
-        transform: scale(1.1);
+        transform: scale(1.27);
     }
 
     #background {
@@ -116,7 +119,7 @@
 <div id="image-container">
     <img id="background" src="assets/image/createRoom.png">
     <div class="text-overlay" id="roomname">
-        <a class="a_text">방 이름</a>
+        <a class="a_text">방이름</a>
     </div>
     <div class="input-overlay" id="roomname_input">
         <input type="text" class="user-input" placeholder="공백 포함 한글 8글자 이내" id="user_roomname">
@@ -133,6 +136,7 @@
     <div id="basicButton"><img class="level-image" src="assets/image/초급(N).png"></div>
     <div id="normalButton"><img class="level-image" src="assets/image/중급(N).png"></div>
     <div id="hardButton"><img class="level-image" src="assets/image/고급(N).png"></div>
+    <div id="fairyButton"><img class="level-image" src="assets/image/동화(N).png"></div>
     <div id="makeButton"><img class="confirm-image" src="assets/image/방만들기(N).png"></div>
     <div id="exitButton"><img class="confirm-image" src="assets/image/취소(N).png"></div>
 </div>

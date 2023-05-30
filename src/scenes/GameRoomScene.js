@@ -53,7 +53,7 @@ export default class GameRoomScene extends Phaser.Scene {
     .setOrigin(1, 1)
     .setDepth(10)
     .setInteractive()
-    .setScale(0.2)
+    .setScale(0.13)
     .on("pointerup", () => {
     if (soundImage.texture.key === "unmute") {
         scene.waitbgm.pause();

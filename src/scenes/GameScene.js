@@ -39,6 +39,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("blank", "assets/image/blank.png");
         this.load.image("deck", "assets/image/deck.png");
         this.load.image("finishButton", "assets/image/finishButton.png");
+        this.load.image("finishButton_cur", "assets/image/finishButton_cur.png");
         this.load.image("logo", "assets/image/logo.png");
         this.load.image("board", "assets/image/board.png");
         this.load.image("뒷면", "assets/image/뒷면.png");
@@ -287,6 +288,7 @@ export default class GameScene extends Phaser.Scene {
         // 자신의 turn을 끝내는 button
         const finishButton = scene.add.sprite(1815, 750, "finishButton")
         .setInteractive()
+        .setScale(0.35)
         .setDepth(1)
         .on("pointerup",() => {
             scene.buttonClicksound.play();
@@ -351,7 +353,7 @@ export default class GameScene extends Phaser.Scene {
         .setOrigin(1, 1)
         .setDepth(10)
         .setInteractive()
-        .setScale(0.2)
+        .setScale(0.13)
         .on("pointerup", () => {
             if (soundImage.texture.key === "unmute") {
                 scene.gamebgm.pause();
