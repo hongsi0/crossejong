@@ -19,6 +19,8 @@ export default class GameRoomScene extends Phaser.Scene {
     this.load.html("chatform", "assets/text/chatform.html");
     this.load.audio("대기방bgm", "assets/sound/대기방bgm.mp3");
     this.load.audio("click", "assets/sound/놓기.mp3");
+    this.load.image("mute", "assets/image/mute.png");
+    this.load.image("unmute", "assets/image/unmute.png");
   }
   create() {
     const scene = this;
@@ -45,6 +47,22 @@ export default class GameRoomScene extends Phaser.Scene {
     scene.logo = scene.add.sprite(200, 120, "logo");
     scene.roomnameBar = scene.add.sprite(990, 85, "roomnameBar");
     scene.roomname = scene.add.text(490, 60, `방 ${sharedData.roomKey}`, WordStyle).setOrigin(0,0);
+
+    // sound
+    const soundImage = scene.add.image(1800, 330, 'unmute')
+    .setOrigin(1, 1)
+    .setDepth(10)
+    .setInteractive()
+    .setScale(0.2)
+    .on("pointerup", () => {
+    if (soundImage.texture.key === "unmute") {
+        scene.waitbgm.pause();
+        soundImage.setTexture("mute");
+    } else if (soundImage.texture.key === "mute") {
+        scene.waitbgm.resume();
+        soundImage.setTexture("unmute");
+    }
+    });
   
     const outbuttonImage = scene.add.image(1600, 800, 'outbutton(N)')
     .setOrigin(0)

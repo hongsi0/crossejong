@@ -40,6 +40,8 @@ export default class RoomScene extends Phaser.Scene {
     this.load.image("out_btn", "assets/image/out_btn.png");
     this.load.image("out_btn_cur", "assets/image/out_btn_cur.png");
     this.load.image("menu", "assets/image/menu.png");
+    this.load.image("mute", "assets/image/mute.png");
+    this.load.image("unmute", "assets/image/unmute.png");
   }
 
   create() {
@@ -62,6 +64,23 @@ export default class RoomScene extends Phaser.Scene {
     //LOGO
     scene.add.image(50,30, "logo").setOrigin(0,0).setDepth(10);
     scene.add.image(460,58+10,"logo_pic").setOrigin(0,0).setScale(0.78);
+
+    // sound
+    const soundImage = scene.add.image(50+1160, 322-170, 'unmute')
+    .setOrigin(1, 1)
+    .setDepth(10)
+    .setInteractive()
+    .setScale(0.2)
+    .on("pointerup", () => {
+      if (soundImage.texture.key === "unmute") {
+        scene.waitbgm.pause();
+        soundImage.setTexture("mute");
+      } else if (soundImage.texture.key === "mute") {
+        scene.waitbgm.resume();
+        soundImage.setTexture("unmute");
+      }
+    });
+
 
     //makeroom
     const makeroomImage = scene.add.image(50+1183, 322+10, 'makeroom')
