@@ -144,7 +144,7 @@ export default class TutorialScene extends Phaser.Scene {
         scene.graphicGroup = new Phaser.GameObjects.Group(scene);
 
         // sound
-        const soundImage = scene.add.image(1880, 330, 'unmute')
+        const soundImage = scene.add.image(1850, 120, 'unmute')
         .setOrigin(1, 1)
         .setDepth(10)
         .setInteractive()
@@ -203,17 +203,19 @@ export default class TutorialScene extends Phaser.Scene {
             finishButton.setTexture("finishButton");
         })
         .on("pointerdown",() => {
-            scene.buttonClicksound.play();
-            finishButton.setTint(0xAAAAAA);
-            finishButton.x += 2;
-            finishButton.y += 2;
+            if (scene.boardclick){
+                scene.buttonClicksound.play();
+                finishButton.setTint(0xAAAAAA);
+                finishButton.x += 2;
+                finishButton.y += 2;
+            }
         })
         .on("pointerup",() => {
-            finishButton.clearTint();
-            finishButton.x -= 2;
-            finishButton.y -= 2;
             scene.sortWord();
             if (scene.boardclick){
+                finishButton.clearTint();
+                finishButton.x -= 2;
+                finishButton.y -= 2;
                 if (scene.tutorialImage.texture.key === "튜토리얼10") {
                     scene.tutorialImage.setTexture("튜토리얼11");
                 }
@@ -228,7 +230,7 @@ export default class TutorialScene extends Phaser.Scene {
                     let engText = scene.add.text(centerX, 455, "", {font: "60px BR-R", color: "#3a2b23"}).setFontStyle('bold').setOrigin(0.5, 0.5).setDepth(10);
                     let meanText = scene.add.text(centerX, 535, "", {font: "35px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
                     let playerText = scene.add.text(centerX, 680, "", {font: "40px BR-R", color: "#3a2b23"}).setOrigin(0.5, 0.5).setDepth(10);
-                                        
+
                     meanText.setMaxLines(2); // 최대 2줄로 제한
                     meanText.setWordWrapWidth(680); // 최대 가로 길이 설정
                     meanText.setAlign('center'); // 가운데 정렬 설정
@@ -258,7 +260,7 @@ export default class TutorialScene extends Phaser.Scene {
                             wordText.y = 380;
                             Toptext.setText("검증 결과");
                             meanText.setText("연극, 무용, 음악 등을 공연하기 위하여 객석 앞에 좀 높게 만들어 놓은 넓은 자리.");
-                            playerText.setText(`${sharedData.userNick}님이 카드 한 장을 받습니다.`);
+                            playerText.setText(`${sharedData.socket.userNick}님이 카드 한 장을 받습니다.`);
                             translateENGButton.visible = true;
                             translateENGButton
                             .on("pointerup",() => {

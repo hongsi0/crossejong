@@ -49,7 +49,7 @@ export default class GameRoomScene extends Phaser.Scene {
     scene.roomname = scene.add.text(490, 60, `방 ${sharedData.roomKey}`, WordStyle).setOrigin(0,0);
 
     // sound
-    const soundImage = scene.add.image(1800, 330, 'unmute')
+    const soundImage = scene.add.image(1850, 120, 'unmute')
     .setOrigin(1, 1)
     .setDepth(10)
     .setInteractive()
@@ -134,8 +134,9 @@ export default class GameRoomScene extends Phaser.Scene {
     scene.inputElement.on("click", function (event) {
       console.log("click");
       event.preventDefault();
-      scene.clicksound.play();
+      // scene.clicksound.play();
       if (event.target.id === "sendchat") {
+        scene.clicksound.play();
         const input = scene.inputElement.getChildByID("chat-input");
         if(input.value != "") {
           sharedData.socket.emit("chat", input.value, sharedData.roomKey);
